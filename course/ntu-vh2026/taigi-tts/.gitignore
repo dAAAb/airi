@@ -1,0 +1,12 @@
+.venv*/
+__pycache__/
+*.pyc
+.source-*/
+*.partial
+*.log
+*.pid
+kaedetai/GPT-SoVITS/
+kaedetai/models/
+kaedetai/outputs/
+mms/model/
+mms/output/

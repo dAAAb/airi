@@ -8,6 +8,17 @@ local/
 *.aac
 *.log
 *.pid
+installer/resources/
+installer/build/
+desktop/dist/
+desktop/resources/
+**/payload/
+**/runtimes/
+**/models/
+*.dmg
+*.zip
+*.tar
+*.part-*
 
 # Keep sanitized, committed experiment evidence despite root result* ignore.
 !/results/

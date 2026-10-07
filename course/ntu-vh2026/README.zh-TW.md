@@ -2,14 +2,16 @@
 
 這是臺大「虛擬人與遙現」第五週的本機語音實驗。先固定 VRM 角色，再比較語音辨識（STT）、語言模型（LLM）與語音合成（TTS）。測試記錄日期：**2026-10-07**。
 
-**可以本機重現：Breeze2 台灣華語 TTS、Breeze-ASR-26 社群 MLX 版檔案轉錄。台語 BreezyVoice 26 只有官方展示，這裡沒有提供台語 TTS 權重或宣稱完成本機合成。**
+**2026-10-07 更新：已在本機 Chrome 完成台語聽說，並由操作者確認。** 新組合是 Breeze-ASR-26＋SARC 台語 LLM＋Taibun＋KaedeTai TTS；設定、成功與失敗案例、重現限制見[本機台語對話筆記](TAIGI-LOCAL-NOTES.zh-TW.md)。聯發科 BreezyVoice 26 仍只有官方展示；KaedeTai 是另一個社群台語模型。
+
+想從介面選模型與啟動兩種角色，請看 [AIRI Local Mac 安裝包說明](installer/README.zh-TW.md)。下面保留手動安裝與比較實驗，方便修改程式、追蹤每一層的結果。
 
 | 名稱 | 耳朵／嘴巴 | 這次真的做了什麼 |
 | --- | --- | --- |
 | MediaTek Breeze2-VITS-onnx | 嘴巴：台灣華語 | Sherpa-ONNX CPU、本機 HTTP 服務、AIRI TTS 測試通過。不是台語 TTS，也沒有用 MLX。 |
-| MediaTek Breeze-ASR-26 → RayyTien MLX 4-bit | 耳朵：台語／華語音訊轉文字 | Apple Silicon MLX 離線檔案轉錄，修正 tokenizer 相容問題。尚未接成 AIRI 即時麥克風 provider。 |
+| MediaTek Breeze-ASR-26 → RayyTien MLX 4-bit | 耳朵：台語／華語音訊轉文字 | Apple Silicon MLX 檔案轉錄，修正 tokenizer 相容問題。新增常駐 HTTP provider，可接 AIRI 麥克風音訊片段。 |
 | MediaTek BreezyVoice 26 / BreezyVoice-Taigi | 嘴巴：台語 | 僅聽官方預錄展示。截至查核日未找到公開權重或可驗證的相應 MLX 版。 |
-| Kokoro-82M | 嘴巴：含中文聲線 | 原課堂對照，使用 `zf_xiaobei`。這個 lab 不另包 Kokoro 服務。 |
+| Kokoro-82M | 嘴巴：含中文聲線 | 原課堂對照，使用 `zf_xiaobei`。AIRI Local 安裝器新增本機服務。 |
 
 ASR 的 987 MB 是主要量化權重檔，不是 TTS 大小，也不是執行時 RAM。模型來源、社群轉換者、執行後端必須分開記錄。
 
@@ -96,7 +98,7 @@ asr26/.venv/bin/python asr26/transcribe.py /path/to/your-recording.wav --json
 
 `model-assets.py` 固定本次下載的 revision 並核對 SHA-256。重跑不加 `--download` 只驗證本機檔案。已有模型可加 `--model-dir /path/to/model`，轉錄與 tokenizer 驗證也支援同一參數。
 
-這是**檔案轉錄**，沒有接管 AIRI 麥克風或改掉原 STT 設定。先以真人錄音驗證，再另外實作串流、語音結束判定、打斷與 AIRI provider。音檔推論快於播放時間，不代表整條對話已即時。
+上述指令是**檔案轉錄**。現在也提供[常駐 HTTP provider](asr26/README.zh-TW.md)，以 `http://127.0.0.1:8001/v1/` 接收 AIRI 麥克風音訊片段。它收完一段再辨識，並不是 token 級串流。音檔推論快於播放時間，不代表整條 STT→LLM→TTS 對話已即時。
 
 ### 真的修到什麼
 

@@ -1,0 +1,50 @@
+{
+  "unit_tests": 11,
+  "audio_saved": false,
+  "checks": [
+    {
+      "model": "kokoro",
+      "status": 200,
+      "seconds": 0.271,
+      "content_type": "audio/wav",
+      "bytes": 130502,
+      "cors": "http://127.0.0.1:5174",
+      "route": "kokoro",
+      "cache_control": "no-store",
+      "sample_rate": 24000,
+      "channels": 1,
+      "audio_seconds": 2.717,
+      "duration_method": "Actual decoded PCM bytes; backend streaming WAV header uses a placeholder frame count"
+    },
+    {
+      "model": "taigi-hanzi",
+      "status": 200,
+      "seconds": 0.368,
+      "content_type": "audio/wav",
+      "bytes": 71724,
+      "cors": "http://127.0.0.1:5174",
+      "route": "taigi-hanzi",
+      "cache_control": "no-store",
+      "sample_rate": 32000,
+      "channels": 1,
+      "audio_seconds": 1.12
+    },
+    {
+      "case": "upstream-error-passthrough",
+      "hub_status": 422,
+      "direct_status": 422,
+      "same_body": true,
+      "content_type_preserved": true,
+      "response": {
+        "detail": "This experimental adapter supports WAV/MP3 at speed 1 only"
+      }
+    },
+    {
+      "case": "arbitrary-target-rejected",
+      "status": 400,
+      "response": {
+        "detail": "Select model kokoro or taigi-hanzi"
+      }
+    }
+  ]
+}

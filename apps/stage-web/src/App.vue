@@ -30,6 +30,7 @@ import { toast, Toaster } from 'vue-sonner'
 
 import PerformanceOverlay from './components/Devtools/PerformanceOverlay.vue'
 
+import { useLocalInstaller } from './composables/local-installer'
 import { usePWAStore } from './stores/pwa'
 
 usePWAStore()
@@ -51,6 +52,7 @@ const settingsAudioDeviceStore = useSettingsAudioDevice()
 const { showingSetup } = storeToRefs(onboardingStore)
 const { isDark } = useTheme()
 const cardStore = useAiriCardStore()
+const { applyLocalInstallerConfiguration } = useLocalInstaller()
 useArtistryStore()
 useConsciousnessStore()
 useHearingStore()
@@ -157,6 +159,7 @@ async function loadStartup() {
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
     })
+    await applyLocalInstallerConfiguration()
     await startup.run('chat', () => chatStore.initialize(syncedPinia))
     await startup.run('services', () => {
       void serverChannelStore.initialize({ possibleEvents: ['ui:configure'] }).catch(error => console.error('Mods server initialization failed:', error))

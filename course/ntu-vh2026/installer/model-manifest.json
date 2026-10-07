@@ -1,0 +1,274 @@
+{
+  "files": [
+    {
+      "model": "asr26",
+      "path": "asr26/model/README.md",
+      "bytes": 4229,
+      "sha256": "a177a03008be3359d08026a506257bd1422e791bc6ae25a18e08d7a61c3ceb0d",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/README.md"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/added_tokens.json",
+      "bytes": 34604,
+      "sha256": "9715fd2243b6f06a5858b5e32950d2853f73dd5bc201aafcf76f5082a2d8acd1",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/added_tokens.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/config.json",
+      "bytes": 1691,
+      "sha256": "feb09a1442c64f34c445f30b562cb8997512f495a821562b26b7e2641476c8c7",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/config.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/generation_config.json",
+      "bytes": 4289,
+      "sha256": "7847d293b436a6d190000b643e653a9f5527cae162988253103436fda9004d3e",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/generation_config.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/merges.txt",
+      "bytes": 493869,
+      "sha256": "2df2990a395e35e8dfbc7511e08c12d56018d8d04691e0133e5d63b21e154dc6",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/merges.txt"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/model.safetensors",
+      "bytes": 987203850,
+      "sha256": "cd10da804a92764cd4e95d47375be29029733555a8adf2f5cf1739fabd8134cd",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/model.safetensors"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/model.safetensors.index.json",
+      "bytes": 151183,
+      "sha256": "dc14519b1f756bea3b6f846a795f80afc3c73edcbe1daacf0f5f1fd59c5956ec",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/model.safetensors.index.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/normalizer.json",
+      "bytes": 52666,
+      "sha256": "bf1c507dc8724ca9cf9903640dacfb69dae2f00edee4f21ceba106a7392f26dd",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/normalizer.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/preprocessor_config.json",
+      "bytes": 339,
+      "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/preprocessor_config.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/special_tokens_map.json",
+      "bytes": 2194,
+      "sha256": "e67ae3a0aaa99abcd9f187138e12db1f65c16a14761c50ef10eef2c174a7a691",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/special_tokens_map.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/tokenizer_config.json",
+      "bytes": 282713,
+      "sha256": "21a4fc0483c14b87f4e0bbc177a9a357479bfa7c95aaf21ad53d71e9c5afafb9",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/tokenizer_config.json"
+    },
+    {
+      "model": "asr26",
+      "path": "asr26/model/vocab.json",
+      "bytes": 1036584,
+      "sha256": "50d6a919f0a0601d56a04eb583c780d18553aa388254ba3158eb6a00f13e2c1a",
+      "url": "https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit/resolve/4f05d1e9ad363554f42ef2380724ede531966046/vocab.json"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/s1_trilingual.ckpt",
+      "bytes": 155618362,
+      "sha256": "620efd37a310848cdb7c29ba30190c8b30a179aff93afac7557d5c366b526002",
+      "url": "https://huggingface.co/KaedeTai/gpt-sovits-tw/resolve/fa251907be54b63277377a96a23377fd7f00e323/s1_trilingual.ckpt"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/s2_r4_e15.pth",
+      "bytes": 951598381,
+      "sha256": "1621dfe40d57e75b4fef61fd6a4265e6836d4e88cca6b57a9f523ec2a2974bc8",
+      "url": "https://huggingface.co/KaedeTai/gpt-sovits-tw/resolve/fa251907be54b63277377a96a23377fd7f00e323/s2_r4_e15.pth"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/chinese-hubert-base/config.json",
+      "bytes": 1449,
+      "sha256": "c3e5060a1277e0f078cc6be9da4528a605dba6ece93018981fe2c820e5c7b103",
+      "url": "https://huggingface.co/lj1995/GPT-SoVITS/resolve/8f8857563c040d542de108a2c18b0425abd6c9c5/chinese-hubert-base/config.json"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/chinese-hubert-base/preprocessor_config.json",
+      "bytes": 212,
+      "sha256": "dcd684124d06722947939d41ea6ae58dbf10968c60a11a29f23ddc602c64a29b",
+      "url": "https://huggingface.co/lj1995/GPT-SoVITS/resolve/8f8857563c040d542de108a2c18b0425abd6c9c5/chinese-hubert-base/preprocessor_config.json"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/chinese-hubert-base/pytorch_model.bin",
+      "bytes": 188811417,
+      "sha256": "24164f129c66499d1346e2aa55f183250c223161ec2770c0da3d3b08cf432d3c",
+      "url": "https://huggingface.co/lj1995/GPT-SoVITS/resolve/8f8857563c040d542de108a2c18b0425abd6c9c5/chinese-hubert-base/pytorch_model.bin"
+    },
+    {
+      "model": "kaedetai",
+      "path": "kaedetai/models/sv/pretrained_eres2netv2w24s4ep4.ckpt",
+      "bytes": 107528697,
+      "sha256": "4f5a0bf73c61eb41b174e1bb54e7ee3c83233892be8e0af1f187024e8e581a35",
+      "url": "https://huggingface.co/lj1995/GPT-SoVITS/resolve/8f8857563c040d542de108a2c18b0425abd6c9c5/sv/pretrained_eres2netv2w24s4ep4.ckpt"
+    },
+    {
+      "model": "kokoro",
+      "path": "kokoro/config.json",
+      "bytes": 2351,
+      "sha256": "5abb01e2403b072bf03d04fde160443e209d7a0dad49a423be15196b9b43c17f",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/config.json"
+    },
+    {
+      "model": "kokoro",
+      "path": "kokoro/kokoro-v1_0.pth",
+      "bytes": 327212226,
+      "sha256": "496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/kokoro-v1_0.pth"
+    },
+    {
+      "model": "kokoro",
+      "path": "kokoro/voices/zf_xiaobei.pt",
+      "bytes": 523435,
+      "sha256": "9b76be63dab4f4f96962030acc0126a9aee9728608fbbe115e2b58a2bd504df6",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/f3ff3571791e39611d31c381e3a41a3af07b4987/voices/zf_xiaobei.pt"
+    }
+  ],
+  "services": [
+    {
+      "id": "asr26",
+      "requires": [
+        "asr26"
+      ],
+      "executable": "runtimes/asr/bin/python3.12",
+      "args": [
+        "-B",
+        "-m",
+        "uvicorn",
+        "server:app",
+        "--app-dir",
+        "{resources}/course/ntu-vh2026/asr26",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18001",
+        "--workers",
+        "1",
+        "--no-access-log"
+      ],
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "BREEZE_ASR26_MODEL_DIR": "{payload}/asr26/model"
+      },
+      "port": 18001,
+      "health": "/health"
+    },
+    {
+      "id": "kokoro",
+      "requires": [
+        "kokoro"
+      ],
+      "executable": "runtimes/kokoro/bin/python3.12",
+      "args": [
+        "-B",
+        "{resources}/installer/kokoro-server.py"
+      ],
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "AIRI_KOKORO_MODELS_DIR": "{payload}/kokoro",
+        "AIRI_KOKORO_PORT": "18880"
+      },
+      "port": 18880,
+      "health": "/health"
+    },
+    {
+      "id": "kaedetai",
+      "requires": [
+        "kaedetai"
+      ],
+      "executable": "runtimes/taigi/bin/python3.11",
+      "args": [
+        "-B",
+        "{resources}/course/ntu-vh2026/taigi-tts/kaedetai/serve-taigi.py"
+      ],
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "AIRI_TAIGI_MODELS_DIR": "{payload}/kaedetai/models",
+        "AIRI_TAIGI_SOURCE_DIR": "{resources}/upstream/kaedetai",
+        "AIRI_TAIBUN_PYTHON": "{resources}/runtimes/taigi/bin/python3.11",
+        "AIRI_TAIBUN_SCRIPT": "{resources}/course/ntu-vh2026/taigi-tts/transliterate.py",
+        "AIRI_TAIGI_PORT": "18883",
+        "AIRI_TAIGI_ALLOWED_ORIGINS": "http://127.0.0.1:17900"
+      },
+      "port": 18883,
+      "health": "/health"
+    },
+    {
+      "id": "speech-hub",
+      "requires": [],
+      "executable": "runtimes/asr/bin/python3.12",
+      "args": [
+        "-B",
+        "-m",
+        "uvicorn",
+        "server:app",
+        "--app-dir",
+        "{resources}/course/ntu-vh2026/local-speech-hub",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18884",
+        "--no-access-log"
+      ],
+      "env": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "AIRI_DESKTOP_MODE": "1"
+      },
+      "port": 18884,
+      "health": "/health"
+    }
+  ],
+  "format_version": 1,
+  "offline": false,
+  "ollama_models": [
+    {
+      "id": "qwen",
+      "path": "registry.ollama.ai/library/qwen3.5/0.8b",
+      "manifest_sha256": "de63045f29755d4721c09d54c9b45c2dadb644f4fd7d604d4cac90d96049971c",
+      "ollama_model_digest": "de63045f29755d4721c09d54c9b45c2dadb644f4fd7d604d4cac90d96049971c",
+      "bytes": 1322069277
+    },
+    {
+      "id": "sarc-taigi",
+      "manifest_sha256": "4e3a8b383ad5f06ea445a62699b93505c052afbf93c066a3848125ed6173142a",
+      "ollama_model_digest": "66544e32e46623d914413577b2b353c853d071612f7304792b817d924554930b",
+      "bytes": 7300779932,
+      "path": "hf.co/Speech-AI-Research-Center/SARC-Taigi-LLM-12b-GGUF/Q4_K_M"
+    },
+    {
+      "id": "gemma4",
+      "manifest_sha256": "2577ea3d73f81c16a6b1c1c4721371a99631c13edcee2a4cd248e37671b6e693",
+      "ollama_model_digest": "38044be4f923e5a55264ed7df4eaac2676651a905f735197c504045140c02bd3",
+      "bytes": 7151004663,
+      "path": "registry.ollama.ai/library/gemma4/12b-it-qat"
+    }
+  ]
+}

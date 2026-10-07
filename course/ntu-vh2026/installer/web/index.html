@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>AIRI Local · 本機角色實驗室</title>
+  <link rel="stylesheet" href="/setup/style.css">
+  <script type="module" src="/setup/setup.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow"><span class="dot"></span> AIRI LOCAL <span>本機角色實驗室</span></div>
+      <h1>讓角色在這台 Mac<br>聽懂，也開口。</h1>
+      <p class="lead">華語對話、台語實驗、看圖與語音。<br>選好模型，接上自己的虛擬人。</p>
+      <p id="scope" class="scope">正在確認安裝包內容…這組推論服務只連到本機；麥克風需由您在瀏覽器授權。</p>
+    </header>
+
+    <section aria-labelledby="models-title">
+      <div class="section-head"><h2 id="models-title"><span>01</span> 選擇模型</h2><span id="size-summary">讀取中…</span></div>
+      <div class="presets" aria-label="模型組合預設">
+        <button type="button" data-preset="lite" aria-pressed="false" disabled><strong>輕量華語</strong><small>Qwen 0.8B ＋ Breeze ＋ Kokoro</small></button>
+        <button type="button" data-preset="full" aria-pressed="false" disabled><strong>完整台語</strong><small>Gemma 4 ＋ SARC ＋ Breeze ＋ 雙語 TTS</small></button>
+      </div>
+      <div id="models" class="models" aria-label="可安裝模型"></div>
+      <p id="disk-summary" class="hint"></p>
+      <p class="hint">完整組合建議至少 32 GB 統一記憶體，這是配置估計，並非最低需求實測。上方大小只計模型權重，不含執行環境。</p>
+      <p class="hint">輕量版先做華語聽說與看圖；完整台語版再加 Gemma 4、SARC 與 KaedeTai。兩版共用 Breeze 聽覺。可勾選自訂組合。</p>
+    </section>
+
+    <section aria-labelledby="runtime-title">
+      <h2 id="runtime-title"><span>02</span> 選擇執行方式</h2>
+      <fieldset id="runtime-options" class="runtime"><legend class="sr-only">Ollama 執行方式</legend>
+        <label><input type="radio" name="ollama-mode" value="bundled" checked><span><strong>使用隨附 Ollama</strong><small>獨立模型目錄與連接埠，不修改既有 Ollama 設定。</small></span></label>
+        <label><input type="radio" name="ollama-mode" value="existing"><span><strong>使用已啟動的 Ollama</strong><small>連到 127.0.0.1:11434，可沿用相同版本的已下載模型。</small></span></label>
+      </fieldset>
+    </section>
+
+    <section aria-labelledby="licenses-title">
+      <h2 id="licenses-title"><span>03</span> 模型授權</h2>
+      <p class="hint">各模型保留原作者授權與來源。SARC 的 Gemma 條款包含用途限制，選用時請閱讀並確認。</p>
+      <div id="licenses" class="licenses"></div>
+      <p class="hint">台語是實驗功能，口音、字音與夾雜語言仍有侷限。</p>
+    </section>
+
+    <section class="status-panel" aria-labelledby="status-title">
+      <h2 id="status-title">準備開始</h2>
+      <p id="status-message" role="status" aria-live="polite">正在連線到本機安裝服務…</p>
+      <progress id="progress" max="100" value="0" aria-label="目前工作進度" hidden></progress>
+      <p id="error" role="alert" hidden></p>
+      <div class="actions">
+        <button id="install" disabled>下載並驗證</button>
+        <button id="start" class="secondary" disabled>啟動 AIRI</button>
+        <button id="cancel" class="text-button" hidden>停止下載</button>
+        <a id="open-airi" class="button" href="/?localSetup=1" hidden>開啟角色</a>
+      </div>
+      <p class="hint">按「啟動 AIRI」後會建立本機專用角色與服務設定，保留既有角色卡。開啟麥克風後，辨識文字會自動送出；您可在聽覺設定關閉。您也可再匯入第四週製作的 VRM。</p>
+    </section>
+    <footer>AIRI × 虛擬人與遙現 · 台灣語音實驗<br>Apple Silicon Mac · 模型各自授權 · 2026</footer>
+  </main>
+  <dialog id="license-dialog" aria-labelledby="license-dialog-title">
+    <div class="dialog-head">
+      <h2 id="license-dialog-title">模型條款</h2>
+      <button id="license-dialog-close" type="button" class="secondary" autofocus>關閉</button>
+    </div>
+    <pre id="license-dialog-text" aria-live="polite"></pre>
+  </dialog>
+</body>
+</html>

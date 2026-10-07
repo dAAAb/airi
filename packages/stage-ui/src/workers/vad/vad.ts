@@ -2,7 +2,7 @@ import type { PreTrainedModel } from '@huggingface/transformers'
 
 import type { BaseVAD, BaseVADConfig, VADEventCallback, VADEvents } from '../../libs/audio/vad'
 
-import { AutoModel, Tensor } from '@huggingface/transformers'
+import { AutoModel, env, PretrainedConfig, Tensor } from '@huggingface/transformers'
 
 /**
  * Voice Activity Detection processor
@@ -49,8 +49,21 @@ export class VAD implements BaseVAD {
     try {
       this.emit('status', { type: 'info', message: 'Loading VAD model...' })
 
+      const localInstaller = import.meta.env.VITE_AIRI_LOCAL_INSTALLER === 'true'
+      if (localInstaller) {
+        // The desktop release ships VAD and its matching ONNX runtime assets.
+        // Missing files must fail locally instead of silently downloading models.
+        env.allowRemoteModels = false
+        env.allowLocalModels = true
+        env.localModelPath = '/local-models/'
+        env.backends.onnx.wasm!.wasmPaths = '/local-assets/onnx/'
+      }
       // Full-precision
-      this.model = await AutoModel.from_pretrained('onnx-community/silero-vad', { config: { model_type: 'custom' } as any, dtype: 'fp32' })
+      this.model = await AutoModel.from_pretrained('onnx-community/silero-vad', {
+        config: new PretrainedConfig({ model_type: 'custom' }),
+        dtype: 'fp32',
+        local_files_only: localInstaller,
+      })
       this.isReady = true
 
       this.emit('status', { type: 'info', message: 'VAD model loaded successfully' })

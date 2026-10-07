@@ -1,6 +1,6 @@
 import type { PreTrainedModel } from '@huggingface/transformers'
 
-import { AutoModel } from '@huggingface/transformers'
+import { AutoModel, env } from '@huggingface/transformers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { VAD } from './vad'
@@ -28,6 +28,35 @@ function createProbabilityModel(probabilities: number[]) {
 describe('vad speech duration', () => {
   beforeEach(() => {
     vi.mocked(AutoModel.from_pretrained).mockReset()
+  })
+
+  it('loads bundled VAD without remote requests in the local installer build', async () => {
+    const previous = {
+      remote: env.allowRemoteModels,
+      local: env.allowLocalModels,
+      path: env.localModelPath,
+      wasm: env.backends.onnx.wasm!.wasmPaths,
+    }
+    vi.stubEnv('VITE_AIRI_LOCAL_INSTALLER', 'true')
+    vi.mocked(AutoModel.from_pretrained).mockResolvedValue(createProbabilityModel([]))
+    try {
+      await new VAD().initialize()
+      expect(AutoModel.from_pretrained).toHaveBeenCalledWith('onnx-community/silero-vad', expect.objectContaining({
+        local_files_only: true,
+        dtype: 'fp32',
+      }))
+      expect(env.allowRemoteModels).toBe(false)
+      expect(env.allowLocalModels).toBe(true)
+      expect(env.localModelPath).toBe('/local-models/')
+      expect(env.backends.onnx.wasm!.wasmPaths).toBe('/local-assets/onnx/')
+    }
+    finally {
+      env.allowRemoteModels = previous.remote
+      env.allowLocalModels = previous.local
+      env.localModelPath = previous.path
+      env.backends.onnx.wasm!.wasmPaths = previous.wasm
+      vi.unstubAllEnvs()
+    }
   })
 
   it('rejects a noise pulse that is shorter than the minimum speech duration', async () => {

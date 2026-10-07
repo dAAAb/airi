@@ -1,0 +1,107 @@
+{
+  "upstream": {
+    "url": "https://github.com/KaedeTai/GPT-SoVITS.git",
+    "commit": "81959852f75c972a0a78364f8ea6b14133a11f4a",
+    "destination": "kaedetai/GPT-SoVITS",
+    "reference_file": "tw_samples/demo_02_kin_a_jit_thinn_khi.mp3",
+    "reference_sha256": "9d0aded895c03050bb903d2528d4cf5b7aa7eff5480b68cc9d64594f9f039481"
+  },
+  "files": [
+    {
+      "repo": "KaedeTai/gpt-sovits-tw",
+      "revision": "fa251907be54b63277377a96a23377fd7f00e323",
+      "file": "s1_trilingual.ckpt",
+      "destination": "kaedetai/models/s1_trilingual.ckpt",
+      "bytes": 155618362,
+      "sha256": "620efd37a310848cdb7c29ba30190c8b30a179aff93afac7557d5c366b526002"
+    },
+    {
+      "repo": "KaedeTai/gpt-sovits-tw",
+      "revision": "fa251907be54b63277377a96a23377fd7f00e323",
+      "file": "s2_r4_e15.pth",
+      "destination": "kaedetai/models/s2_r4_e15.pth",
+      "bytes": 951598381,
+      "sha256": "1621dfe40d57e75b4fef61fd6a4265e6836d4e88cca6b57a9f523ec2a2974bc8"
+    },
+    {
+      "repo": "lj1995/GPT-SoVITS",
+      "revision": "8f8857563c040d542de108a2c18b0425abd6c9c5",
+      "file": "chinese-hubert-base/config.json",
+      "destination": "kaedetai/models/chinese-hubert-base/config.json",
+      "bytes": 1449,
+      "sha256": "c3e5060a1277e0f078cc6be9da4528a605dba6ece93018981fe2c820e5c7b103"
+    },
+    {
+      "repo": "lj1995/GPT-SoVITS",
+      "revision": "8f8857563c040d542de108a2c18b0425abd6c9c5",
+      "file": "chinese-hubert-base/preprocessor_config.json",
+      "destination": "kaedetai/models/chinese-hubert-base/preprocessor_config.json",
+      "bytes": 212,
+      "sha256": "dcd684124d06722947939d41ea6ae58dbf10968c60a11a29f23ddc602c64a29b"
+    },
+    {
+      "repo": "lj1995/GPT-SoVITS",
+      "revision": "8f8857563c040d542de108a2c18b0425abd6c9c5",
+      "file": "chinese-hubert-base/pytorch_model.bin",
+      "destination": "kaedetai/models/chinese-hubert-base/pytorch_model.bin",
+      "bytes": 188811417,
+      "sha256": "24164f129c66499d1346e2aa55f183250c223161ec2770c0da3d3b08cf432d3c"
+    },
+    {
+      "repo": "lj1995/GPT-SoVITS",
+      "revision": "8f8857563c040d542de108a2c18b0425abd6c9c5",
+      "file": "sv/pretrained_eres2netv2w24s4ep4.ckpt",
+      "destination": "kaedetai/models/sv/pretrained_eres2netv2w24s4ep4.ckpt",
+      "bytes": 107528697,
+      "sha256": "4f5a0bf73c61eb41b174e1bb54e7ee3c83233892be8e0af1f187024e8e581a35"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "README.md",
+      "destination": "mms/model/README.md",
+      "bytes": 4005,
+      "sha256": "44b50bbb6dd5a736991c406cf1e0fc60b35136e4d6c97ebb21ecfedc3fc450fe"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "config.json",
+      "destination": "mms/model/config.json",
+      "bytes": 1641,
+      "sha256": "c93b297485f9951839987900c60d8c41f5eae27342bf8908fdd65b245860b360"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "model.safetensors",
+      "destination": "mms/model/model.safetensors",
+      "bytes": 145235192,
+      "sha256": "7d8456cf4295fa9589c57c83be2345035435e7ddb21137ac76e5383155cdc35b"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "special_tokens_map.json",
+      "destination": "mms/model/special_tokens_map.json",
+      "bytes": 47,
+      "sha256": "845f635933c404f060a1d7a2f4c4494bf4a91f8ebec99a41108778d026426dfc"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "tokenizer_config.json",
+      "destination": "mms/model/tokenizer_config.json",
+      "bytes": 287,
+      "sha256": "8e6fc6f18d7de091d5e7773add2a3b75ef08cda3ca4882872cd0b759b1c66897"
+    },
+    {
+      "repo": "facebook/mms-tts-nan",
+      "revision": "f28526a6caaf9dc55e030da83008c933f6a1978b",
+      "file": "vocab.json",
+      "destination": "mms/model/vocab.json",
+      "bytes": 549,
+      "sha256": "627673755f3cf0e3b3113ab53f781422a7b3cb4df4f1193ebe94b939992badf1"
+    }
+  ]
+}

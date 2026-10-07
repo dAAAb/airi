@@ -1,0 +1,66 @@
+# AIRI Local Mac 安裝器
+
+這個資料夾提供 Apple Silicon Mac 本機安裝器的原始碼。它把模型選擇、下載驗證、服務啟動和角色設定串在同一個頁面。模型權重、Python runtimes 與建置後的 AIRI 不存入 Git；安裝包由 release 建置程序提供。
+
+有兩種預設選擇：輕量組合使用 Qwen 3.5 0.8B、Breeze ASR-26 與 Kokoro；完整台語組合再使用 Gemma 4、SARC 與 KaedeTai。Lite 離線包只提供輕量三模型；Full 離線包含全部六模型，預設使用台語五模型；下載版可選六模型，預設輕量組合。
+
+| 組合 | 對話與輸出 | 使用界線 |
+|---|---|---|
+| 輕量 | Qwen 3.5 0.8B ＋ Breeze ASR-26 ＋ Kokoro | 可用華語語音及圖片描述；不包含台語發音模型。Qwen 是中國阿里巴巴的 Dense 小模型，能力與回答穩定性不能視為等同較大模型。 |
+| 完整台語 | Gemma 4 ＋ SARC ＋ Breeze ASR-26 ＋ Kokoro ＋ KaedeTai | 華語／台語各一張角色卡，圖片由 Gemma 4 先描述。 |
+
+完整台語組合包括：
+
+| 角色或功能 | 模型 |
+|---|---|
+| ReLU 華語 | Gemma 4 12B IT QAT ＋ Kokoro `zf_xiaobei` |
+| ReLU 台語（實驗） | SARC Taigi 12B Q4_K_M ＋ Taibun ＋ KaedeTai |
+| 共用聽覺 | Breeze ASR-26 MLX 4-bit |
+| 圖片描述 | Gemma 4，台語角色接收描述後再回答 |
+
+完整組合建議至少 32 GB 統一記憶體，這是配置估計，尚未以 32 GB Mac 做最低規格驗收。下載頁的大小指模型權重，另需 runtime、暫存與可用磁碟空間。已驗證的台語品質與性能界線見[課堂筆記](../TAIGI-LOCAL-NOTES.zh-TW.md)；不能把開發機實測等同所有 Mac 的乾淨安裝驗收。
+
+## 從安裝包開始
+
+1. 開啟 AIRI Local。安裝器頁面位於 `http://127.0.0.1:17900/setup`。
+2. 選擇模型。隨附 Ollama 使用獨立的 `12434` 埠，或選擇已啟動於 `11434` 的 Ollama。
+3. 選用 SARC 時，閱讀並確認 Gemma 條款。其他模型顯示其授權連結與 notices。
+4. 按「下載並驗證」。完整離線包可以從隨附 payload 驗證，精簡包需下載缺少的檔案。
+5. 驗證完成後按「啟動 AIRI」。依已選模型建立本機專用角色卡（輕量一張，完整台語兩張），使用 AIRI 內建 AvatarSample_A。
+6. 在 AIRI 選擇角色、開啟麥克風並授權。也可上傳自己的 VRM。
+
+選了 ASR 的配置會開啟辨識文字自動送出。可在聽覺設定關閉。台語輸出限制短句、台語漢字；英文、未知字與過長文字可能被 TTS 明確拒絕。
+
+再次從安裝頁啟動時，安裝器重接自己建立的角色服務。名稱、提示詞和外觀保留，其他角色卡不變。單純開啟 AIRI 首頁不會匯入設定。重新選取的模型決定啟動哪些服務；未選 TTS 的新角色使用靜音語音 provider。
+
+## 原始碼與本機邊界
+
+- `manager.py` 只綁 `127.0.0.1:17900`，安裝動作需要同源請求與本次程序 token。下載與啟動都受固定清單限制。
+- `web/` 是無外部套件的安裝頁，不載入分析碼或遠端 JS。
+- AIRI 的匯入需同時符合編譯旗標 `VITE_AIRI_LOCAL_INSTALLER=true`、精確本機 origin 與 `?localSetup=1`。
+- App 內的 ASR 為 `18001`，華語 TTS 為 `18880`，台語 TTS 為 `18883`，共用 speech hub 為 `18884`。這與手動教學用的 `8001/8880/8883/8884` 分開。
+- 發現不屬於安裝器的埠占用時會回報，避免終止未知程序。
+- Ollama 模型 digest、模型檔 SHA-256 與 payload manifest 用於確認版本；不把模型「存在」等同「已驗證」。
+
+安裝器不會把 ChatGPT 訂閱轉成 API 額度。切到雲端 provider 後，相應請求會送往該雲端服務。
+
+## 授權與 release 資料
+
+`collect-license-notices.py` 收集原作者模型卡、Gemma 全文與 NOTICE、其他授權全文，以及實際影音函式庫對應來源。Gemma 頁面轉成純文字供離線閱讀，不把第三方 HTML 腳本帶入本機 origin。
+
+```sh
+python3 course/ntu-vh2026/installer/collect-license-notices.py
+```
+
+輸出位於忽略版控的 `resources/licenses/`。其中 `upstream-source-manifest.json` 記錄 URL、SHA-256 和位元組數，`source/` 保留影音函式庫的對應原始碼。檔案、權重與 runtime 各自的授權不因打包而改成 MIT。詳見[授權查核](MODEL-LICENSES.zh-TW.md)及[第三方 notices](THIRD-PARTY-NOTICES.md)。
+
+## 已執行的程式檢查
+
+```sh
+node --test course/ntu-vh2026/installer/test-setup-state.mjs
+python3 course/ntu-vh2026/installer/test-manager.py
+pnpm -F @proj-airi/stage-web exec vitest run src/composables/local-installer-config.test.ts src/composables/local-installer.test.ts --project unit
+pnpm -F @proj-airi/stage-web typecheck
+```
+
+前端狀態 5 項、AIRI 設定匯入 10 項測試通過，stage-web typecheck 通過。安裝管理器測試以其最新輸出為準。完整根目錄 `pnpm lint` 仍因此開發 checkout 缺少 `docs` 的 `@radix-ui/colors` 而失敗；本次變更的 scoped ESLint 通過。

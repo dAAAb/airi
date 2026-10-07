@@ -1,0 +1,33 @@
+{
+  "scope": "Local HTTP endpoint with real pinned model. Two audio formats. Does not prove full AIRI microphone-to-TTS interaction.",
+  "model": "breeze-asr-26-mlx",
+  "base_url": "http://127.0.0.1:8001/v1/",
+  "rows": [
+    {
+      "input_format": "audio/wav",
+      "sha256": "f419fab165be33fe42acbd8b4f462df11e2a5e002f576d0156ad14b25a5ebe6d",
+      "status": 200,
+      "http_seconds": 1.3631232090010599,
+      "inference_seconds": 1.312156,
+      "audio_seconds": 29.689,
+      "cors_origin": "http://127.0.0.1:5174",
+      "text": "來 阿豪 我讓小慧洗就好 來這裡吃水果 媽 沒關係 現在是性別平等的時代 夫妻都會一起分擔家務事 對啊 媽 她平常都會做家務事 老伴你看 我們女婿多好 是啊 好女婿 阿憨 快吃水果 我也要去洗盤子了 我孫子也很厲害 是啊 性別平等 從你我做起 以上公告由行政院提供"
+    },
+    {
+      "input_format": "audio/webm",
+      "sha256": "8f40e9d35dd19d474ded8c2ac07a2ffc4a3011ef45f707172e9cd6177c769aba",
+      "status": 200,
+      "http_seconds": 2.6489063749995694,
+      "inference_seconds": 2.582894,
+      "audio_seconds": 29.689,
+      "cors_origin": "http://127.0.0.1:5174",
+      "text": "阿和 我讓小慧洗就好 來這裡吃水果啦 媽 沒關係啦 現在是性別平等的時代 夫妻都會一起分擔家務事啊 對啊 媽 她平常都會做家務事喔 老伴你看 我們女婿多好啊 是啊 好女婿 阿公 快吃水果 我也要去洗盤子了 我孫子也很厲害耶 是啊 性別平等從你我做起 性別平等從你我做起 以上公告由行政院提供 以上公告由行政院提供"
+    }
+  ],
+  "validation_date": "2026-10-07",
+  "notes": [
+    "WAV and WebM were decoded from the same public Taigi recording. The WebM uses Opus 32 kbps.",
+    "The compressed WebM changes some names and repeats two ending clauses. HTTP success is not a claim of perfect recognition.",
+    "11 model-free contract tests passed, including chunked body limits and temporary-file cleanup."
+  ]
+}

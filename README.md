@@ -6,19 +6,22 @@
 
 **學生入口：[繁體中文實作指南、模型下載與測試指令](./course/ntu-vh2026/README.zh-TW.md)**
 
-下方的 `Try it` 與預編譯下載連到上游服務／發行版。本課修正請依學生入口從原始碼啟動。
+**Mac App：[課程版 Releases](https://github.com/dAAAb/airi/releases) · [安裝器與版本選擇](./course/ntu-vh2026/installer/README.zh-TW.md) · [台語聽說筆記](./course/ntu-vh2026/TAIGI-LOCAL-NOTES.zh-TW.md)**
+
+課程版提供勾選下載、輕量離線與完整台語離線包。內建 Ollama 使用獨立的埠與模型目錄，可與原有 Ollama 並存。下方的 `Try it` 與其他預編譯連結屬於上游。
 
 | 課堂案例 | 我們實際測到什麼 | 不把它當作什麼 |
 | --- | --- | --- |
 | 台灣華語 TTS：Breeze2-VITS-onnx | 本機 CPU 合成課程介紹，與 Kokoro 同句比較 | 台語發音、MLX 加速或完整即時對話延遲 |
-| 台語 ASR：Breeze-ASR-26 社群 MLX 4-bit | Apple Silicon 離線轉錄台語，輸出華語漢字 | 台語 TTS、台語正字評測或已接入 AIRI 的串流 STT |
+| 台語 ASR：Breeze-ASR-26 社群 MLX 4-bit | Apple Silicon 離線轉錄台語，輸出華語漢字 | 台語 TTS、台語正字評測或連續串流解碼（目前以語音片段接入 AIRI） |
 | 中英夾雜 | 短句 `training` 被辨成「春捲」，`attention` 變成「注意」 | 只看句子通順，就判定專有名詞辨識成功 |
+| 台語 TTS：KaedeTai＋Taibun | 本機漢字轉音、合成與 AIRI 台語角色已驗證；使用者確認能聽說 | 聯發科模型、MLX 加速、所有句子皆正確 |
 | 台語 TTS：BreezyVoice 26 | 聽官方預錄示範，和華語 TTS 區分 | 已下載權重、本機生成或已測過對應 MLX 版 |
 
 先 fork，再按指南啟動 `http://127.0.0.1:5174/`，用自己的角色與錄音重做實驗。
 固定角色與測句，每次只換一個 provider、ASR 或 TTS，記錄原音、辨識字、回覆與實際發聲。
 課堂資料包含可重現腳本、去除本機路徑的測試結果與來源。
-模型權重和第三方示範音訊由學生按需取得，不隨程式碼散布。
+Git 原始碼不含模型權重與個人錄音；Release 的離線包另外附上指定模型及各自授權、來源與 notices。
 
 程式修正與驗證：[本機 provider／圖片傳送／Ollama Vision 修正](./docs/classroom-local-fixes.md)。
 This classroom fork adds local speech experiments in Traditional Chinese and fixes provider and image transport errors.
