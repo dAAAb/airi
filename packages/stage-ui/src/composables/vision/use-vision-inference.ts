@@ -1,5 +1,4 @@
 import type { Conversation } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
 
 import type { VisionWorkloadId } from './use-vision-workloads'
 
@@ -53,21 +52,12 @@ export function useVisionInference() {
 
   /** Reads one image with the given vision provider and returns the trimmed text. */
   async function describeImage(providerId: string, modelId: string, input: VisionInferenceInput) {
-    const provider = await providersStore.getChatProviderInstance(providerId)
+    const provider = await providersStore.getChatProviderInstance(providerId, providerId === 'vision-ollama'
+      ? { reasoning: ollamaThinkingEnabled.value ? 'enabled' : 'disabled' }
+      : undefined)
     const workload = getVisionWorkload(input.workloadId)
     const prompt = input.promptOverride ?? workload.prompt
     const { url } = parseDataUrl(input.imageDataUrl)
-    const visionProvider: GenerationProvider = providerId === 'vision-ollama'
-      ? {
-          generation(model) {
-            const request = provider.generation(model)
-            if (request.protocol !== 'chat-completions')
-              return request
-            return { ...request, config: { ...request.config, think: ollamaThinkingEnabled.value } }
-          },
-        }
-      : provider
-
     const context: Conversation = { turns: [{
       id: 'vision-input',
       type: 'user',
@@ -81,7 +71,7 @@ export function useVisionInference() {
     }, VISION_INFERENCE_TIMEOUT_MS)
 
     try {
-      await llmStore.stream(modelId, visionProvider, context, {
+      await llmStore.stream(modelId, provider, context, {
         // A frame description calls no tools. The chat tool list only costs context,
         // and a provider without tool calling rejects it.
         supportsTools: false,

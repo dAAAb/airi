@@ -428,12 +428,12 @@ export const useChatStore = defineStore('chat', () => {
 
     const message = messages[messageIndex]
     const imageDescriptions = [
-      ...(message.imageDescriptions ?? []).filter(cached => cached.imageIndex !== imageIndex),
+      ...(message.imageDescriptions ?? []).filter(cached => cached.imageIndex !== imageIndex).map(cached => toRaw(cached)),
       { description, imageIndex },
     ]
     const nextMessages = [...messages]
-    // Spreading a reactive message copies its nested arrays as proxies, which
-    // `structuredClone` rejects when the send result leaves the leader.
+    // Both the message and retained descriptions come from reactive state.
+    // Keep plain records so structuredClone can send the result from the leader.
     nextMessages[messageIndex] = { ...toRaw(message), imageDescriptions }
     chatSession.setSessionMessages(sessionId, nextMessages)
   }

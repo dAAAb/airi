@@ -5,7 +5,7 @@ import type { ProviderReplicaRow } from '../../services/inference-service-provid
 import type { ProviderSyncRow, ProviderSyncSnapshot } from './merge'
 
 import { useDebounceFn, useIntervalFn, useLocalStorage } from '@vueuse/core'
-import { isEqual } from 'es-toolkit'
+import { cloneDeep, isEqual } from 'es-toolkit'
 import { nanoid } from 'nanoid'
 import { defineStore } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'
@@ -210,9 +210,11 @@ export const useProviderConfigStore = defineStore('provider-config', () => {
   }
 
   function ensureProvider(providerId: string, definitionId: string, config: Record<string, unknown> = {}) {
+    // Synced action results cross tab boundaries through structuredClone.
+    // Return a detached snapshot, including nested config, instead of Vue proxies.
     const current = providers.value[providerId]
     if (current)
-      return current
+      return cloneDeep(current)
 
     const definition = getDefinedProvider(definitionId)
     if (!definition)
@@ -227,7 +229,7 @@ export const useProviderConfigStore = defineStore('provider-config', () => {
     }
     providers.value[providerId] = provider
     delete pendingDeletes.value[providerId]
-    return provider
+    return cloneDeep(provider)
   }
 
   function markProviderAdded(providerId: string) {
@@ -501,7 +503,7 @@ export const useProviderConfigStore = defineStore('provider-config', () => {
     }
     providers.value[providerId] = next
     schedulePush()
-    return next
+    return cloneDeep(next)
   }
 
   async function resetProviders() {

@@ -1,5 +1,7 @@
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import { getDefinedProvider, getGenerationProvider } from '@proj-airi/provider-inference'
+import { chat } from '@xsai/shared-chat'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -68,6 +70,7 @@ describe('useVisionInference', () => {
       workloadId: 'screen:interpret',
       promptOverride: 'Interpret this frame',
     })).resolves.toBe('Frame summary')
+    expect(vi.mocked(useProviderStore().getChatProviderInstance).mock.calls[0]?.[1]).toBeUndefined()
   })
 
   it('counts each inference and each failure for the settings page', async () => {
@@ -89,6 +92,42 @@ describe('useVisionInference', () => {
     expect(activity.inferenceCount).toBe(3)
     expect(activity.failedInferenceCount).toBe(2)
     expect(activity.lastInference).toMatchObject({ provider: 'openai', model: 'mock-model', error: 'Provider unavailable' })
+  })
+
+  it.each([false, true])('sends Ollama vision thinking=%s using the OpenAI-compatible reasoning field', async (thinkingEnabled) => {
+    const vision = useVisionStore()
+    vision.activeProvider = 'vision-ollama'
+    vision.ollamaThinkingEnabled = thinkingEnabled
+    const definition = getDefinedProvider('ollama')
+    if (!definition)
+      throw new Error('Ollama definition must exist')
+    const instance = await definition.createProvider({
+      baseUrl: 'http://localhost:11434/v1/',
+      thinkingMode: 'auto',
+    })
+    const ollamaProvider = getGenerationProvider(instance)
+    if (!ollamaProvider)
+      throw new Error('Ollama must provide generation')
+
+    vi.spyOn(useProviderStore(), 'getChatProviderInstance').mockImplementation(async (_id, options) => ({
+      generation: model => ollamaProvider.generation(model, options),
+    }))
+    const requestFetch = vi.fn<typeof fetch>().mockResolvedValue(new Response('{}'))
+    stream.mockImplementation(async (_model, generationProvider) => {
+      const request = generationProvider.generation('qwen3.5:0.8b')
+      if (request.protocol !== 'chat-completions')
+        throw new Error('Ollama must use chat-completions')
+      await chat({ ...request.config, messages: [], fetch: requestFetch })
+    })
+
+    await useVisionInference().runVisionInference({
+      imageDataUrl: 'data:image/png;base64,Zm9v',
+      workloadId: 'screen:interpret',
+    })
+
+    const body = JSON.parse(String(requestFetch.mock.calls[0]?.[1]?.body))
+    expect(body).toMatchObject({ reasoning_effort: thinkingEnabled ? 'medium' : 'none' })
+    expect(body).not.toHaveProperty('think')
   })
 
   /** Apple Vision declares one read at a time in its provider definition. */

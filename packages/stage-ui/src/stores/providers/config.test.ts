@@ -2,7 +2,7 @@ import type { InferenceServiceProvider } from '../../libs/providers/types'
 
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createApp, nextTick } from 'vue'
+import { createApp, nextTick, reactive } from 'vue'
 
 import { useProviderConfigStore } from './config'
 
@@ -284,6 +284,47 @@ describe('provider config store', () => {
     expect(added.definitionId).toBe('openai-compatible')
     expect(store.listedProviders[added.id]?.config).toEqual({ apiKey: 'sk-new' })
     expect(mocks.service.upsertRemote).not.toHaveBeenCalled()
+  })
+
+  it.each(['new', 'existing'] as const)('returns a transferable snapshot when ensuring a %s provider', (kind) => {
+    const store = installStore()
+    const config = reactive({
+      connection: { headers: { 'X-Test': 'local' } },
+      models: [{ id: 'test-model' }],
+    })
+    if (kind === 'existing')
+      store.providers[localProvider.id] = { ...localProvider, config }
+
+    const provider = store.ensureProvider(localProvider.id, localProvider.definitionId, config)
+
+    // Synced action results cross the tab boundary through structuredClone.
+    expect(structuredClone(provider)).toEqual({ ...localProvider, config })
+    expect(provider.config).not.toBe(store.providers[localProvider.id].config)
+    expect(provider.config.connection).not.toBe(config.connection)
+    expect(provider.config.models).not.toBe(config.models)
+  })
+
+  it('returns a transferable snapshot when adding a provider with nested reactive config', async () => {
+    const store = installStore()
+    const config = reactive({ models: [{ id: 'test-model' }] })
+
+    const provider = await store.addProvider('openai-compatible', config)
+
+    expect(structuredClone(provider)).toMatchObject({ config: { models: [{ id: 'test-model' }] } })
+    expect(provider.config.models).not.toBe(config.models)
+  })
+
+  it('returns a transferable snapshot when updating nested reactive config', async () => {
+    const store = installStore()
+    store.providers[localProvider.id] = { ...localProvider }
+    const config = reactive({ models: [{ id: 'test-model' }] })
+
+    const provider = await store.updateProviderConfig(localProvider.id, config, 'configured')
+
+    expect(structuredClone(provider)).toMatchObject({
+      config: { models: [{ id: 'test-model' }] },
+      status: 'configured',
+    })
   })
 
   it('keeps a local delete through a pull that still returns the live row', async () => {

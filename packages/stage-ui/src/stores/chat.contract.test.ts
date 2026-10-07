@@ -595,6 +595,43 @@ describe('chat store contract', () => {
     ])
   })
 
+  it('returns cloneable results for multiple fresh image attachments', async () => {
+    // Saving the second description must retain the first as plain data.
+    // A reactive descriptor nested inside a raw message cannot cross the RPC boundary.
+    visionMocks.configured = true
+    visionMocks.runInference
+      .mockResolvedValueOnce('A red square.')
+      .mockResolvedValueOnce('A blue circle.')
+    llmStreamMock.mockImplementation(async (_model: string, _provider: GenerationProvider, _context: Conversation, options: StreamOptions) => {
+      await options.onStreamEvent?.({ type: 'finish' })
+    })
+
+    const store = useChatStore()
+    const result = await store.send({
+      sessionId: 'session-1',
+      text: 'Compare these images.',
+      attachments: [
+        { type: 'image', mimeType: 'image/png', data: 'cmVk' },
+        { type: 'image', mimeType: 'image/png', data: 'Ymx1ZQ==' },
+      ],
+    })
+
+    expect(() => structuredClone(result)).not.toThrow()
+    expect(visionMocks.runInference).toHaveBeenCalledTimes(2)
+    const imageMessage = result.messages.find(message => message.role === 'user')
+    expect(imageMessage?.content).toEqual([
+      { type: 'text', text: 'Compare these images.' },
+      { type: 'image_url', image_url: { url: 'data:image/png;base64,cmVk' } },
+      { type: 'image_url', image_url: { url: 'data:image/png;base64,Ymx1ZQ==' } },
+    ])
+    expect(imageMessage?.imageDescriptions).toEqual([
+      { imageIndex: 0, description: 'A red square.' },
+      { imageIndex: 1, description: 'A blue circle.' },
+    ])
+    await store.send({ sessionId: 'session-1', text: 'What were their colors?' })
+    expect(visionMocks.runInference).toHaveBeenCalledTimes(2)
+  })
+
   it('reports a failed read of the current image and stores no description', async () => {
     // ROOT CAUSE:
     //
