@@ -140,6 +140,14 @@ def validate_resources(resources, mode):
     return manifest
 
 
+def remove_web_sourcemaps(web_root):
+    # Source maps can contain the build machine's absolute paths. They are not
+    # needed for the packaged UI and must not accompany a public Mac release.
+    for source_map in Path(web_root).rglob('*.map'):
+        if source_map.is_file():
+            source_map.unlink()
+
+
 def rebrand(app):
     icon = ROOT.parents[2] / 'apps/stage-tamagotchi/build/icon.icns'
     if icon.is_file():
@@ -232,6 +240,7 @@ def main():
     for source in [*onnx.glob('dist/*.wasm'), *onnx.glob('dist/*.mjs'), onnx / 'LICENSE']:
         if source.is_file() and not (onnx_target / source.name).exists():
             clone_or_copy(source, onnx_target / source.name)
+    remove_web_sourcemaps(resources / 'web')
     copy_tree(COURSE / 'installer', resources / 'installer',
               ignore=shutil.ignore_patterns('resources', '__pycache__', '*.pyc', '*.log', '.DS_Store'))
     course_source = resources / 'course/ntu-vh2026'

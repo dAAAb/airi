@@ -39,6 +39,20 @@ class PackagingTests(unittest.TestCase):
         result = builder.validate_resources(self.root, 'thin')
         self.assertFalse(result['offline'])
 
+    def test_public_web_maps_are_removed_without_touching_runtime_assets(self):
+        web = self.root / 'web'
+        (web / 'assets').mkdir(exist_ok=True)
+        source_map = web / 'assets' / 'module.js.map'
+        source_map.write_text('/Users/example/private-build-path')
+        runtime = web / 'assets' / 'module.js'
+        runtime.write_text('export const ready = true')
+        outside = self.root / 'model.map'
+        outside.write_bytes(b'not a web source map')
+        builder.remove_web_sourcemaps(web)
+        self.assertFalse(source_map.exists())
+        self.assertEqual(runtime.read_text(), 'export const ready = true')
+        self.assertEqual(outside.read_bytes(), b'not a web source map')
+
     def test_full_rejects_missing_payload(self):
         with self.assertRaisesRegex(ValueError, 'Offline payload'):
             builder.validate_resources(self.root, 'full')
