@@ -65,13 +65,23 @@ Apple APFS 可用 copy-on-write 複製既有 payload，減少此機器重複占�
 
 產物預設放在本資料夾 `dist/`。腳本拒絕覆蓋既有產物。預設僅做 ad-hoc signing，**沒有 Developer ID 簽署或 Apple notarization**。不能把本機成功啟動等同於已完成公開發行簽署。
 
-full 通常超過 GitHub 單一 asset 限制。發行時應建立含分片 hash 的分割封裝，避免先在空間不足的硬碟產生一個巨大壓縮檔。本腳本不會自行上傳或建立 release。
+Lite／Full 的壓縮包可能超過 GitHub 單一 asset 限制。`package-release.py` 串流產生每段至多 1.8 GB 的分片、SHA256 清單及小型 `Installer.zip`，避免先建立巨大壓縮檔。`Installer.zip` 保留組裝腳本的執行權限；把它與所有分片放在同一資料夾，解壓後雙擊 `Open-*.command`，即可先驗證再組装。
+
+```sh
+python3 course/ntu-vh2026/desktop/package-release.py \
+  'course/ntu-vh2026/desktop/dist/AIRI Local Full.app' \
+  --output course/ntu-vh2026/desktop/dist/packages/full \
+  --prefix AIRI-Local-Full-0_1_0-arm64
+```
+
+指定 `--upload-release TAG` 時，只允許上傳到已存在的 draft release。每段都要收到 GitHub 對應的大小與 SHA256 才刪除本機暫存，失敗則保留檔案。預設不會上傳，也不會建立 release。
 
 ## 檢查
 
 ```sh
 node --test course/ntu-vh2026/desktop/test-policy.cjs
 python3 course/ntu-vh2026/desktop/test-build-app.py
+python3 course/ntu-vh2026/desktop/test-package-release.py
 ```
 
 安全策略測試涵蓋精確 origin、音訊權限、外部 URL scheme 與 offline 網路限制。打包測試涵蓋模型缺漏、越界路徑、外部 symlink 及 HTTPS 下載來源。這些測試不能取代實際 App 的麥克風、離線推論與乾淨機器驗證。

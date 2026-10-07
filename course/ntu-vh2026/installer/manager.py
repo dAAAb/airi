@@ -387,7 +387,12 @@ def make_handler(manager):
             pass
 
         def send_data(self, status, data, content_type='application/json'):
-            raw = json.dumps(data, ensure_ascii=False).encode() if content_type == 'application/json' else data
+            # Static JSON files already contain encoded bytes. Only API objects
+            # need serialization, regardless of the shared JSON MIME type.
+            if content_type == 'application/json' and not isinstance(data, (bytes, bytearray)):
+                raw = json.dumps(data, ensure_ascii=False).encode()
+            else:
+                raw = data
             self.send_response(status)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(raw)))

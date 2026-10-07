@@ -289,5 +289,29 @@
     "mandarin_asr_roundtrip": "returned text, with substitutions in the course title",
     "taigi_asr": "returned Mandarin-character meaning for a public Taiwanese Hokkien recording, with transcription errors",
     "taigi_tts": "not part of this lightweight selection; Kokoro Chinese is not a Taiwanese Hokkien voice"
+  },
+  "native_ui_lite_acceptance": {
+    "checked_at": "2026-10-07",
+    "package": "AIRI Local Lite.app",
+    "bundled_models": [
+      "qwen",
+      "asr26",
+      "kokoro"
+    ],
+    "steps": [
+      "Opened setup after Electron service-worker/cache cleanup; existing conversations remained available.",
+      "Clicked Verify bundled models: all three models verified.",
+      "Clicked Start AIRI: local services started and ReLU lightweight Mandarin card selected.",
+      "Created a new conversation and attached synthetic green triangle image with complete Traditional Chinese question."
+    ],
+    "prompt": "圖片中是什麼形狀與顏色？請用繁體中文簡短回答。",
+    "reply": "這是一個綠色的三角形形狀。",
+    "assessment": "Correct color and shape through native App image upload and chat UI.",
+    "observed_limitations": [
+      "Initial character preview module fetch failed once; the displayed Retry button recovered. The module and its dependency files were present with correct MIME types; cause unconfirmed.",
+      "An earlier UI typing attempt sent only punctuation, so that response was not counted as a valid visual test.",
+      "This run does not establish live microphone input, audible TTS playback quality, Taiwanese conversational accuracy or Full offline package end-to-end behavior."
+    ],
+    "privacy": "Only the synthetic test image and new test conversation are included in evidence; existing user conversations are preserved and excluded."
   }
 }

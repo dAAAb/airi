@@ -28,6 +28,38 @@ class ManagerTests(unittest.TestCase):
                 'sha256': hashlib.sha256(content).hexdigest(),
                 'url': 'https://huggingface.co/test/model/resolve/fixed/model.bin'}
 
+    def http_get(self, path):
+        class Connection:
+            response = bytearray()
+
+            def makefile(self, *_args):
+                return io.BytesIO(f'GET {path} HTTP/1.0\r\nHost: 127.0.0.1:{manager.PORT}\r\n\r\n'.encode())
+
+            def sendall(self, data):
+                self.response.extend(data)
+
+        connection = Connection()
+        manager.make_handler(self.app)(connection, ('127.0.0.1', 12345), Mock())
+        headers, body = bytes(connection.response).split(b'\r\n\r\n', 1)
+        return headers, body
+
+    def test_static_json_keeps_original_utf8_bytes_and_content_length(self):
+        root = self.resources / 'web/assets'
+        root.mkdir(parents=True)
+        content = '{\n  "name": "本機角色", "count": 3\n}\n'.encode()
+        (root / 'model-config.json').write_bytes(content)
+        headers, body = self.http_get('/assets/model-config.json')
+        self.assertTrue(headers.startswith(b'HTTP/1.0 200'))
+        self.assertIn(b'Content-Type: application/json', headers)
+        self.assertIn(f'Content-Length: {len(content)}'.encode(), headers)
+        self.assertEqual(body, content)
+
+    def test_api_objects_still_serialize_as_json(self):
+        headers, body = self.http_get('/api/bootstrap')
+        self.assertTrue(headers.startswith(b'HTTP/1.0 200'))
+        self.assertIn(b'Content-Type: application/json', headers)
+        self.assertEqual(json.loads(body), {'token': self.app.token, 'origin': manager.ORIGIN})
+
     def test_paths_cannot_escape_even_through_symlinks(self):
         for value in ('../secret', '/etc/passwd'):
             with self.assertRaises(ValueError):

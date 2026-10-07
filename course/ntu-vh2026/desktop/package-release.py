@@ -10,6 +10,7 @@ import os
 import shutil
 import shlex
 import subprocess
+import tempfile
 from pathlib import Path
 
 PART_BYTES = 1800000000
@@ -54,7 +55,7 @@ def main():
     parts = []
     try:
         while True:
-            first = gzip.stdout.read(1024 * 1024)
+            first = gzip.stdout.read(min(1024 * 1024, PART_BYTES))
             if not first:
                 break
             if shutil.disk_usage(args.output).free < PART_BYTES + 5 * 1024**3:
@@ -89,13 +90,20 @@ def main():
         gzip.terminate()
         tar.terminate()
         raise
+    finally:
+        gzip.stdout.close()
     (args.output / (args.prefix + '.sha256')).write_text(''.join(f'{r["sha256"]}  {r["name"]}\n' for r in parts))
     assembler = args.output / ('Open-' + args.prefix + '.command')
     assembler.write_text('''#!/bin/zsh
 set -euo pipefail
-cd "${0:A:h}"
+installer_dir="${0:A:h}"
+cd "$installer_dir"
+# Finder unzips the small Installer.zip into a folder beside the downloaded parts.
+if [[ ! -f ''' + args.prefix + '''.tar.gz.part-001 && -f ../''' + args.prefix + '''.tar.gz.part-001 ]]; then
+  cd ..
+fi
 print 'Checking all downloaded parts…'
-/usr/bin/shasum -a 256 -c ''' + args.prefix + '''.sha256
+/usr/bin/shasum -a 256 -c "$installer_dir/''' + args.prefix + '''.sha256"
 unpack_dir=$(/usr/bin/mktemp -d "./AIRI-unpacked.XXXXXX")
 print 'Extracting the signed application…'
 /bin/cat ''' + ' '.join(row['name'] for row in parts) + ''' | /usr/bin/tar -xzf - -C "$unpack_dir"
@@ -104,7 +112,24 @@ print "Verified. The application is in $unpack_dir. Move it to Applications if d
 /usr/bin/open "$unpack_dir"
 ''')
     assembler.chmod(0o755)
-    print('Packaging complete:', record_path, flush=True)
+    # A .command downloaded alone can lose its executable bit. Shipping it in a
+    # ZIP preserves its mode for Finder users and keeps the checksums beside it.
+    installer_zip = args.output / (args.prefix + '-Installer.zip')
+    with tempfile.TemporaryDirectory(prefix='.assembler-', dir=args.output) as temporary:
+        folder = Path(temporary) / (args.prefix + '-Installer')
+        folder.mkdir()
+        for source in (assembler, record_path, args.output / (args.prefix + '.sha256')):
+            shutil.copy2(source, folder / source.name)
+        (folder / 'READ-ME.txt').write_text(
+            '將全部 .tar.gz.part-* 分片與 Installer.zip 下載到同一個資料夾。\n'
+            '解壓 Installer.zip 後，雙擊裡面的 Open-*.command。\n'
+            '程式先驗證每段 SHA256，再解壓並檢查 App 簽章。\n'
+            '也可在終端機執行：zsh Open-*.command。\n\n'
+            'Download every part and Installer.zip into one folder. Unzip the installer,\n'
+            'then double-click its Open-*.command. Checksums are verified before extraction.\n')
+        subprocess.run(['/usr/bin/ditto', '-c', '-k', '--sequesterRsrc', '--keepParent',
+                        str(folder), str(installer_zip)], check=True)
+    print('Packaging complete:', record_path, 'Installer:', installer_zip, flush=True)
 
 
 if __name__ == '__main__':
