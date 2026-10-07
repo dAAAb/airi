@@ -69,6 +69,24 @@ async function readStream<T>(stream: ReadableStream<T>, handler: (value: T) => P
   }
 }
 
+/** Normalize only the two stage ACT fields; never interpret model text as code or a URL. */
+function normalizeActMarker(marker: string) {
+  const match = /^<\|ACT\s+(\{[\s\S]*\})\s*\|>$/.exec(marker)
+  if (!match)
+    return marker
+  try {
+    const payload: unknown = JSON.parse(match[1])
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload))
+      return marker
+    const entries = Object.entries(payload).filter(([key]) => key.trim() === 'emotion' || key.trim() === 'motion')
+    const normalized = Object.fromEntries(entries.map(([key, value]) => [key.trim(), typeof value === 'string' ? value.trim() : value]))
+    return `<|ACT ${JSON.stringify(normalized)}|>`
+  }
+  catch {
+    return marker
+  }
+}
+
 function createLlmMarkerParser(options?: MarkerParserOptions) {
   const minLiteralEmitLength = Math.max(1, options?.minLiteralEmitLength ?? 1)
   const tailLength = Math.max(TAG_OPEN.length - 1, ESCAPED_TAG_OPEN.length - 1)
@@ -81,14 +99,19 @@ function createLlmMarkerParser(options?: MarkerParserOptions) {
       buffer = buffer
         .replaceAll(ESCAPED_TAG_OPEN, TAG_OPEN)
         .replaceAll(ESCAPED_TAG_CLOSE, TAG_CLOSE)
+        // Some local models tokenize the ACT delimiters with spaces. Keep this
+        // tolerance specific to ACT so ordinary angle-bracket prose is unchanged.
+        .replace(/<[ \t]{0,8}\|[ \t]{0,8}ACT[ \t]{0,8}(?=\{)/g, '<|ACT ')
 
       while (buffer.length > 0) {
         if (!inTag) {
           const openTagIndex = buffer.indexOf(TAG_OPEN)
           if (openTagIndex < 0) {
-            if (buffer.length - tailLength >= minLiteralEmitLength) {
-              const emit = buffer.slice(0, -tailLength)
-              buffer = buffer.slice(-tailLength)
+            const partialAct = /<[ \t]{0,8}(?:\|[ \t]{0,8}(?:A(?:C(?:T[ \t]{0,8})?)?)?)?$/.exec(buffer)
+            const keepLength = Math.max(tailLength, partialAct?.[0].length ?? 0)
+            if (buffer.length - keepLength >= minLiteralEmitLength) {
+              const emit = buffer.slice(0, -keepLength)
+              buffer = buffer.slice(-keepLength)
               await onLiteral(emit)
             }
             break
@@ -102,13 +125,15 @@ function createLlmMarkerParser(options?: MarkerParserOptions) {
           inTag = true
         }
         else {
-          const closeTagIndex = buffer.indexOf(TAG_CLOSE)
+          const spacedActClose = buffer.startsWith('<|ACT ') ? /\|[ \t]{0,8}>/.exec(buffer) : null
+          const closeTagIndex = spacedActClose?.index ?? buffer.indexOf(TAG_CLOSE)
+          const closeTagLength = spacedActClose?.[0].length ?? TAG_CLOSE.length
           if (closeTagIndex < 0)
             break
 
-          const emit = buffer.slice(0, closeTagIndex + TAG_CLOSE.length)
-          buffer = buffer.slice(closeTagIndex + TAG_CLOSE.length)
-          await onSpecial(emit)
+          const emit = buffer.slice(0, closeTagIndex) + TAG_CLOSE
+          buffer = buffer.slice(closeTagIndex + closeTagLength)
+          await onSpecial(normalizeActMarker(emit))
           inTag = false
         }
       }
@@ -116,7 +141,11 @@ function createLlmMarkerParser(options?: MarkerParserOptions) {
 
     async end(onLiteral: (value: string) => Promise<void> | void) {
       if (!inTag && buffer.length > 0) {
-        await onLiteral(buffer)
+        // Only the end of input confirms this is an incomplete ACT rather than
+        // a prose word such as ACTOR split after ACT across two chunks.
+        buffer = buffer.replace(/<[ \t]{0,8}\|[ \t]{0,8}ACT[ \t]{0,8}$/, '')
+        if (buffer)
+          await onLiteral(buffer)
         buffer = ''
       }
     },

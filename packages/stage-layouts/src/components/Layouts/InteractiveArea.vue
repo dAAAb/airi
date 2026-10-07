@@ -20,6 +20,7 @@ import ChatContainer from '../Widgets/ChatContainer.vue'
 
 import { useChatToolCallRerun } from '../../composables/useChatToolCallRerun'
 
+const props = withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 const { isReady } = useDeferredMount()
 const chatOrchestrator = useChatStore()
 const { activeTurns } = storeToRefs(chatOrchestrator)
@@ -78,7 +79,7 @@ async function handleRetryMessage(index: number) {
           <div h-full w="1/3" origin-left bg-primary-500 class="animate-scan" />
         </div>
         <ChatPanelHeader />
-        <div w="full" max-h="<md:[60%]" py="<sm:2" flex="~ col" rounded="lg" relative min-h-0 flex-1 overflow-hidden px="2 <md:0" py-4>
+        <div :class="props.compact && 'compact-chat-history'" w="full" max-h="<md:[60%]" py="<sm:2" flex="~ col" rounded="lg" relative min-h-0 flex-1 overflow-hidden px="2 <md:0" py-4>
           <ChatHistory
             v-if="isReady"
             :messages="historyMessages"
@@ -97,11 +98,21 @@ async function handleRetryMessage(index: number) {
       </ChatContainer>
     </div>
 
-    <ChatActionButtons />
+    <ChatActionButtons v-if="!props.compact" />
   </div>
 </template>
 
 <style scoped>
+.compact-chat-history {
+  max-height: none;
+}
+
+@media (min-height: 560px) {
+  .compact-chat-history {
+    min-height: 150px;
+  }
+}
+
 @keyframes scan {
   0% {
     transform: translateX(-100%);

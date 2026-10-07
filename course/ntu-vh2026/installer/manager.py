@@ -125,7 +125,11 @@ class LocalManager:
                 continue
             entry = dict(row)
             if row['kind'] == 'ollama':
-                entry['installed'] = local.get(row['model'], {}).get('digest') == row['digest']
+                try:
+                    expected = self.expected_ollama_digests(row)
+                    entry['installed'] = local.get(row['model'], {}).get('digest') in expected
+                except RuntimeError:
+                    entry['installed'] = False
             else:
                 files = [item for item in manifest['files'] if item['model'] == row['id']]
                 entry['installed'] = bool(files) and all(self.payload_path(item['path']).is_file()
@@ -224,12 +228,28 @@ class LocalManager:
         except Exception as error:
             self.update(state='error', message=str(error))
 
-    def verify_bundled_ollama(self, row):
-        root = self.resources / 'payload/ollama'
+    def ollama_record(self, row):
         records = {item['id']: item for item in self.manifest().get('ollama_models', [])}
         record = records.get(row['id'])
         if not record or record.get('ollama_model_digest') != row['digest']:
             raise RuntimeError('Offline model verification metadata is missing. Reinstall this release.')
+        digest = record.get('manifest_sha256', '')
+        if not isinstance(digest, str) or len(digest) != 64 or any(c not in '0123456789abcdef' for c in digest):
+            raise RuntimeError('Ollama manifest verification metadata is invalid. Reinstall this release.')
+        return record
+
+    def expected_ollama_digests(self, row):
+        # The packaged 0.35.1 runtime reports the raw manifest SHA. The tested
+        # external 0.40 runtime reports its model digest, which differs for some
+        # models. External Ollama may use either version: both representations
+        # must come from this release's pinned record, never from the API itself.
+        # Our fixed private runtime accepts only the raw manifest SHA, and its
+        # app-owned model store must also pass full manifest/blob file hashing.
+        manifest_digest = self.ollama_record(row)['manifest_sha256']
+        return {row['digest'], manifest_digest} if self.mode == 'existing' else {manifest_digest}
+
+    def verify_ollama_store(self, row, root):
+        record = self.ollama_record(row)
         path = confined(root / 'manifests', record['path'])
         if not path.is_file() or hash_file(path) != record['manifest_sha256']:
             raise RuntimeError('Offline Ollama manifest is damaged. Reinstall this release.')
@@ -246,10 +266,17 @@ class LocalManager:
             total += item['size']
             self.update(completed=total, message='驗證離線模型')
 
+    def verify_bundled_ollama(self, row):
+        self.verify_ollama_store(row, self.resources / 'payload/ollama')
+
     def install_ollama(self, row):
-        if self.manifest().get('offline'):
+        offline = self.manifest().get('offline', False)
+        if offline:
             self.verify_bundled_ollama(row)
-        if any(item.get('name') == row['model'] and item.get('digest') == row['digest'] for item in self.ollama_models()):
+        expected = self.expected_ollama_digests(row)
+        if any(item.get('name') == row['model'] and item.get('digest') in expected for item in self.ollama_models()):
+            if self.mode == 'bundled' and not offline:
+                self.verify_ollama_store(row, self.data / 'ollama')
             return
         if (self.resources / 'payload/ollama').is_dir():
             raise RuntimeError('Offline model payload does not match its manifest. Reinstall this release.')
@@ -267,8 +294,10 @@ class LocalManager:
                     raise RuntimeError(event['error'])
                 self.update(completed=event.get('completed', 0), total=event.get('total', row['bytes']),
                             message=event.get('status', '下載中'))
-        if not any(item.get('name') == row['model'] and item.get('digest') == row['digest'] for item in self.ollama_models()):
+        if not any(item.get('name') == row['model'] and item.get('digest') in expected for item in self.ollama_models()):
             raise RuntimeError('Downloaded model differs from the tested release. It was not marked ready.')
+        if self.mode == 'bundled':
+            self.verify_ollama_store(row, self.data / 'ollama')
 
     def install_file(self, item):
         target = self.payload_path(item['path'])

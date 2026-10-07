@@ -8,7 +8,7 @@ import workletUrl from '@proj-airi/stage-ui/workers/vad/process.worklet?worker&u
 
 import { BackgroundProvider } from '@proj-airi/stage-layouts/components/Backgrounds'
 import { useBackgroundThemeColor } from '@proj-airi/stage-layouts/composables/theme-color'
-import { useBackgroundStore } from '@proj-airi/stage-layouts/stores/background'
+import { BackgroundKind, useBackgroundStore } from '@proj-airi/stage-layouts/stores/background'
 import { HoloCoupon } from '@proj-airi/stage-ui/components'
 import { ViewControlSlider, WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useAudioRecorder } from '@proj-airi/stage-ui/composables/audio/audio-recorder'
@@ -23,6 +23,13 @@ import { breakpointsTailwind, useBreakpoints, useMouse } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
+import DesktopPetControls from '../components/desktop-pet-controls.vue'
+
+import { useDesktopPet } from '../composables/desktop-pet'
+
+const { isDesktopPet, available: desktopAvailable } = useDesktopPet()
+const petChatOpen = ref(false)
+const petViewOpen = ref(false)
 const paused = ref(false)
 const modelRenderState = ref<'pending' | 'loading' | 'mounted'>('pending')
 const modelRenderError = ref<Error>()
@@ -46,7 +53,8 @@ function handleSettingsOpen(open: boolean) {
 }
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
-const isMobile = breakpoints.smaller('md')
+const mobileBreakpoint = breakpoints.smaller('md')
+const isMobile = computed(() => mobileBreakpoint.value && !desktopAvailable)
 const mobileInteractiveArea = useTemplateRef<InstanceType<typeof MobileInteractiveArea>>('mobileInteractiveArea')
 const stageViewport = shallowRef({ height: 0, offsetTop: 0 })
 // NOTICE:
@@ -54,7 +62,7 @@ const stageViewport = shallowRef({ height: 0, offsetTop: 0 })
 // Root cause: Safari moves the Visual Viewport before the page receives the new offsetTop value.
 // Source: https://bugs.webkit.org/show_bug.cgi?id=265578
 // Removal condition: Safari keeps fixed content stable during the input pan.
-const stageSurfaceStyle = computed(() => isMobile.value
+const stageSurfaceStyle = computed(() => isMobile.value && !isDesktopPet.value
   ? {
       position: 'fixed' as const,
       inset: '0',
@@ -66,10 +74,20 @@ const stageSurfaceStyle = computed(() => isMobile.value
 
 const backgroundStore = useBackgroundStore()
 const { selectedOption, sampledColor } = storeToRefs(backgroundStore)
+const stageBackground = computed(() => isDesktopPet.value
+  ? backgroundStore.options.find(option => option.kind === BackgroundKind.Transparent)!
+  : selectedOption.value)
+const stageSampledColor = computed({
+  get: () => isDesktopPet.value ? 'transparent' : sampledColor.value,
+  set: (value) => {
+    if (!isDesktopPet.value)
+      sampledColor.value = value
+  },
+})
 const backgroundSurface = useTemplateRef<InstanceType<typeof BackgroundProvider>>('backgroundSurface')
 const { stageModelRenderer } = storeToRefs(useSettings())
 
-const { syncBackgroundTheme } = useBackgroundThemeColor({ backgroundSurface, selectedOption, sampledColor })
+const { syncBackgroundTheme } = useBackgroundThemeColor({ backgroundSurface, selectedOption: stageBackground, sampledColor: stageSampledColor })
 onMounted(() => syncBackgroundTheme())
 
 // Audio + transcription pipeline (mirrors stage-tamagotchi)
@@ -127,7 +145,7 @@ async function sendVoiceInputTextToChat(text: string | undefined) {
 }
 
 function handleVoiceInputText(text: string | undefined) {
-  if (!isMobile.value)
+  if (isDesktopPet.value || !isMobile.value)
     return sendVoiceInputTextToChat(text)
   if (text?.trim())
     mobileInteractiveArea.value?.receiveTranscription(text)
@@ -214,26 +232,28 @@ const cursorPosition = computed(() => ({
 <template>
   <BackgroundProvider
     ref="backgroundSurface"
-    class="widgets top-widgets"
-    :background="selectedOption"
+    class="widgets top-widgets desktop-stage-surface"
+    :background="stageBackground"
     :style="stageSurfaceStyle"
-    :top-color="sampledColor"
+    :top-color="stageSampledColor"
   >
     <div
       data-testid="mobile-stage-content"
       :class="[
-        'relative z-2 h-full w-100vw overflow-hidden md:h-100dvh',
+        'desktop-stage-content relative z-2 h-full w-100vw overflow-hidden md:h-100dvh',
         'flex flex-col',
+        isDesktopPet && 'desktop-pet-stage',
       ]"
     >
       <!-- header -->
-      <div class="px-0 py-1 md:px-3 md:py-3" w-full gap-2>
+      <div v-if="!isDesktopPet" class="px-0 py-1 md:px-3 md:py-3" w-full gap-2>
         <Header class="hidden md:flex" />
       </div>
       <!-- page -->
       <div relative flex="~ 1 row gap-y-0 gap-x-2 <md:col">
         <div relative flex-1 min-w="1/2">
           <div
+            v-show="!isDesktopPet || petViewOpen"
             absolute left-0 z-15 px-3
             :class="[
               stageModelRenderer === 'live2d' ? 'top-0 h-full py-[20vh]' : 'top-1/2 -translate-y-1/2',
@@ -245,18 +265,28 @@ const cursorPosition = computed(() => ({
             v-model:state="modelRenderState"
             h-full w-full
             :cursor-position="cursorPosition"
-            :enable-orbit-controls="!isMobile"
+            :enable-orbit-controls="isDesktopPet ? petViewOpen : !isMobile"
+            :transparent="isDesktopPet"
             :paused="paused"
             @error="markModelFailed"
           />
         </div>
-        <InteractiveArea v-if="!isMobile" h="85dvh" absolute right-4 flex flex-1 flex-col max-w="500px" min-w="30%" />
+        <div
+          v-if="!isMobile"
+          v-show="!isDesktopPet || petChatOpen"
+          :class="isDesktopPet
+            ? 'desktop-pet-chat absolute inset-x-2 bottom-22 top-14 z-25 rounded-xl bg-neutral-50/95 shadow-xl dark:bg-neutral-900/95'
+            : 'absolute right-4 h-85dvh max-w-500px min-w-30%'"
+        >
+          <InteractiveArea :compact="isDesktopPet" :class="isDesktopPet ? 'desktop-pet-chat-area' : 'h-full w-full flex flex-col'" />
+        </div>
       </div>
-      <HoloCoupon />
+      <HoloCoupon v-if="!isDesktopPet" />
+      <DesktopPetControls v-if="isDesktopPet" v-model:chat-open="petChatOpen" v-model:view-open="petViewOpen" />
     </div>
     <Teleport to="body">
       <MobileInteractiveArea
-        v-if="isMobile"
+        v-if="isMobile && !isDesktopPet"
         ref="mobileInteractiveArea"
         @settings-open="handleSettingsOpen"
         @stage-viewport-change="stageViewport = $event"
@@ -264,6 +294,37 @@ const cursorPosition = computed(() => ({
     </Teleport>
   </BackgroundProvider>
 </template>
+
+<style scoped>
+.desktop-pet-stage {
+  height: 100dvh;
+}
+
+.desktop-pet-chat-area {
+  display: flex;
+  height: 100%;
+  padding-top: 0;
+}
+
+.desktop-pet-chat-area :deep(> div:first-child) {
+  min-height: 0;
+  max-height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.desktop-pet-chat-area :deep(.ph-no-capture) {
+  height: auto;
+  max-height: min(220px, 45dvh);
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.desktop-pet-chat-area :deep(textarea) {
+  min-height: 100px;
+  max-height: 120px;
+}
+</style>
 
 <route lang="yaml">
 name: IndexScenePage

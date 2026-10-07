@@ -1,3 +1,17 @@
+desktop-pet:
+  enter: 桌寵模式
+  enter-from-stage: 請先回到角色舞台，再開啟桌寵模式
+  move: 拖曳移動 AIRI
+  always-on-top: 保持在其他視窗上方
+  click-through: 讓滑鼠穿透
+  click-through-hint: 讓滑鼠穿透。可從 AIRI 選單或 Dock 恢復操作。
+  window: 回到一般視窗
+  mic-on: 開啟麥克風
+  mic-off: 關閉麥克風
+  listening: 麥克風已開啟
+  chat: 顯示或隱藏對話
+  adjust-view: 調整角色視角
+  settings: 開啟設定
 chat:
   actions:
     retry: 重試

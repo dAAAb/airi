@@ -20,6 +20,7 @@ APP_ID = 'ai.daaaab.airi-local-classroom'
 MIN_FREE = 5 * 1024 ** 3
 LITE_MODELS = ['qwen', 'asr26', 'kokoro']
 FULL_DEFAULT_MODELS = ['sarc-taigi', 'gemma4', 'asr26', 'kokoro', 'kaedetai']
+APP_VERSION = json.loads((ROOT / 'package.json').read_text())['version']
 
 
 def reserve(path, additional=0):
@@ -166,7 +167,7 @@ def rebrand(app):
             renamed = executable.with_name('AIRI Local')
             if executable != renamed:
                 executable.rename(renamed)
-            values.update(CFBundleShortVersionString='0.1.0', CFBundleVersion='1',
+            values.update(CFBundleShortVersionString=APP_VERSION, CFBundleVersion=APP_VERSION,
                           CFBundleExecutable='AIRI Local',
                           CFBundleIconFile='airi-local.icns' if icon.is_file() else values.get('CFBundleIconFile', 'electron.icns'),
                           NSMicrophoneUsageDescription='AIRI Local 使用麥克風，讓本機虛擬角色聽見你的國語或台語。',
@@ -192,6 +193,7 @@ def main():
         raise SystemExit('Run download-electron.py and build-web.sh before packaging.')
     if not args.resources.is_dir():
         raise SystemExit('Prepare portable runtimes and a payload-manifest.json first.')
+    subprocess.run(['node', str(ROOT / 'build-native.mjs')], check=True)
     manifest = select_manifest(json.loads((args.resources / 'payload-manifest.json').read_text()), args.mode)
     output.parent.mkdir(parents=True, exist_ok=True)
     reserve(output.parent)
@@ -201,8 +203,10 @@ def main():
         (resources / remove).unlink(missing_ok=True)
     app_source = resources / 'app'
     app_source.mkdir()
-    for name in ('package.json', 'main.cjs', 'policy.cjs'):
+    for name in ('package.json', 'policy.cjs'):
         clone_or_copy(ROOT / name, app_source / name)
+    for name in ('main.cjs', 'preload.cjs'):
+        clone_or_copy(ROOT / '.compiled' / name, app_source / name)
     ignored = {'web', 'installer', 'app', '.DS_Store', '__pycache__', 'payload-manifest.json'}
     if args.mode == 'thin':
         ignored.add('payload')
@@ -258,7 +262,7 @@ def main():
             clone_or_copy(source, notices / f'Electron-{name}')
     manifest = validate_resources(resources, args.mode)
     rebrand(output)
-    metadata = {'app_id': APP_ID, 'version': '0.1.0', 'electron': '43.4.1',
+    metadata = {'app_id': APP_ID, 'version': APP_VERSION, 'electron': '43.4.1',
                 'architecture': 'arm64', 'flavor': args.mode, 'offline': manifest['offline'],
                 'models': sorted({row['model'] for row in manifest['files']}
                                  | {row['id'] for row in manifest.get('ollama_models', [])}),

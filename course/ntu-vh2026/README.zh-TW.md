@@ -6,6 +6,8 @@
 
 想從介面選模型與啟動兩種角色，請看 [AIRI Local Mac 安裝包說明](installer/README.zh-TW.md)。下面保留手動安裝與比較實驗，方便修改程式、追蹤每一層的結果。
 
+**2026-10-08：** [桌寵與 AI 語意動作](DESKTOP-PET.zh-TW.md) 說明透明桌面模式、語意選動作的控制流程及學生實驗。
+
 | 名稱 | 耳朵／嘴巴 | 這次真的做了什麼 |
 | --- | --- | --- |
 | MediaTek Breeze2-VITS-onnx | 嘴巴：台灣華語 | Sherpa-ONNX CPU、本機 HTTP 服務、AIRI TTS 測試通過。不是台語 TTS，也沒有用 MLX。 |

@@ -78,6 +78,7 @@ import { useVRMEmote } from '../../composables/vrm/expression'
 import { createVrmInteractionColliders } from '../../composables/vrm/interaction'
 import { resolveInternalVrmHooks } from '../../composables/vrm/internal-hooks'
 import { useVRMLipSync } from '../../composables/vrm/lip-sync'
+import { createVrmSemanticMotion } from '../../composables/vrm/semantic-motion'
 import {
   createThreeRendererMemorySnapshot,
   createVrmSceneSummarySnapshot,
@@ -192,6 +193,7 @@ const raycaster = new Raycaster()
 
 // Animation related ref
 const vrmAnimationMixer = ref<AnimationMixer>()
+const semanticMotion = createVrmSemanticMotion()
 const { onBeforeRender, stop, start } = useLoop()
 
 const vrmHooks: readonly VrmHook[] = resolveInternalVrmHooks()
@@ -316,6 +318,7 @@ function getActiveManagedVrmInstance() {
 }
 
 function clearActiveManagedVrmRefs() {
+  semanticMotion.stop()
   vrmAnimationMixer.value = undefined
   vrmEmote.value = undefined
   vrm.value = undefined
@@ -333,6 +336,7 @@ function applyModelTransform(group: Group) {
 }
 
 function applyManagedVrmInstance(instance: ManagedVrmInstance) {
+  semanticMotion.stop()
   // A reload creates a new group while the saved transform can stay unchanged.
   // Apply it during every commit because the value watchers will not run again.
   applyModelTransform(instance.group)
@@ -460,6 +464,7 @@ function bindManagedVrmInstanceRenderLoop() {
     const tracingEnabled = traceStart > 0
 
     const animationMixerMs = measureFrameStep(tracingEnabled, () => {
+      semanticMotion.restore()
       vrmAnimationMixer.value?.update(delta)
     })
     const activeVrm = vrm.value
@@ -480,6 +485,8 @@ function bindManagedVrmInstanceRenderLoop() {
         runVrmFrameRuntimeHook(activeVrm, delta)
     })
     const humanoidMs = measureFrameStep(tracingEnabled, () => {
+      if (activeVrm && !vrmFrameRuntimeHook.value)
+        semanticMotion.update(activeVrm, delta)
       activeVrm?.humanoid.update()
     })
     const lookAtMs = measureFrameStep(tracingEnabled, () => {
@@ -1103,6 +1110,11 @@ function headAnchor() {
 
 defineExpose({
   headAnchor,
+  playMotion(name: string, intensity = 1) {
+    if (!vrm.value || paused.value || vrmFrameRuntimeHook.value)
+      return false
+    return semanticMotion.play(name, intensity)
+  },
   getInteractionColliders: () => interactionColliders.value?.colliders ?? [],
   setExpression(expression: string, intensity = 1) {
     vrmEmote.value?.setEmotionWithResetAfter(expression, 3000, intensity)
@@ -1111,6 +1123,8 @@ defineExpose({
   // External callers use it for live pose/tracking input; internal hooks remain reserved for
   // stage-ui-three's own model/material lifecycle extensions.
   setVrmFrameHook(hook?: VrmFrameRuntimeHook) {
+    if (hook)
+      semanticMotion.stop()
     vrmFrameRuntimeHook.value = hook
   },
   scene: computed(() => vrm.value?.scene),

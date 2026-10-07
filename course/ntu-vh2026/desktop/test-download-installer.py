@@ -21,6 +21,13 @@ spec.loader.exec_module(downloader)
 
 
 class DownloadInstallerTests(unittest.TestCase):
+    def test_release_version_stays_on_fixed_repository(self):
+        self.assertEqual(downloader.release_url('v0.2.0-ntu2026-local'),
+                         'https://github.com/dAAAb/airi/releases/download/v0.2.0-ntu2026-local')
+        for value in ('https://example.com', '../v0.2.0-ntu2026-local', 'v0.2.0-ntu2026-local?a=b', None):
+            with self.assertRaises(ValueError):
+                downloader.release_url(value)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

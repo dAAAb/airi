@@ -1,3 +1,17 @@
+desktop-pet:
+  enter: Desktop pet
+  enter-from-stage: Return to the character stage to open desktop pet mode
+  move: Drag to move AIRI
+  always-on-top: Keep above other windows
+  click-through: Let clicks pass through
+  click-through-hint: Let clicks pass through. Restore interaction from the AIRI menu or Dock.
+  window: Return to window mode
+  mic-on: Turn on microphone
+  mic-off: Turn off microphone
+  listening: Microphone on
+  chat: Show or hide chat
+  adjust-view: Adjust character view
+  settings: Open settings
 character-switcher:
   title: Switch character
   manage: Manage characters

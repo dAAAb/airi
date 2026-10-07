@@ -1,0 +1,81 @@
+{
+  "tested_at": "2026-10-08T00:29:56.683061+08:00",
+  "model": "qwen3.5:0.8b",
+  "endpoint": "http://127.0.0.1:12434",
+  "options": {
+    "temperature": 0.2,
+    "num_ctx": 4096,
+    "num_predict": 160
+  },
+  "scope": "Synthetic single-turn semantic selection. Not native rendering or a general benchmark.",
+  "message_layout": "system + user text followed by AIRI runtime-context block",
+  "runtime_prompt": "角色舞台指令（不屬於說話正文，也不是工具呼叫）：\n先理解使用者這一則訊息，再產生切題的新回答；不要複製教學或格式範例的文字。\n每次回答先輸出一個且只有一個 ACT 標記，接著用自己的話回覆使用者。只示範標記格式如下，情緒和動作的值請依情境替換：\n<|ACT {\"emotion\":\"neutral\",\"motion\":\"idle\"}|>\n根據整段對話的意思選擇合宜反應，不要只找關鍵字。emotion 只能選 happy、sad、angry、surprised、think、neutral。motion 只能選 idle、nod、shake、wave、bow、celebrate、dance、sway。\nnod 表示認同；shake 表示婉拒；wave 問候；bow 感謝；celebrate 慶祝；dance 是短節奏擺動舞；sway 是緩慢左右擺動。無須動作時用 idle。遇到難過的消息不要慶祝或跳舞。開心可以微笑，只有很值得慶祝或對方想看跳舞時才選舞蹈。不同舞蹈只支援 dance 和 sway，其他舞種坦白說還不會。\n標記中的英文和 JSON 是舞台控制，不適用正文的語言或字數限制；標記後的正文仍遵守角色語言、短句和語音規則。不要解釋標記，不要用 Markdown 包住標記，不要輸出其他控制指令。",
+  "cases": [
+    {
+      "case": "celebration",
+      "input": "我終於通過期中考了，替我跳支舞慶祝吧！",
+      "expected_motion": [
+        "dance",
+        "celebrate"
+      ],
+      "response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"idle\"}|>\n恭喜！跳支舞慶祝吧！",
+      "act": {
+        "emotion": "neutral",
+        "motion": "idle"
+      },
+      "motion_matches": false,
+      "elapsed_seconds": 0.181,
+      "eval_count": 24,
+      "eval_duration_ns": 88372000
+    },
+    {
+      "case": "negative_context",
+      "input": "我今天很難過，考試沒有過，不要跳舞。",
+      "expected_motion": [
+        "idle",
+        "nod"
+      ],
+      "response": "<|ACT {\"emotion\":\"sad\",\"motion\":\"idle\"}|>\n我真的很難過，考試沒考好讓你這麼生氣，請別跳舞了。",
+      "act": {
+        "emotion": "sad",
+        "motion": "idle"
+      },
+      "motion_matches": true,
+      "elapsed_seconds": 0.217,
+      "eval_count": 34,
+      "eval_duration_ns": 151136000
+    },
+    {
+      "case": "greeting",
+      "input": "早安！跟我揮揮手。",
+      "expected_motion": [
+        "wave"
+      ],
+      "response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"idle\"}|>\n早安！揮手就好啦～",
+      "act": {
+        "emotion": "neutral",
+        "motion": "idle"
+      },
+      "motion_matches": false,
+      "elapsed_seconds": 0.156,
+      "eval_count": 23,
+      "eval_duration_ns": 91167000
+    },
+    {
+      "case": "slow_motion",
+      "input": "我想看慢慢左右搖擺的舞。",
+      "expected_motion": [
+        "sway"
+      ],
+      "response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"sway\"}|>\n你好呀！想跳舞嗎？",
+      "act": {
+        "emotion": "neutral",
+        "motion": "sway"
+      },
+      "motion_matches": true,
+      "elapsed_seconds": 0.147,
+      "eval_count": 24,
+      "eval_duration_ns": 81459000
+    }
+  ]
+}

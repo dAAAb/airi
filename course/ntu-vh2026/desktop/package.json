@@ -1,11 +1,11 @@
 {
   "name": "airi-local-classroom",
   "productName": "AIRI Local",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Local Mandarin and Taiwanese AIRI classroom launcher",
   "author": "dAAAb",
   "license": "MIT",
   "main": "main.cjs",
-  "scripts": { "test": "node --test test-policy.cjs" }
+  "scripts": { "build": "node build-native.mjs", "test": "NODE_PATH=../../../apps/stage-web/node_modules node --test test-*.cjs" }
 }

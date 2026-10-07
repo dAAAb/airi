@@ -2,6 +2,10 @@
 
 這是 dAAAb 課程版的獨立 Electron 啟動殼，Bundle ID 為 `ai.daaaab.airi-local-classroom`。它不使用上游 AIRI 的更新服務，也不會取代使用者原有的 Ollama。
 
+0.2.0 加入透明桌寵模式。角色頁的「桌寵模式」與原生「桌寵」選單可切換；`⌘⌥P` 或 Dock 圖示可解除滑鼠穿透並找回角色。模式切換保留同一個 renderer，不重啟錄音或對話。[完整操作與語意動作教學](../DESKTOP-PET.zh-TW.md)。
+
+preload 只公開固定的模式／置頂／穿透控制，透過 Eventa 傳遞，主程序驗證視窗、主 frame 與精確 origin。建置會把既有 workspace 依賴編入 main 與 sandboxed preload。
+
 App 以同一個 `http://127.0.0.1:17900` origin 顯示安裝頁與編譯後的 AIRI。管理服務擁有自己的 Ollama（12434）及推論服務；資料放在 `~/Library/Application Support/AIRI Local Classroom/local`。關閉 App 時，管理服务會關閉它自己啟動的子程序。
 
 ## 三種產物
@@ -88,7 +92,7 @@ python3 course/ntu-vh2026/desktop/generate-download-installer.py \
 python3 course/ntu-vh2026/desktop/test-download-installer.py
 ```
 
-`ACTUAL_APP_BYTES` 使用封裝前 App 的邏輯檔案總大小。下載器固定從 `dAAAb/airi` 的 `v0.1.0-ntu2026-local` release 下載 manifest 指定的分片，不接受自訂 URL。請等全部分片上傳完成、manifest 定案後再產生下載器。
+`ACTUAL_APP_BYTES` 使用封裝前 App 的邏輯檔案總大小。下載器固定從 `dAAAb/airi` 下載 manifest 指定的分片，不接受自訂 URL。新版本請指定 `--release-tag v0.2.0-ntu2026-local`；省略時保留 0.1.0 的重現流程。請等全部分片上傳完成、manifest 定案後再產生下載器。
 
 下載前檢查剩餘分片容量、解壓後 App 大小，再保留 2 GiB 餘裕。檔案放在解壓下載器的同一資料夾；空間不足時，先把整個資料夾搬到其他磁碟。已通過驗證的分片不重抓，未完成分片支援續傳。所有 SHA256 與大小通過後才解壓到新的資料夾，再執行 `codesign --verify` 並開啟資料夾。分片保留供離線搬運，下載器不修改 Gatekeeper。
 

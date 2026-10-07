@@ -1,0 +1,185 @@
+{
+  "scope": "Replay of saved synthetic model output; verifies parser and TTS text separation, not live rendering or pronunciation.",
+  "cases": [
+    {
+      "source": "desktop-pet-gemma-semantic.json",
+      "model": "gemma4:12b-it-qat",
+      "case": "celebration",
+      "raw_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"dance\"}|>太棒了，我現在就為你的成功盡情跳舞。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "dance"
+        }
+      ],
+      "speech_text": "太棒了，我現在就為你的成功盡情跳舞。",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-gemma-semantic.json",
+      "model": "gemma4:12b-it-qat",
+      "case": "negative_context",
+      "raw_response": "<|ACT {\"emotion\":\"sad\",\"motion\":\"idle\"}|>別太難過，下次一定會考過的，我會一直支持你的。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "sad",
+            "intensity": 1
+          },
+          "motion": "idle"
+        }
+      ],
+      "speech_text": "別太難過，下次一定會考過的，我會一直支持你的。",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-gemma-semantic.json",
+      "model": "gemma4:12b-it-qat",
+      "case": "greeting",
+      "raw_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"wave\"}|>早安，很高興見到你。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "wave"
+        }
+      ],
+      "speech_text": "早安，很高興見到你。",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-gemma-semantic.json",
+      "model": "gemma4:12b-it-qat",
+      "case": "slow_motion",
+      "raw_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"sway\"}|>沒問題，我現在就為您表演緩慢左右搖擺的舞蹈。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "sway"
+        }
+      ],
+      "speech_text": "沒問題，我現在就為您表演緩慢左右搖擺的舞蹈。",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-qwen-semantic-final.json",
+      "model": "qwen3.5:0.8b",
+      "case": "celebration",
+      "raw_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"celebrate\"}|>\n恭喜！跳支舞吧！",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "celebrate"
+        }
+      ],
+      "speech_text": "恭喜！跳支舞吧！",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-qwen-semantic-final.json",
+      "model": "qwen3.5:0.8b",
+      "case": "negative_context",
+      "raw_response": "<|ACT {\"emotion\":\"sad\",\"motion\":\"shake\"}|>\n我真的很難過，考試沒考好，別跳舞。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "sad",
+            "intensity": 1
+          },
+          "motion": "shake"
+        }
+      ],
+      "speech_text": "我真的很難過，考試沒考好，別跳舞。",
+      "control_leaked_to_speech": false,
+      "motion_matches": false
+    },
+    {
+      "source": "desktop-pet-qwen-semantic-final.json",
+      "model": "qwen3.5:0.8b",
+      "case": "greeting",
+      "raw_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"wave\"}|>\n早安！揮手問候就好啦～😊",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "wave"
+        }
+      ],
+      "speech_text": "早安！揮手問候就好啦～😊",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-qwen-semantic-final.json",
+      "model": "qwen3.5:0.8b",
+      "case": "slow_motion",
+      "raw_response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"idle\"}|>\n你好！我是你的虛擬課程助理，想看你慢慢左右搖擺的舞。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "neutral",
+            "intensity": 1
+          },
+          "motion": "idle"
+        }
+      ],
+      "speech_text": "你好！我是你的虛擬課程助理，想看你慢慢左右搖擺的舞。",
+      "control_leaked_to_speech": false,
+      "motion_matches": false
+    },
+    {
+      "source": "desktop-pet-sarc-semantic.json",
+      "model": "hf.co/Speech-AI-Research-Center/SARC-Taigi-LLM-12b-GGUF:Q4_K_M",
+      "case": "celebration",
+      "raw_response": "< | ACT { \" emotion \" : \" happy \" , \" motion \" : \" dance \" } | > 恭喜你通過期中考，替你跳舞慶祝！",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "dance"
+        }
+      ],
+      "speech_text": "恭喜你通過期中考，替你跳舞慶祝！",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    },
+    {
+      "source": "desktop-pet-sarc-semantic.json",
+      "model": "hf.co/Speech-AI-Research-Center/SARC-Taigi-LLM-12b-GGUF:Q4_K_M",
+      "case": "negative_context",
+      "raw_response": "< | ACT {\" emotion \" : \" sad \" , \" motion \" : \" idle \" } | > 無關係，考試無過嘛是正常的代誌，下次努力就好矣。",
+      "normalized_actions": [
+        {
+          "emotion": {
+            "name": "sad",
+            "intensity": 1
+          },
+          "motion": "idle"
+        }
+      ],
+      "speech_text": "無關係，考試無過嘛是正常的代誌，下次努力就好矣。",
+      "control_leaked_to_speech": false,
+      "motion_matches": true
+    }
+  ]
+}

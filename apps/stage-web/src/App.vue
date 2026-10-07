@@ -20,7 +20,7 @@ import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
 import { useSettings, useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
 import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
 import { useStartupResourcesStore } from '@proj-airi/stage-ui/stores/startup-resources'
-import { ErrorBoundary, useTheme } from '@proj-airi/ui'
+import { ErrorBoundary, GhostButton, useTheme } from '@proj-airi/ui'
 import { StageTransitionGroup } from '@proj-airi/ui-transitions'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -30,6 +30,7 @@ import { toast, Toaster } from 'vue-sonner'
 
 import PerformanceOverlay from './components/Devtools/PerformanceOverlay.vue'
 
+import { useDesktopPet } from './composables/desktop-pet'
 import { useLocalInstaller } from './composables/local-installer'
 import { usePWAStore } from './stores/pwa'
 
@@ -39,6 +40,12 @@ const contextBridgeStore = useContextBridgeStore()
 const authStore = useAuthStore()
 const i18n = useI18n()
 const router = useRouter()
+const desktop = useDesktopPet()
+const { isDesktopPet, busy: desktopBusy } = desktop
+watch(isDesktopPet, (enabled) => {
+  if (enabled && router.currentRoute.value.path !== '/')
+    void router.push('/')
+})
 const activeRouteTransitionName = ref('')
 const displayModelsStore = useDisplayModelsStore()
 const settingsStore = useSettings()
@@ -214,6 +221,15 @@ function openOnboardingAfterStartup() {
 </script>
 
 <template>
+  <div v-if="desktop.available && !isDesktopPet" class="airi-native-titlebar fixed inset-x-0 top-0 z-50 h-8 flex items-center justify-between bg-neutral-100 pl-22 pr-2 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
+    <span class="pointer-events-none text-xs">AIRI Local</span>
+    <GhostButton
+      size="sm" icon="i-lucide:cat" :disabled="desktopBusy || router.currentRoute.value.path !== '/'"
+      :label="i18n.t('stage.desktop-pet.enter')"
+      :title="i18n.t(router.currentRoute.value.path === '/' ? 'stage.desktop-pet.enter' : 'stage.desktop-pet.enter-from-stage')"
+      @click="desktop.setMode('pet')"
+    />
+  </div>
   <StartupOverlay logo-src="/favicon.svg" @finished="openOnboardingAfterStartup" @skip-model="continueWithoutModel">
     <StageTransitionGroup
       :primary-color="primaryColor"
@@ -221,7 +237,7 @@ function openOnboardingAfterStartup() {
       :tertiary-color="tertiaryColor"
       :colors="colors"
       :z-index="100"
-      :disable-transitions="settings.disableTransitions.value"
+      :disable-transitions="isDesktopPet || settings.disableTransitions.value"
       :use-page-specific-transitions="settings.usePageSpecificTransitions.value"
     >
       <RouterView v-slot="{ Component, route }">

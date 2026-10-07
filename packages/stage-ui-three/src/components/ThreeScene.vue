@@ -981,6 +981,7 @@ watch(directionalLightRotation, (newRotation) => {
 }, { deep: true })
 
 defineExpose({
+  playMotion: (name: string, intensity = 1) => modelRef.value?.playMotion(name, intensity) ?? false,
   setExpression: (expression: string, intensity = 1) => {
     modelRef.value?.setExpression(expression, intensity)
   },

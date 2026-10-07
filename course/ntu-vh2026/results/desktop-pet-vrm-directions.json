@@ -1,0 +1,370 @@
+{
+  "scope": "Offline actual model node transforms + three-vrm humanoid + bundled idle animation + source motion controller. No rendered images.",
+  "checked_at": "2026-10-07T17:10:09.728Z",
+  "sources": [
+    "https://vrm.dev/api/coordinate/",
+    "https://github.com/pixiv/three-vrm/blob/dev/packages/three-vrm-animation/src/createVRMAnimationClip.ts"
+  ],
+  "models": [
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-A/AvatarSample_A.vrm",
+      "sha256": "2a0ccd84880b03d7b65503d8b6287f7a97f3bb4fab70a5fd0a47b433c97827f5",
+      "meta_version": "0",
+      "source_front": [
+        0,
+        0,
+        -1
+      ],
+      "checks": {
+        "bow_moves_forward": true,
+        "right_wave_stays_on_right": true,
+        "right_wave_lifts": true,
+        "left_hand_stays_still_during_wave": true
+      },
+      "samples": [
+        {
+          "motion": "bow",
+          "legacy_axes": true,
+          "head_forward_delta_m": -0.0863315502041694,
+          "right_hand_up_delta_m": 0.012165199129223536,
+          "right_hand_side_m": 0.08331906149586438,
+          "right_hand_forward_m": 0.17808807847726926,
+          "left_hand_motion_m": 0.03991446749870571
+        },
+        {
+          "motion": "bow",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0.08801747444551289,
+          "right_hand_up_delta_m": -0.00372671313825379,
+          "right_hand_side_m": 0.09634367957439133,
+          "right_hand_forward_m": -0.024705434604341235,
+          "left_hand_motion_m": 0.039914467498705704
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.4369595760392879,
+          "right_hand_side_m": -0.4301566939048601,
+          "right_hand_forward_m": -0.15013393530610267,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.6266185720664337,
+          "right_hand_side_m": 0.4236314516038109,
+          "right_hand_forward_m": 0.0002687826539187442,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.00073952118479771,
+          "right_hand_up_delta_m": 0.3567570322462912,
+          "right_hand_side_m": -0.4438318346947584,
+          "right_hand_forward_m": -0.09675322553213583,
+          "left_hand_motion_m": 0.655473954496224
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.0007289303663453664,
+          "right_hand_up_delta_m": 0.5607197299383269,
+          "right_hand_side_m": 0.44993537225251684,
+          "right_hand_forward_m": 0.0596967244261611,
+          "left_hand_motion_m": 0.6487710936629102
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.00565678222104983,
+          "right_hand_up_delta_m": 0.1762297577905041,
+          "right_hand_side_m": -0.3741201482030537,
+          "right_hand_forward_m": -0.01524197459809129,
+          "left_hand_motion_m": 0.3073478482352735
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.006657005277404256,
+          "right_hand_up_delta_m": 0.36161905436517006,
+          "right_hand_side_m": 0.4485155406905882,
+          "right_hand_forward_m": 0.07998311575536715,
+          "left_hand_motion_m": 0.30534089296646544
+        }
+      ]
+    },
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-B/AvatarSample_B.vrm",
+      "sha256": "7fca4a77fdc60ab2c78a9907430744562626180125fa386eb74fb2ea15c2e518",
+      "meta_version": "0",
+      "source_front": [
+        0,
+        0,
+        -1
+      ],
+      "checks": {
+        "bow_moves_forward": true,
+        "right_wave_stays_on_right": true,
+        "right_wave_lifts": true,
+        "left_hand_stays_still_during_wave": true
+      },
+      "samples": [
+        {
+          "motion": "bow",
+          "legacy_axes": true,
+          "head_forward_delta_m": -0.08389933389713142,
+          "right_hand_up_delta_m": 0.011619608495813116,
+          "right_hand_side_m": 0.08061721044032122,
+          "right_hand_forward_m": 0.17232091954383888,
+          "left_hand_motion_m": 0.03862439787292462
+        },
+        {
+          "motion": "bow",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0.08556859487516144,
+          "right_hand_up_delta_m": -0.003452532251522311,
+          "right_hand_side_m": 0.09321946104151524,
+          "right_hand_forward_m": -0.023895519816506686,
+          "left_hand_motion_m": 0.03862439787292466
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.42282728080452425,
+          "right_hand_side_m": -0.416202125495713,
+          "right_hand_forward_m": -0.14528467381923543,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.6063347646161518,
+          "right_hand_side_m": 0.40987784644375025,
+          "right_hand_forward_m": 0.00023780524150038805,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.00071886927529515,
+          "right_hand_up_delta_m": 0.345129368557861,
+          "right_hand_side_m": -0.42944539102288837,
+          "right_hand_forward_m": -0.09361948202130989,
+          "left_hand_motion_m": 0.6342959797214152
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.0007085753577204586,
+          "right_hand_up_delta_m": 0.5426613443261857,
+          "right_hand_side_m": 0.43533652141583856,
+          "right_hand_forward_m": 0.05775735753856633,
+          "left_hand_motion_m": 0.6276868100185954
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.005495765604091167,
+          "right_hand_up_delta_m": 0.1703858534448468,
+          "right_hand_side_m": -0.36200384185211787,
+          "right_hand_forward_m": -0.014758549570984021,
+          "left_hand_motion_m": 0.2972741286285495
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.006472456887494432,
+          "right_hand_up_delta_m": 0.35004125190642765,
+          "right_hand_side_m": 0.4339788511467746,
+          "right_hand_forward_m": 0.07738062728737544,
+          "left_hand_motion_m": 0.29540344255535955
+        }
+      ]
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm0.vrm",
+      "sha256": "568e5285e3791bb79293e846526ce507d4770e11675e823067c9fbbe92cf0287",
+      "meta_version": "0",
+      "source_front": [
+        0,
+        0,
+        -1
+      ],
+      "checks": {
+        "bow_moves_forward": true,
+        "right_wave_stays_on_right": true,
+        "right_wave_lifts": true,
+        "left_hand_stays_still_during_wave": true
+      },
+      "samples": [
+        {
+          "motion": "bow",
+          "legacy_axes": true,
+          "head_forward_delta_m": -0.12673226104478627,
+          "right_hand_up_delta_m": 0.018526152299132903,
+          "right_hand_side_m": 0.0782731043143578,
+          "right_hand_forward_m": 0.16733068554704136,
+          "left_hand_motion_m": 0.01608657597133418
+        },
+        {
+          "motion": "bow",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0.1254650999861051,
+          "right_hand_up_delta_m": -0.016252746946228247,
+          "right_hand_side_m": 0.09049702815541794,
+          "right_hand_forward_m": -0.022977168858565253,
+          "left_hand_motion_m": 0.01608657597133433
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.41297317809737333,
+          "right_hand_side_m": -0.4031342553618703,
+          "right_hand_forward_m": -0.14259879035506706,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.5907882660124806,
+          "right_hand_side_m": 0.39635916400949484,
+          "right_hand_forward_m": -0.0017152088161299164,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.0010626518213348382,
+          "right_hand_up_delta_m": 0.3345676640915851,
+          "right_hand_side_m": -0.4169018261686058,
+          "right_hand_forward_m": -0.09147342435301076,
+          "left_hand_motion_m": 0.6213127324239544
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.0010472364349131125,
+          "right_hand_up_delta_m": 0.5313318883037126,
+          "right_hand_side_m": 0.4217407112964096,
+          "right_hand_forward_m": 0.05536869378517055,
+          "left_hand_motion_m": 0.6107716844653267
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.008535025946552324,
+          "right_hand_up_delta_m": 0.16157282929371508,
+          "right_hand_side_m": -0.35220007170366935,
+          "right_hand_forward_m": -0.015481856691430242,
+          "left_hand_motion_m": 0.29595028529470463
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.009229666968361971,
+          "right_hand_up_delta_m": 0.3455798726034931,
+          "right_hand_side_m": 0.4215514973757854,
+          "right_hand_forward_m": 0.07403728815638036,
+          "left_hand_motion_m": 0.29111608525936156
+        }
+      ]
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm1.vrm",
+      "sha256": "eea43ce7ada1384bb7150335fe87944d27ccd2e8a6be52b6699c2d1f7548a7c4",
+      "meta_version": "1",
+      "source_front": [
+        0,
+        0,
+        1
+      ],
+      "checks": {
+        "bow_moves_forward": true,
+        "right_wave_stays_on_right": true,
+        "right_wave_lifts": true,
+        "left_hand_stays_still_during_wave": true
+      },
+      "samples": [
+        {
+          "motion": "bow",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0.12546502253213068,
+          "right_hand_up_delta_m": -0.01625273154218243,
+          "right_hand_side_m": 0.09049665880550417,
+          "right_hand_forward_m": -0.02297719685475863,
+          "left_hand_motion_m": 0.01608655455272325
+        },
+        {
+          "motion": "bow",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0.12546502253213068,
+          "right_hand_up_delta_m": -0.01625273154218243,
+          "right_hand_side_m": 0.09049665880550417,
+          "right_hand_forward_m": -0.02297719685475863,
+          "left_hand_motion_m": 0.01608655455272325
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": true,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.5907879131027606,
+          "right_hand_side_m": 0.3963592201621512,
+          "right_hand_forward_m": -0.0017152665668552017,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "wave",
+          "legacy_axes": false,
+          "head_forward_delta_m": 0,
+          "right_hand_up_delta_m": 0.5907879131027606,
+          "right_hand_side_m": 0.3963592201621512,
+          "right_hand_forward_m": -0.0017152665668552017,
+          "left_hand_motion_m": 0
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": true,
+          "head_forward_delta_m": -0.0010472357551482014,
+          "right_hand_up_delta_m": 0.5313315306042895,
+          "right_hand_side_m": 0.4217407210623916,
+          "right_hand_forward_m": 0.055368687550890854,
+          "left_hand_motion_m": 0.6107714807870278
+        },
+        {
+          "motion": "celebrate",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.0010472357551482014,
+          "right_hand_up_delta_m": 0.5313315306042895,
+          "right_hand_side_m": 0.4217407210623916,
+          "right_hand_forward_m": 0.055368687550890854,
+          "left_hand_motion_m": 0.6107714807870278
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": true,
+          "head_forward_delta_m": -0.009229660559375692,
+          "right_hand_up_delta_m": 0.34557957012348706,
+          "right_hand_side_m": 0.4215513790108787,
+          "right_hand_forward_m": 0.07403727130927523,
+          "left_hand_motion_m": 0.2911160321391902
+        },
+        {
+          "motion": "dance",
+          "legacy_axes": false,
+          "head_forward_delta_m": -0.009229660559375692,
+          "right_hand_up_delta_m": 0.34557957012348706,
+          "right_hand_side_m": 0.4215513790108787,
+          "right_hand_forward_m": 0.07403727130927523,
+          "left_hand_motion_m": 0.2911160321391902
+        }
+      ]
+    }
+  ]
+}

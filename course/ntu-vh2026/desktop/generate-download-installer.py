@@ -12,7 +12,14 @@ import zipfile
 from pathlib import Path
 
 RELEASE_URL = 'https://github.com/dAAAb/airi/releases/download/v0.1.0-ntu2026-local'
+DEFAULT_RELEASE_TAG = 'v0.1.0-ntu2026-local'
 MARGIN_BYTES = 2 * 1024**3
+
+
+def release_url(tag):
+    if not isinstance(tag, str) or not re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+-ntu2026-local', tag):
+        raise ValueError('Expected a versioned NTU classroom release tag')
+    return f'https://github.com/dAAAb/airi/releases/download/{tag}'
 
 
 def validate_manifest(value, prefix):
@@ -36,7 +43,7 @@ def validate_manifest(value, prefix):
     return {'app': app, 'parts': parts}
 
 
-def render_command(manifest, prefix, unpacked_bytes):
+def render_command(manifest, prefix, unpacked_bytes, release_tag=DEFAULT_RELEASE_TAG):
     manifest = validate_manifest(manifest, prefix)
     if type(unpacked_bytes) is not int or unpacked_bytes <= 0:
         raise ValueError('Expected the positive unpacked app size')
@@ -49,7 +56,7 @@ def render_command(manifest, prefix, unpacked_bytes):
     template = Path(__file__).with_name('download-installer-template.zsh').read_text()
     values = {
         '@@PREFIX@@': shlex.quote(prefix), '@@APP@@': shlex.quote(manifest['app']),
-        '@@URL@@': shlex.quote(RELEASE_URL), '@@NAMES@@': names,
+        '@@URL@@': shlex.quote(release_url(release_tag)), '@@NAMES@@': names,
         '@@HASHES@@': hashes, '@@SIZES@@': sizes,
         '@@UNPACKED@@': str(unpacked_bytes), '@@MARGIN@@': str(MARGIN_BYTES),
         '@@TOTAL@@': str(sum(row['bytes'] for row in parts)),
@@ -59,12 +66,12 @@ def render_command(manifest, prefix, unpacked_bytes):
     return template
 
 
-def generate(manifest_path, output, unpacked_bytes):
+def generate(manifest_path, output, unpacked_bytes, release_tag=DEFAULT_RELEASE_TAG):
     if not manifest_path.name.endswith('-parts.json'):
         raise ValueError('Expected <prefix>-parts.json')
     prefix = manifest_path.name.removesuffix('-parts.json')
     manifest = validate_manifest(json.loads(manifest_path.read_text()), prefix)
-    command = render_command(manifest, prefix, unpacked_bytes)
+    command = render_command(manifest, prefix, unpacked_bytes, release_tag)
     output.mkdir(parents=True, exist_ok=True)
     command_path = output / f'Download-{prefix}.command'
     zip_path = output / f'{prefix}-Downloader.zip'
@@ -78,7 +85,7 @@ def generate(manifest_path, output, unpacked_bytes):
         'Full／Lite App 已包含對應模型。Thin App 開啟後仍需選取下載模型。\n'
         'App 使用 ad-hoc 簽章，未經 Apple notarization。此程式不改 Gatekeeper。\n'
         '若 macOS 阻擋，請依系統提示自行決定是否允許，勿使用來路不明的繞過指令。\n\n'
-        f'Release: {RELEASE_URL}\n'
+        f'Release: {release_url(release_tag)}\n'
         f'Archive parts: {sum(row["bytes"] for row in manifest["parts"])} bytes\n'
         f'Unpacked app: {unpacked_bytes} bytes\n'
         f'Free-space margin: {MARGIN_BYTES} bytes\n'
@@ -104,8 +111,9 @@ def main():
     parser.add_argument('manifest', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--unpacked-bytes', type=int, required=True)
+    parser.add_argument('--release-tag', default=DEFAULT_RELEASE_TAG)
     args = parser.parse_args()
-    for path in generate(args.manifest, args.output, args.unpacked_bytes):
+    for path in generate(args.manifest, args.output, args.unpacked_bytes, args.release_tag):
         print(path)
 
 

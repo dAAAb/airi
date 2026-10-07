@@ -6,6 +6,20 @@
 
 > Heavily inspired by [Neuro-sama](https://www.youtube.com/@Neurosama)
 
+## Local Mac desktop pet
+
+The classroom Mac package exposes a narrow `window.airiDesktop` bridge.
+Its title bar opens desktop pet mode with a transparent character stage and compact controls.
+Drag the AIRI handle to move the window. Use the microphone, chat, view, pin, and settings buttons around the character.
+The microphone indicator stays visible while microphone input is enabled.
+
+Click-through applies to the whole window. Restore interaction through the native AIRI menu or Dock.
+Switching modes keeps the stage mounted, preserves the selected background, and reuses the speech pipeline.
+Opening settings returns to the ordinary window layout.
+
+An ordinary browser has no native bridge, so it keeps the web layout.
+Adding `?desktopPet=1` to a browser URL does not create a floating desktop window.
+
 ## Performance diagnostics
 
 Run `pnpm dev:web:https` from the repository root. Open `/devtools/performance-visualizer` and enable FPS.

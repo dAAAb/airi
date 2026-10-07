@@ -37,6 +37,37 @@ html.dark {
   color-scheme: dark;
 }
 
+html.airi-desktop-window #app {
+  box-sizing: border-box;
+  padding-top: 32px;
+}
+
+.airi-native-titlebar {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.airi-native-titlebar button {
+  -webkit-app-region: no-drag;
+}
+
+html.airi-desktop-pet,
+html.airi-desktop-pet body,
+html.airi-desktop-pet #app {
+  background: transparent !important;
+  overflow: hidden;
+}
+
+html.airi-desktop-pet {
+  transition: none;
+}
+
+html.airi-desktop-window .desktop-stage-surface,
+html.airi-desktop-window .desktop-stage-content {
+  height: calc(100dvh - 32px);
+  min-height: calc(100dvh - 32px);
+}
+
 #nprogress {
   pointer-events: none;
 }

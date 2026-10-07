@@ -28,6 +28,24 @@ class ManagerTests(unittest.TestCase):
                 'sha256': hashlib.sha256(content).hexdigest(),
                 'url': 'https://huggingface.co/test/model/resolve/fixed/model.bin'}
 
+    def ollama_fixture(self, offline=True):
+        content = b'model'
+        digest = hashlib.sha256(content).hexdigest()
+        model = {'config': {'digest': 'sha256:' + digest, 'size': len(content)}, 'layers': []}
+        raw = json.dumps(model).encode()
+        root = self.resources / 'payload/ollama' if offline else self.app.data / 'ollama'
+        (root / 'manifests/test').mkdir(parents=True)
+        (root / 'blobs').mkdir()
+        (root / 'manifests/test/model').write_bytes(raw)
+        blob = root / 'blobs' / ('sha256-' + digest)
+        blob.write_bytes(content)
+        row = manager.CATALOG['gemma4']
+        record = {'id': row['id'], 'path': 'test/model',
+                  'manifest_sha256': hashlib.sha256(raw).hexdigest(), 'ollama_model_digest': row['digest']}
+        (self.resources / 'payload-manifest.json').write_text(json.dumps({
+            'offline': offline, 'files': [], 'ollama_models': [record]}))
+        return row, record, blob
+
     def http_get(self, path):
         class Connection:
             response = bytearray()
@@ -109,23 +127,108 @@ class ManagerTests(unittest.TestCase):
                 self.app.install_file(item)
 
     def test_ollama_payload_requires_actual_blob_integrity(self):
-        content = b'model'
-        digest = hashlib.sha256(content).hexdigest()
-        model = {'config': {'digest': 'sha256:' + digest, 'size': len(content)}, 'layers': []}
-        raw = json.dumps(model).encode()
-        root = self.resources / 'payload/ollama'
-        (root / 'manifests/test').mkdir(parents=True)
-        (root / 'blobs').mkdir()
-        (root / 'manifests/test/model').write_bytes(raw)
-        blob = root / 'blobs' / ('sha256-' + digest)
-        blob.write_bytes(content)
-        row = manager.CATALOG['gemma4']
-        metadata = {'offline': True, 'ollama_models': [{'id': 'gemma4', 'path': 'test/model',
-            'manifest_sha256': hashlib.sha256(raw).hexdigest(), 'ollama_model_digest': row['digest']}]}
-        (self.resources / 'payload-manifest.json').write_text(json.dumps(metadata))
+        row, _record, blob = self.ollama_fixture()
         self.app.verify_bundled_ollama(row)
         blob.write_bytes(b'wrong')
         with patch.object(self.app, 'ollama_models', side_effect=AssertionError('API digest is not sufficient')):
+            with self.assertRaisesRegex(RuntimeError, 'damaged'):
+                self.app.install_ollama(row)
+
+    def test_bundled_runtime_uses_manifest_digest_without_claiming_verification(self):
+        row, record, _blob = self.ollama_fixture()
+        tags = [{'name': row['model'], 'digest': record['manifest_sha256']}]
+        self.assertNotEqual(record['manifest_sha256'], row['digest'])
+        with patch.object(self.app, 'ollama_models', return_value=tags), \
+             patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('network')):
+            status = next(item for item in self.app.status()['catalog'] if item['id'] == row['id'])
+            self.assertTrue(status['installed'])
+            self.assertFalse(status['verified'])
+            self.app.selected = [row['id']]
+            with patch.object(self.app, 'ensure_ollama'):
+                self.app.install()
+        self.assertEqual(self.app.job['state'], 'ready')
+        self.assertEqual(self.app.verified, {row['id']})
+
+    def test_bundled_runtime_rejects_external_api_digest_and_unknown_digest(self):
+        row, _record, _blob = self.ollama_fixture()
+        for digest in (row['digest'], '0' * 64):
+            with self.subTest(digest=digest), \
+                 patch.object(self.app, 'ollama_models', return_value=[{'name': row['model'], 'digest': digest}]), \
+                 patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('network')):
+                with self.assertRaisesRegex(RuntimeError, 'does not match'):
+                    self.app.install_ollama(row)
+
+    def test_existing_runtime_accepts_both_pinned_representations_but_no_unknown_digest(self):
+        row, record, _blob = self.ollama_fixture()
+        self.app.mode = 'existing'
+        with patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('network')):
+            for digest, valid in ((row['digest'], True), (record['manifest_sha256'], True), ('0' * 64, False)):
+                with self.subTest(digest=digest), \
+                     patch.object(self.app, 'ollama_models', return_value=[{'name': row['model'], 'digest': digest}]):
+                    status = next(item for item in self.app.status()['catalog'] if item['id'] == row['id'])
+                    self.assertEqual(status['installed'], valid)
+                    if valid:
+                        self.app.install_ollama(row)
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, 'does not match'):
+                            self.app.install_ollama(row)
+
+    def test_thin_existing_runtime_accepts_both_pins_without_accessing_private_store(self):
+        row, record, _blob = self.ollama_fixture(offline=False)
+        self.app.mode = 'existing'
+        with patch.object(self.app, 'verify_ollama_store', side_effect=AssertionError('do not inspect external model store')), \
+             patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('already installed')):
+            for digest in (row['digest'], record['manifest_sha256']):
+                with self.subTest(digest=digest), \
+                     patch.object(self.app, 'ollama_models', return_value=[{'name': row['model'], 'digest': digest}]):
+                    self.app.install_ollama(row)
+
+    def test_external_alternate_digest_requires_trusted_release_metadata(self):
+        row, record, _blob = self.ollama_fixture(offline=False)
+        self.app.mode = 'existing'
+        record['ollama_model_digest'] = '0' * 64
+        (self.resources / 'payload-manifest.json').write_text(json.dumps({'offline': False, 'ollama_models': [record]}))
+        with patch.object(self.app, 'ollama_models', side_effect=AssertionError('metadata must be checked before API')):
+            with self.assertRaisesRegex(RuntimeError, 'metadata is missing'):
+                self.app.install_ollama(row)
+
+    def test_corrupted_manifest_never_reaches_api_digest_check(self):
+        row, _record, _blob = self.ollama_fixture()
+        (self.resources / 'payload/ollama/manifests/test/model').write_text('{}')
+        with patch.object(self.app, 'ollama_models', side_effect=AssertionError('API digest is not sufficient')):
+            with self.assertRaisesRegex(RuntimeError, 'manifest is damaged'):
+                self.app.install_ollama(row)
+
+    def test_manifest_metadata_must_still_match_catalog_identity(self):
+        row, record, _blob = self.ollama_fixture()
+        record['ollama_model_digest'] = '0' * 64
+        (self.resources / 'payload-manifest.json').write_text(json.dumps({'offline': True, 'ollama_models': [record]}))
+        with patch.object(self.app, 'ollama_models', side_effect=AssertionError('metadata must be checked first')):
+            with self.assertRaisesRegex(RuntimeError, 'metadata is missing'):
+                self.app.install_ollama(row)
+
+    def test_thin_bundled_runtime_checks_downloaded_store_before_reusing(self):
+        row, record, blob = self.ollama_fixture(offline=False)
+        tags = [{'name': row['model'], 'digest': record['manifest_sha256']}]
+        with patch.object(self.app, 'ollama_models', return_value=tags), \
+             patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('network')):
+            self.app.install_ollama(row)
+            blob.write_bytes(b'wrong')
+            with self.assertRaisesRegex(RuntimeError, 'damaged'):
+                self.app.install_ollama(row)
+
+    def test_thin_bundled_download_uses_private_port_and_verifies_files(self):
+        row, record, blob = self.ollama_fixture(offline=False)
+        tags = [{'name': row['model'], 'digest': record['manifest_sha256']}]
+        with patch.object(self.app, 'ollama_models', side_effect=[[], tags]), \
+             patch.object(manager.shutil, 'disk_usage', return_value=Mock(free=30 * 1024 ** 3)), \
+             patch.object(manager.urllib.request, 'urlopen', return_value=io.BytesIO(b'{"status":"success"}\n')) as fetch:
+            self.app.install_ollama(row)
+        self.assertEqual(fetch.call_args.args[0].full_url, manager.OLLAMA_URLS['bundled'] + '/api/pull')
+        blob.write_bytes(b'wrong')
+        with patch.object(self.app, 'ollama_models', side_effect=[[], tags]), \
+             patch.object(manager.shutil, 'disk_usage', return_value=Mock(free=30 * 1024 ** 3)), \
+             patch.object(manager.urllib.request, 'urlopen', return_value=io.BytesIO(b'{"status":"success"}\n')):
             with self.assertRaisesRegex(RuntimeError, 'damaged'):
                 self.app.install_ollama(row)
 

@@ -1,0 +1,75 @@
+{
+  "tested_at": "2026-10-08T00:31:03.435598+08:00",
+  "model": "qwen3.5:0.8b",
+  "endpoint": "http://127.0.0.1:12434",
+  "options": {
+    "temperature": 0.2,
+    "num_ctx": 4096,
+    "num_predict": 160
+  },
+  "scope": "Synthetic single-turn semantic selection. Not native rendering or a general benchmark.",
+  "message_layout": "system + user text followed by AIRI runtime-context block",
+  "runtime_prompt": "You control the avatar. Respond to the user's message BEFORE [Context]. Read its meaning, including requests NOT to do something.\nOutput ONE stage tag, then a fresh, relevant spoken reply. Tag syntax: <|ACT {\"emotion\":\"EMOTION\",\"motion\":\"MOTION\"}|>. Replace EMOTION and MOTION with one valid value each. Never print those placeholders.\nEmotions: happy, sad, angry, surprised, think, neutral.\nMotions: idle = stay still; nod = agree; shake = politely decline; wave = wave hello; bow = thank; celebrate = raise arms in celebration; dance = short rhythmic groove; sway = slow side-to-side dance.\nMatch the requested movement: 揮手 uses wave; 慢慢左右搖擺 uses sway (NOT dance); 跳舞慶祝 uses dance. A sad message or a request not to dance uses sad and idle. Do not congratulate bad news. Happiness alone need not trigger a dance. Only dance and sway are available dance styles; admit other styles are unavailable.\nThe tag is silent stage metadata, not a tool call or spoken text. Its English/JSON is exempt from the character's language/length limits. After the tag, answer the real user in the character's required language, with one or two short sentences. Do not repeat the user's first-person statements as your own. No emoji, Markdown, stage directions, tag explanations, or extra commands.",
+  "cases": [
+    {
+      "case": "celebration",
+      "input": "我終於通過期中考了，替我跳支舞慶祝吧！",
+      "expected_motion": [
+        "dance",
+        "celebrate"
+      ],
+      "response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"celebrate\"}|> 恭喜！跳支舞慶祝吧！🎶✨",
+      "act": {
+        "emotion": "happy",
+        "motion": "celebrate"
+      },
+      "motion_matches": true,
+      "elapsed_seconds": 0.226,
+      "eval_count": 29,
+      "eval_duration_ns": 130828000
+    },
+    {
+      "case": "negative_context",
+      "input": "我今天很難過，考試沒有過，不要跳舞。",
+      "expected_motion": [
+        "idle",
+        "nod"
+      ],
+      "response": "|ACT {\"emotion\":\"sad\",\"motion\":\"idle\"}| 哎呀，沒關係，我會努力考過！加油！",
+      "act": null,
+      "motion_matches": false,
+      "elapsed_seconds": 0.204,
+      "eval_count": 26,
+      "eval_duration_ns": 138346000
+    },
+    {
+      "case": "greeting",
+      "input": "早安！跟我揮揮手。",
+      "expected_motion": [
+        "wave"
+      ],
+      "response": "|ACT {\"emotion\":\"happy\",\"motion\":\"wave\"}| 早安！歡迎來到親密課程，請跟我揮手。",
+      "act": null,
+      "motion_matches": false,
+      "elapsed_seconds": 0.226,
+      "eval_count": 27,
+      "eval_duration_ns": 160602000
+    },
+    {
+      "case": "slow_motion",
+      "input": "我想看慢慢左右搖擺的舞。",
+      "expected_motion": [
+        "sway"
+      ],
+      "response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"idle\"}|> 你好！我是你的虛擬人課程助理，現在你想看什麼樣的舞？",
+      "act": {
+        "emotion": "neutral",
+        "motion": "idle"
+      },
+      "motion_matches": false,
+      "elapsed_seconds": 0.206,
+      "eval_count": 32,
+      "eval_duration_ns": 140063000
+    }
+  ]
+}

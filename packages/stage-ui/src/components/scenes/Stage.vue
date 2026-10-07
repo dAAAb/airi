@@ -59,9 +59,11 @@ const props = withDefaults(defineProps<{
   cursorPosition?: { x: number, y: number }
   enableOrbitControls?: boolean
   paused?: boolean
+  transparent?: boolean
 }>(), {
   enableOrbitControls: true,
   paused: false,
+  transparent: false,
 })
 
 const emit = defineEmits<{ error: [error: Error] }>()
@@ -267,6 +269,7 @@ const activeCardId = computed(() => activeCard.value?.name ?? 'default')
 const speechRuntimeStore = useSpeechRuntimeStore()
 const backgroundStore = useBackgroundStore()
 const { activeBackgroundUrl } = storeToRefs(backgroundStore)
+const sceneBackgroundUrl = computed(() => props.transparent ? null : activeBackgroundUrl.value)
 
 const { currentMotion } = storeToRefs(useLive2dParams())
 
@@ -327,9 +330,14 @@ function toStageEmotionPayload(payload: { name: string, intensity: number }): Em
 chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
   if (signal.type === 'act') {
     const act = normalizeActPayload(signal.payload)
-    if (act.motion && stageModelRenderer.value === 'live2d') {
-      currentMotion.value = { group: act.motion }
-      return
+    if (act.motion) {
+      if (stageModelRenderer.value === 'live2d') {
+        currentMotion.value = { group: act.motion }
+        return
+      }
+      else if (stageModelRenderer.value === 'vrm') {
+        vrmViewerRef.value?.playMotion(act.motion)
+      }
     }
     if (act.emotion) {
       const emotion = toStageEmotionPayload(act.emotion)
@@ -1008,6 +1016,11 @@ defineExpose({
       await vrmViewerRef.value?.setExpression(expression, intensity)
     }
   },
+  playMotion: (name: string, intensity = 1) => {
+    if (stageModelRenderer.value === 'vrm')
+      return vrmViewerRef.value?.playMotion(name, intensity) ?? false
+    return false
+  },
 })
 </script>
 
@@ -1023,7 +1036,7 @@ defineExpose({
         h-full w-full flex-1
         :model-src="stageModelSelectedUrl"
         :model-id="stageModelSelected"
-        :background-url="activeBackgroundUrl"
+        :background-url="sceneBackgroundUrl"
         :cursor-position="cursorPosition"
         :mouth-open-size="mouthOpenSize"
         :now-speaking="nowSpeaking"
@@ -1040,14 +1053,14 @@ defineExpose({
         ref="vrmViewerRef"
         v-model:state="componentState"
         :presence="presenceBubble"
-        :background-url="activeBackgroundUrl"
+        :background-url="sceneBackgroundUrl"
         min-w="50% <lg:full" h-full w-full flex-1
         :model-id="stageModelSelected"
         :model-src="stageModelSelectedUrl"
         :cursor-position="cursorPosition"
         :idle-animation="animations.idleLoop.toString()"
         :paused="paused"
-        :show-axes="stageViewControlsEnabled"
+        :show-axes="stageViewControlsEnabled && !props.transparent"
         :enable-orbit-controls="props.enableOrbitControls"
         :audio-context="audioContext"
         :current-audio-source="currentAudioSource"
@@ -1058,7 +1071,7 @@ defineExpose({
         v-if="stageModelRenderer === 'spine' && showStage"
         ref="spineSceneRef"
         v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
+        :background-url="sceneBackgroundUrl"
         min-w="50% <lg:full"
         h-full w-full flex-1
         :model-src="stageModelSelectedUrl"
@@ -1075,7 +1088,7 @@ defineExpose({
         v-if="stageModelRenderer === 'tachie' && showStage"
         ref="tachieSceneRef"
         v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
+        :background-url="sceneBackgroundUrl"
         min-w="50% <lg:full"
         h-full w-full flex-1
         :model-src="stageModelSelectedUrl"
@@ -1089,7 +1102,7 @@ defineExpose({
         v-if="stageModelRenderer === 'mmd' && showStage"
         ref="mmdSceneRef"
         v-model:state="componentState"
-        :background-url="activeBackgroundUrl"
+        :background-url="sceneBackgroundUrl"
         min-w="50% <lg:full"
         h-full w-full flex-1
         :model-src="stageModelSelectedUrl"
