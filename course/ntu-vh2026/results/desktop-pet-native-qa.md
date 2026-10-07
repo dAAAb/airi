@@ -21,6 +21,17 @@
 
 **方向修正後的最後原生畫面檢查尚待完成：Mac 鎖定，無法操作 UI。** 未將此項記成通過。拖曳的實際位移、附件草稿、拔除螢幕與真人麥克風本次也沒有完整驗收。
 
+## 最終 Full 包的服務驗收
+
+鎖定期間另用最終 App 內的 LocalManager、Ollama 與語音執行環境，在 `/tmp` 的隔離資料目錄啟動服務；沒有操作 GUI、下載模型或改動使用者設定。Gemma／ASR／Kokoro 檔案與模型識別碼驗證、私人服務啟動及清理，共 11 個條件通過。
+
+- 隨附 Ollama 0.35.1：Gemma 回 HTTP 200，單次 2.394 秒；這是服務可用性測試，回覆受 token 上限截斷，不是回答品質評分。
+- Speech hub → Kokoro：HTTP 200，4.0 秒 WAV，生成耗時 0.577 秒。
+- Breeze ASR：health HTTP 200；沒有輸入真人錄音。
+- App 簽章在測試前後均通過；既有 11434 的版本與 PID 未改變。測試建立的私人服務全部停止。
+
+[原始服務驗收報告](desktop-pet-full-backend-smoke.json)。本次沒有重新測試 SARC／KaedeTai 的完整台語語音鏈。
+
 ## 自動檢查與限制
 
 - Marker parser／chat orchestrator：57 tests 通過。

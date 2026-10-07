@@ -1,0 +1,97 @@
+{
+  "scope": "Final packaged Full backend only, no native GUI or microphone recording",
+  "data_dir": "/private/tmp/airi-final-full-smoke-lp49ymu1",
+  "selected_models": [
+    "gemma4",
+    "asr26",
+    "kokoro"
+  ],
+  "started_at": "2026-10-07T17:30:43Z",
+  "checks": {
+    "signature_before": true,
+    "installed_and_verified": true,
+    "bundled_digest_matches_pinned_manifest": true,
+    "gemma_chat_200_nonempty": true,
+    "hub_to_kokoro_200_valid_wav": true,
+    "selection_persisted_in_temp_only": true,
+    "private_ui_not_started": true,
+    "owned_services_stopped": true,
+    "private_ports_released": true,
+    "external_ollama_unchanged": true,
+    "signature_after": true
+  },
+  "external_ollama_before": {
+    "listener_pid": [
+      "1045"
+    ],
+    "version": "0.40.0"
+  },
+  "manager_sha256": "f380da8fa8c09a9a8d4f36abc9edfef7ce3aa45b4a4cd26e7b3039402b9ebd8b",
+  "bundled_ollama_version": "0.35.1",
+  "owned_services": {
+    "ollama": 46695,
+    "asr26": 46708,
+    "kokoro": 46711,
+    "speech-hub": 46713
+  },
+  "health": {
+    "asr": {
+      "http_status": 200,
+      "body": {
+        "status": "ok",
+        "model": "breeze-asr-26-mlx",
+        "source": "RayyTien/Breeze-ASR-26-mlx-4bit",
+        "provider": "mlx",
+        "mode": "audio segments, not streaming decoding",
+        "max_audio_seconds": 120,
+        "tokenizer_compatibility": {
+          "compatibility_patch": "HF Whisper no-speech spelling",
+          "previous_no_speech_id": 50257,
+          "no_speech_spelling": "<|nocaptions|>",
+          "no_speech_id": 50362,
+          "eot_id": 50257,
+          "eot_suppressed": false,
+          "scope": "in-memory wrapper property only; site-packages unchanged"
+        }
+      }
+    },
+    "kokoro": {
+      "http_status": 200,
+      "body": {
+        "ready": true,
+        "model": "kokoro",
+        "language": "Mandarin Chinese"
+      }
+    },
+    "speech_hub": {
+      "http_status": 200,
+      "body": {
+        "status": "ok",
+        "models": [
+          "kokoro",
+          "taigi-hanzi"
+        ],
+        "scope": "Fixed local routing; this is not a backend readiness check"
+      }
+    }
+  },
+  "chat": {
+    "http_status": 200,
+    "model": "gemma4:12b-it-qat",
+    "text": "這裡有幾種不同語氣的簡短問候，你可以根據課程的氛圍選擇最適合的一種：\n\n**1. 熱情活力型（適合開課或社群互動）：**\n「大家好！歡迎加入虛擬人課程的夥伴們，很高興能與各位一起探索",
+    "seconds": 2.394
+  },
+  "speech": {
+    "http_status": 200,
+    "bytes": 192044,
+    "audio_seconds": 4.0,
+    "elapsed_seconds": 0.577,
+    "sha256": "7ad1ca9d83e8db5d8da217b0e8d43888625d284aa103fd140c37b631469859b6"
+  },
+  "external_ollama_after": {
+    "listener_pid": [
+      "1045"
+    ],
+    "version": "0.40.0"
+  }
+}
