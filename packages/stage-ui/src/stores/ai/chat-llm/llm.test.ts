@@ -4,7 +4,7 @@ import type { Tool } from '@xsai/shared-chat'
 import type { ExecutableTool } from './tools'
 
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { isToolRelatedError, useLLM } from './llm'
 import { useLlmToolsStore } from './tools'
@@ -81,6 +81,11 @@ describe('isToolRelatedError', () => {
     debugMock.mockClear()
     createSparkCommandToolMock.mockClear()
     setActivePinia(createPinia())
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.restoreAllMocks()
   })
 
   const positives: [provider: string, msg: string][] = [
@@ -247,6 +252,40 @@ describe('isToolRelatedError', () => {
   } satisfies Tool
 
   const helloTurns = { turns: [{ id: 'user', type: 'user' as const, content: [{ type: 'text' as const, text: 'hello' }] }] }
+
+  it('omits tool definitions and tool choice when the local launch disables tools', async () => {
+    vi.stubEnv('VITE_AIRI_DISABLE_TOOLS', 'true')
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const customTools = vi.fn(async () => [customTool])
+    streamTextMock.mockImplementationOnce(() => createMockStreamResult())
+
+    await useLLM().stream('completion-only-model', provider, helloTurns, {
+      tools: customTools,
+      supportsTools: true,
+      toolChoice: 'required',
+    })
+
+    expect(streamTextMock.mock.calls[0]?.[0]?.tools).toBeUndefined()
+    expect(streamTextMock.mock.calls[0]?.[0]?.toolChoice).toBeUndefined()
+    expect(customTools).not.toHaveBeenCalled()
+    expect(mcpMock).not.toHaveBeenCalled()
+    expect(debugMock).not.toHaveBeenCalled()
+    expect(warning).toHaveBeenCalledWith(expect.stringContaining('Character action and MCP tools are unavailable'))
+  })
+
+  it('preserves tool calling when the local disable flag is false', async () => {
+    vi.stubEnv('VITE_AIRI_DISABLE_TOOLS', 'false')
+    streamTextMock.mockImplementationOnce(() => createMockStreamResult())
+
+    await useLLM().stream('model-a', provider, helloTurns, {
+      tools: [customTool],
+      toolChoice: 'required',
+    })
+
+    expect(streamTextMock.mock.calls[0]?.[0]?.tools?.map(toolNameFrom)).toContain('custom-tool')
+    expect(streamTextMock.mock.calls[0]?.[0]?.toolChoice).toBe('required')
+    expect(mcpMock).toHaveBeenCalledTimes(1)
+  })
 
   for (const message of [
     'Invalid schema for function \'broken\': \'dict\' is not valid under any of the given schemas',

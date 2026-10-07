@@ -22,6 +22,10 @@ export interface LlmStreamOptions extends StreamOptions {
 export const useLLM = defineStore('llm', () => {
   const toolsCompatibility = ref<Map<string, boolean>>(new Map())
   const contentArrayCompatibility = ref<Map<string, boolean>>(new Map())
+  const disableTools = import.meta.env.VITE_AIRI_DISABLE_TOOLS === 'true'
+
+  if (disableTools)
+    console.warn('[llm] Tool calling is disabled by VITE_AIRI_DISABLE_TOOLS=true. Character action and MCP tools are unavailable. VRM idle animation and speech lip sync remain available.')
 
   async function stream(model: string, chatProvider: GenerationProvider, context: Conversation, options?: LlmStreamOptions) {
     const key = modelKey(model, chatProvider.generation(model))
@@ -35,6 +39,8 @@ export const useLLM = defineStore('llm', () => {
       conversation: context,
       options: {
         ...streamOptions,
+        supportsTools: disableTools ? false : streamOptions.supportsTools,
+        toolChoice: disableTools ? undefined : streamOptions.toolChoice,
         onStreamEvent: async (event) => {
           if (event.type === 'tool-call')
             toolExecutionStarted = true

@@ -17,7 +17,7 @@ import { useConsciousnessStore } from '@proj-airi/stage-ui/stores/modules/consci
 import { useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision'
 import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
 import { Button, FieldInput, FieldValues, GhostButton, IconButton } from '@proj-airi/ui'
-import { ComboboxSelect } from '@proj-airi/ui/components/form'
+import { ComboboxSelect, Input } from '@proj-airi/ui/components/form'
 import { isEqual } from 'es-toolkit'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
@@ -211,6 +211,13 @@ const speechModelOptions = computed(() => {
     value: model.id,
     label: model.name || model.id,
   })), selectedSpeechModel.value)
+})
+
+// Compatible speech servers define their own model and voice IDs. Their catalogs
+// can be empty, so cards accept the same free-form IDs as the provider settings.
+const usesCustomSpeechIds = computed(() => {
+  const provider = selectedSpeechProvider.value || speechProvider.value
+  return providersStore.findProviderDefinition(provider)?.id === 'openai-compatible-audio-speech'
 })
 
 // Computed: available speech voices options
@@ -996,7 +1003,15 @@ function handleBack() {
                     <label :class="moduleFieldLabelClasses">
                       {{ t('settings.pages.card.speech.model') }}
                     </label>
+                    <Input
+                      v-if="usesCustomSpeechIds"
+                      v-model="selectedSpeechModel"
+                      :aria-label="t('settings.pages.card.speech.model')"
+                      :placeholder="getDefaultPlaceholder()"
+                      class="w-full"
+                    />
                     <ComboboxSelect
+                      v-else
                       v-model="speechModelSelection"
                       :options="speechModelOptions"
                       :placeholder="getDefaultPlaceholder()"
@@ -1007,7 +1022,15 @@ function handleBack() {
                     <label :class="moduleFieldLabelClasses">
                       {{ t('settings.pages.card.speech.voice') }}
                     </label>
+                    <Input
+                      v-if="usesCustomSpeechIds"
+                      v-model="selectedSpeechVoiceId"
+                      :aria-label="t('settings.pages.card.speech.voice')"
+                      :placeholder="getDefaultPlaceholder()"
+                      class="w-full"
+                    />
                     <ComboboxSelect
+                      v-else
                       v-model="speechVoiceSelection"
                       :options="speechVoiceOptions"
                       :placeholder="getDefaultPlaceholder()"

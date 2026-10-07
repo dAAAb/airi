@@ -72,3 +72,27 @@ pnpm exec moeru-lint \
   packages/stage-ui/src/composables/vision/use-vision-inference.test.ts
 git diff --check
 ```
+
+## Explicit tool-free local conversation
+
+Some SARC models offer conversation without tool calling. Set `VITE_AIRI_DISABLE_TOOLS=true` before starting Vite for that classroom mode:
+
+```sh
+VITE_AIRI_DISABLE_TOOLS=true sh course/ntu-vh2026/start-airi-local.sh
+```
+
+The stage LLM store sets the existing core capability `supportsTools=false`. It omits both tool definitions and tool choice. It also skips MCP, character action, and custom-tool resolution. A console warning identifies the disabled functions. VRM idle animation and speech lip sync still work.
+
+The portable helper leaves this flag unset by default. Restart Vite after changing it. Removing the flag restores the normal tool capability behavior. This switch does not add vision capability to SARC. Use a separate configured vision model, such as the tested local Gemma model, to describe images first.
+
+Two added regression cases check that explicit disable sends no tools or tool choice, and that `false` preserves normal tool calling. The complete `llm.test.ts` suite has 36 passing cases. Stage UI typecheck also passes.
+
+## Per-card compatible speech IDs
+
+OpenAI-compatible speech servers can use model and voice IDs absent from a catalog. The card editor now accepts these IDs as text. Empty fields inherit the global settings. Other provider types retain their existing selectors.
+
+The stage resolves the selected card/module model and voice before provider-level defaults. Previously, the stage replaced card overrides with those defaults. Two cards can now share one local endpoint and use separate voices. Provider instances receive the same behavior as the built-in compatible provider ID.
+
+The [local speech hub](../course/ntu-vh2026/local-speech-hub/README.zh-TW.md) routes `kokoro` with `zf_xiaobei` to port 8880. It routes `taigi-hanzi` with `taigi-demo-reference` to port 8883. Failed synthesis never switches languages. It records only completion metadata, without input text or audio.
+
+Validation: all 36 speech-store tests pass, including two checks of the outgoing model/voice pairs. Two headless Chrome tests save custom IDs and empty inherited values through the card editor. The tests cover both the built-in provider ID and a configured provider instance. Stage UI and Stage Pages typechecks pass. Targeted lint reports zero errors and 12 pre-existing long-comment warnings. The hub has 11 passing contract tests and real HTTP 200 responses from both backends. No user browser session was used for these automated tests.

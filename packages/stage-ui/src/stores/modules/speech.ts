@@ -481,16 +481,8 @@ export const useSpeechStore = defineStore('speech', () => {
       return
 
     let nextVoice: VoiceInfo | undefined
-    if (activeSpeechProvider.value === 'openai-compatible-audio-speech') {
-      nextVoice = {
-        id: voiceId,
-        name: voiceId,
-        description: voiceId,
-        previewURL: '',
-        languages: [{ code: 'en', title: 'English' }],
-        provider: activeSpeechProvider.value,
-        gender: 'neutral',
-      }
+    if (providersStore.findProviderDefinition(activeSpeechProvider.value)?.id === 'openai-compatible-audio-speech') {
+      nextVoice = resolveSpeechSelection().voice
     }
     else {
       nextVoice = voices[activeSpeechProvider.value]?.find(voice => voice.id === voiceId)
@@ -500,6 +492,28 @@ export const useSpeechStore = defineStore('speech', () => {
       return
 
     activeSpeechVoice.value = nextVoice
+  }
+
+  /** Resolves card/module selections before provider-level defaults, without changing stored settings. */
+  function resolveSpeechSelection(): { model: string, voice: VoiceInfo | undefined } {
+    if (providersStore.findProviderDefinition(activeSpeechProvider.value)?.id !== 'openai-compatible-audio-speech') {
+      return { model: activeSpeechModel.value, voice: activeSpeechVoice.value }
+    }
+
+    const config = providerStore.getProviderConfig(activeSpeechProvider.value)
+    const model = activeSpeechModel.value || (typeof config?.model === 'string' && config.model) || 'tts-1'
+    const voiceId = activeSpeechVoiceId.value || (typeof config?.voice === 'string' && config.voice) || 'alloy'
+    // A compatible endpoint can use arbitrary IDs without publishing a voice catalog.
+    const voice: VoiceInfo = {
+      id: voiceId,
+      name: voiceId,
+      description: voiceId,
+      previewURL: '',
+      languages: [],
+      provider: activeSpeechProvider.value,
+      gender: 'neutral',
+    }
+    return { model, voice }
   }
 
   /**
@@ -623,7 +637,7 @@ export const useSpeechStore = defineStore('speech', () => {
     let hasVoice = !!activeSpeechVoiceId.value
 
     // For OpenAI Compatible providers, check provider config as fallback
-    if (activeSpeechProvider.value === 'openai-compatible-audio-speech') {
+    if (providersStore.findProviderDefinition(activeSpeechProvider.value)?.id === 'openai-compatible-audio-speech') {
       const providerConfig = providerStore.getProviderConfig(activeSpeechProvider.value)
       hasModel ||= !!providerConfig?.model
       hasVoice ||= !!providerConfig?.voice
@@ -695,6 +709,7 @@ export const useSpeechStore = defineStore('speech', () => {
     ensureActiveSpeechModel,
     generateSSML,
     resolveSpeechInput,
+    resolveSpeechSelection,
     resetState,
     resetSettings,
   }

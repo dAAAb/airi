@@ -65,6 +65,42 @@ describe('speech store helpers', () => {
     expect(toSignedPercent(0)).toBe('0%')
   })
 
+  it.each(['openai-compatible-audio-speech', 'local-speech-hub-instance'])('sends each selected model and voice instead of provider defaults for %s', async (providerId) => {
+    const requests: Record<string, unknown>[] = []
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async (_input, init) => {
+      if (typeof init?.body === 'string')
+        requests.push(JSON.parse(init.body))
+      return new Response(new Uint8Array([1, 2, 3]), { headers: { 'Content-Type': 'audio/wav' } })
+    }))
+    const providers = useProviderStore()
+    vi.spyOn(providers, 'listProviderVoices').mockResolvedValue([])
+    const config = useProviderConfigStore()
+    await config.ensureProvider(providerId, 'openai-compatible-audio-speech', {
+      apiKey: '',
+      baseUrl: 'http://127.0.0.1:8884/v1/',
+      model: 'provider-default-model',
+      voice: 'provider-default-voice',
+    })
+    const speech = useSpeechStore()
+    const provider = await providers.getProviderInstance<Parameters<typeof speech.speech>[0]>(providerId)
+    for (const [model, voice] of [['kokoro', 'zf_xiaobei'], ['taigi-hanzi', 'taigi-demo-reference']]) {
+      await speech.selectProviderModel(providerId, model, voice)
+      const selection = speech.resolveSpeechSelection()
+      expect(selection.model).toBe(model)
+      expect(selection.voice?.id).toBe(voice)
+      expect(speech.activeSpeechVoice?.id).toBe(voice)
+      await speech.speech(provider, selection.model, '本機測試。', selection.voice!.id, config.getProviderConfig(providerId))
+      expect(requests.at(-1)).toMatchObject({ model, voice })
+    }
+    expect(config.getProviderConfig(providerId)).toMatchObject({ model: 'provider-default-model', voice: 'provider-default-voice' })
+
+    // Empty module values still use the provider settings, without storing defaults.
+    await speech.selectProviderModel(providerId, '', '')
+    expect(speech.resolveSpeechSelection()).toMatchObject({ model: 'provider-default-model', voice: { id: 'provider-default-voice' } })
+    expect(speech.activeSpeechModel).toBe('')
+    expect(speech.activeSpeechVoiceId).toBe('')
+  })
+
   // ROOT CAUSE:
   //
   // The speech store watched its model-list projection even when no UI used

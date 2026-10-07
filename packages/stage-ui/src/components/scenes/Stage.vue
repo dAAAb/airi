@@ -495,47 +495,8 @@ const speechPipeline = createSpeechPipeline<AudioBuffer>({
 
     const providerConfig = providerStore.getProviderConfig(activeSpeechProvider.value)
 
-    // For OpenAI Compatible providers, always use provider config for model and voice
-    // since these are manually configured in provider settings
-    let model = activeSpeechModel.value
-    let voice = activeSpeechVoice.value
-
-    if (activeSpeechProvider.value === 'openai-compatible-audio-speech') {
-      // Always prefer provider config for OpenAI Compatible (user configured it there)
-      if (providerConfig?.model) {
-        model = providerConfig.model as string
-      }
-      else {
-        // Fallback to default if not in provider config
-        model = 'tts-1'
-        console.warn('[Speech Pipeline] OpenAI Compatible: No model in provider config, using default', { providerConfig })
-      }
-
-      if (providerConfig?.voice) {
-        voice = {
-          id: providerConfig.voice as string,
-          name: providerConfig.voice as string,
-          description: providerConfig.voice as string,
-          previewURL: '',
-          languages: [{ code: 'en', title: 'English' }],
-          provider: activeSpeechProvider.value,
-          gender: 'neutral',
-        }
-      }
-      else {
-        // Fallback to default if not in provider config
-        voice = {
-          id: 'alloy',
-          name: 'alloy',
-          description: 'alloy',
-          previewURL: '',
-          languages: [{ code: 'en', title: 'English' }],
-          provider: activeSpeechProvider.value,
-          gender: 'neutral',
-        }
-        console.warn('[Speech Pipeline] OpenAI Compatible: No voice in provider config, using default', { providerConfig })
-      }
-    }
+    // Card/module selections take precedence over compatible-provider defaults.
+    const { model, voice } = speechStore.resolveSpeechSelection()
 
     if (!model || !voice)
       return null
