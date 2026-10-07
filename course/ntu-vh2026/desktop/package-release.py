@@ -11,15 +11,16 @@ import shutil
 import shlex
 import subprocess
 from pathlib import Path
-from urllib.parse import quote
 
 PART_BYTES = 1800000000
 
 
 def github_asset(repo, tag, name):
-    result = subprocess.run(['gh', 'api', f'repos/{repo}/releases/tags/{quote(tag, safe="")}'],
+    result = subprocess.run(['gh', 'api', f'repos/{repo}/releases?per_page=100'],
                             check=True, capture_output=True, text=True)
-    release = json.loads(result.stdout)
+    release = next((row for row in json.loads(result.stdout) if row['tag_name'] == tag), None)
+    if release is None:
+        raise RuntimeError('The draft release was not found')
     if not release['draft']:
         raise RuntimeError('Upload packaging requires a draft release')
     return next((row for row in release['assets'] if row['name'] == name), None)

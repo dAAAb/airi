@@ -1,0 +1,293 @@
+{
+  "checked_at": "2026-10-07",
+  "hardware": {
+    "chip": "Apple M4 Max",
+    "ram_gib": 128,
+    "architecture": "arm64"
+  },
+  "package": "AIRI Local.app (thin), lightweight Qwen + ASR + Kokoro selection",
+  "offline_package": false,
+  "scope": "Packaged thin App with downloaded Qwen + ASR + Kokoro selection. Loopback API acceptance only. This report does not establish microphone permission, live avatar audio playback, full-package offline behavior, or native-speaker speech quality.",
+  "runs": [
+    {
+      "id": "health_manager",
+      "http_status": 200,
+      "wall_seconds": 3.588,
+      "bytes": 1841,
+      "response": {
+        "ollama_mode": "bundled",
+        "selected": [
+          "qwen",
+          "asr26",
+          "kokoro"
+        ],
+        "offline": false,
+        "packaged": true,
+        "services": {
+          "ollama": true,
+          "asr26": true,
+          "kokoro": true,
+          "speech-hub": true
+        },
+        "verified_models": [
+          "qwen",
+          "asr26",
+          "kokoro"
+        ]
+      }
+    },
+    {
+      "id": "health_ollama",
+      "http_status": 200,
+      "wall_seconds": 0.038,
+      "bytes": 503,
+      "response": {
+        "models": [
+          {
+            "name": "qwen3.5:0.8b",
+            "model": "qwen3.5:0.8b",
+            "modified_at": "2026-10-07T22:16:21.844140376+08:00",
+            "size": 1322069277,
+            "digest": "de63045f29755d4721c09d54c9b45c2dadb644f4fd7d604d4cac90d96049971c",
+            "details": {
+              "parent_model": "qwen35-validation-20260930:0.8b-stock-q8_0-q8draft2",
+              "format": "gguf",
+              "family": "qwen35",
+              "families": [
+                "qwen35"
+              ],
+              "parameter_size": "752.39M",
+              "quantization_level": "Q8_0",
+              "context_length": 262144,
+              "embedding_length": 1024
+            },
+            "capabilities": [
+              "completion",
+              "vision",
+              "tools",
+              "thinking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "health_asr",
+      "http_status": 200,
+      "wall_seconds": 0.012,
+      "bytes": 451,
+      "response": {
+        "status": "ok",
+        "model": "breeze-asr-26-mlx",
+        "source": "RayyTien/Breeze-ASR-26-mlx-4bit",
+        "provider": "mlx",
+        "mode": "audio segments, not streaming decoding",
+        "max_audio_seconds": 120,
+        "tokenizer_compatibility": {
+          "compatibility_patch": "HF Whisper no-speech spelling",
+          "previous_no_speech_id": 50257,
+          "no_speech_spelling": "<|nocaptions|>",
+          "no_speech_id": 50362,
+          "eot_id": 50257,
+          "eot_suppressed": false,
+          "scope": "in-memory wrapper property only; site-packages unchanged"
+        }
+      }
+    },
+    {
+      "id": "health_kokoro",
+      "http_status": 200,
+      "wall_seconds": 0.025,
+      "bytes": 61,
+      "response": {
+        "ready": true,
+        "model": "kokoro",
+        "language": "Mandarin Chinese"
+      }
+    },
+    {
+      "id": "health_hub",
+      "http_status": 200,
+      "wall_seconds": 0.009,
+      "bytes": 118,
+      "response": {
+        "status": "ok",
+        "models": [
+          "kokoro",
+          "taigi-hanzi"
+        ],
+        "scope": "Fixed local routing; this is not a backend readiness check"
+      }
+    },
+    {
+      "id": "qwen_text",
+      "http_status": 200,
+      "wall_seconds": 14.385,
+      "bytes": 432,
+      "response": {
+        "model": "qwen3.5:0.8b",
+        "created_at": "2026-10-07T14:21:56.994132Z",
+        "message": {
+          "role": "assistant",
+          "content": "歡迎大家加入我們的虛擬人課程，讓我們一起探索未來科技與藝術的無限可能！"
+        },
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 14367379500,
+        "load_duration": 8657541,
+        "prompt_eval_count": 26,
+        "prompt_eval_cached_count": 22,
+        "prompt_eval_duration": 355056000,
+        "eval_count": 20,
+        "eval_duration": 13956565000
+      },
+      "input": "請用繁體中文說一句歡迎同學上虛擬人課程的話。",
+      "assessment": "Non-empty appropriate welcome response in Traditional Chinese."
+    },
+    {
+      "id": "qwen_vision_triangle",
+      "http_status": 200,
+      "wall_seconds": 20.53,
+      "bytes": 348,
+      "response": {
+        "model": "qwen3.5:0.8b",
+        "created_at": "2026-10-07T14:22:12.864827Z",
+        "message": {
+          "role": "assistant",
+          "content": "三角形，绿色。"
+        },
+        "done": true,
+        "done_reason": "stop",
+        "total_duration": 15475541291,
+        "load_duration": 21595916,
+        "prompt_eval_count": 93,
+        "prompt_eval_cached_count": 89,
+        "prompt_eval_duration": 8214449000,
+        "eval_count": 5,
+        "eval_duration": 7004521000
+      },
+      "fixture": {
+        "id": "green_triangle_on_white",
+        "sha256": "52395ea89f8ac6b8fcf20dff333332a465a972656c12760e66bfc6c77539395d",
+        "expected": "綠色三角形",
+        "origin": "Simple classroom test image, inspected visually before this run."
+      },
+      "assessment": "Correct shape and color. Output used Simplified Chinese characters."
+    },
+    {
+      "id": "kokoro_chinese_through_hub",
+      "http_status": 200,
+      "wall_seconds": 30.266,
+      "bytes": 219644,
+      "x_audio_seconds": "4.575",
+      "x_inference_seconds": "29.654653041000074",
+      "x_speech_hub_model": "kokoro",
+      "wav": {
+        "channels": 1,
+        "sample_rate": 24000,
+        "duration_seconds": 4.575
+      },
+      "sha256": "4766b538ea230ce3a75bca9a1e37365559a8b25115667cf0dfae4080c0479910",
+      "input": "你好，歡迎來到虛擬人與遙現課程。",
+      "voice": "zf_xiaobei",
+      "format": "wav",
+      "assessment": "Valid WAV returned. No native-speaker MOS or intelligibility score was collected."
+    },
+    {
+      "id": "kokoro_chinese_asr_roundtrip",
+      "http_status": 200,
+      "wall_seconds": 0.786,
+      "bytes": 54,
+      "response": {
+        "text": "你好 歡迎來到虛擬人語遙線課程"
+      },
+      "x_audio_seconds": "4.575000",
+      "x_inference_seconds": "0.749665",
+      "expected_tts_input": "你好，歡迎來到虛擬人與遙現課程。",
+      "assessment": "Roundtrip produced text, but 與遙現 was transcribed as 語遙線. This combines TTS and ASR errors and does not measure either model independently."
+    },
+    {
+      "id": "public_taigi_asr",
+      "http_status": 200,
+      "wall_seconds": 3.776,
+      "bytes": 363,
+      "response": {
+        "text": "來 阿豪 我讓小慧洗就好 來這裡吃水果 媽 沒關係 現在是性別平等的時代 夫妻都會一起分擔家務事 對啊 媽 她平常都會做家務事 老伴你看 我們女婿多好 是啊 好女婿 阿憨 快吃水果 我也要去洗盤子了 我孫子也很厲害 是啊 性別平等 從你我做起 以上公告由行政院提供"
+      },
+      "x_audio_seconds": "29.689000",
+      "x_inference_seconds": "3.736629",
+      "fixture": {
+        "id": "ey_taigi_housework",
+        "sha256": "f419fab165be33fe42acbd8b4f462df11e2a5e002f576d0156ad14b25a5ebe6d",
+        "source": "https://gec.ey.gov.tw/PAGE/B442714C48EEC07/35e9d5c8-f4f5-4d22-913d-0ae605ff8f8f",
+        "language": "Taiwanese Hokkien input, Mandarin-character output",
+        "note": "Fixture bytes are not redistributed. See sources/audio-sources.json for source and rights notes."
+      },
+      "assessment": "Meaning broadly follows the public housework PSA. Names, words and closing sentence contain errors. Output is Mandarin-character interpretation, not native Taiwanese orthography.",
+      "reference_metadata": "sources/fixture-references.json#ey_taigi_housework"
+    },
+    {
+      "id": "qwen_openai_compatible_vision_reasoning_none",
+      "http_status": 200,
+      "wall_seconds": 0.118,
+      "response": {
+        "id": "chatcmpl-286",
+        "object": "chat.completion",
+        "created": 1791383041,
+        "model": "qwen3.5:0.8b",
+        "system_fingerprint": "fp_ollama",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "形状是三角形，颜色是绿色。"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 97,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 9,
+          "total_tokens": 106
+        }
+      },
+      "request_parameters": {
+        "reasoning_effort": "none",
+        "max_tokens": 80,
+        "stream": false
+      },
+      "fixture_id": "green_triangle_on_white",
+      "assessment": "Correct green triangle description. The request used reasoning_effort none and returned non-empty content in this synthetic example."
+    },
+    {
+      "id": "qwen_openai_compatible_streaming_vision_reasoning_none",
+      "http_status": 200,
+      "wall_seconds": 0.086,
+      "time_to_first_content_seconds": 0.053,
+      "content": "形状是三角形，颜色是绿色。",
+      "reasoning_characters": 0,
+      "events": 9,
+      "finish_reason": "stop",
+      "request_parameters": {
+        "reasoning_effort": "none",
+        "stream": true,
+        "max_tokens": "omitted"
+      },
+      "fixture_id": "green_triangle_on_white",
+      "assessment": "Correct green triangle description. The request used reasoning_effort none and returned non-empty content in this synthetic example."
+    }
+  ],
+  "timing_caveat": "Sequential requests were sent on a working machine, without isolated load control. Warmup, request queuing and concurrent user activity can affect times. These are observations, not comparative performance benchmarks.",
+  "observed_capabilities": {
+    "text_generation": "passed for one short Traditional Chinese welcome prompt",
+    "vision": "passed for one synthetic green triangle via native and OpenAI-compatible APIs, including SSE content deltas with reasoning_effort none",
+    "chinese_tts": "returned a decodable 4.575-second mono WAV through the speech hub",
+    "mandarin_asr_roundtrip": "returned text, with substitutions in the course title",
+    "taigi_asr": "returned Mandarin-character meaning for a public Taiwanese Hokkien recording, with transcription errors",
+    "taigi_tts": "not part of this lightweight selection; Kokoro Chinese is not a Taiwanese Hokkien voice"
+  }
+}

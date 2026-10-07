@@ -89,7 +89,7 @@ hub 只按模型 ID 固定轉送：`kokoro` 到 8880，`taigi-hanzi` 到 8883。
 ## 為何改這些程式
 
 1. Provider 和圖片訊息的 Vue proxy 曾跨過 `structuredClone` 邊界而失敗；修成可複製的快照／普通記錄。
-2. Ollama 的原生 `think` 不等於 OpenAI-compatible 路徑的 reasoning 選項；改用既有 provider 映射，關閉時送 `reasoning_effort:none`。
+2. Ollama 的原生 `think` 不等於 OpenAI-compatible 路徑的 reasoning 選項；改用既有 provider 映射，關閉時送 `reasoning_effort:none`。視覺設定依 provider 定義判斷，不能只比對名稱 `vision-ollama`，否則安裝器建立的獨立 Ollama 實例不會套用。只產生思考、沒有描述文字的回應，不能算作成功看圖。
 3. SARC 此版不支援 tools。`VITE_AIRI_DISABLE_TOOLS=true` 明確停用工具定義與工具選擇，保留嘴型與待機動畫。
 4. ASR tokenizer 的 no-speech 拼字差異曾誤把 EOT 當成禁止 token；記憶體相容修正解除不能結束的重複解碼。
 5. compatible provider 的模型清單不一定包含自訂 ID。角色卡新增 model／voice 文字輸入。

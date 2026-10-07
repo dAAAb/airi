@@ -80,7 +80,7 @@ const lastInferenceProviderName = computed(() => {
   const providerId = lastInference.value?.provider
   return moduleVisionProvidersMetadata.value.find(metadata => metadata.id === providerId)?.localizedName ?? providerId
 })
-const isOllamaVisionProvider = computed(() => activeProvider.value === 'vision-ollama')
+const isOllamaVisionProvider = computed(() => providersStore.findProviderDefinition(activeProvider.value)?.id === 'ollama')
 
 function canDeleteProvider(providerId: string) {
   return !providerId.startsWith('official-provider') && !providerId.startsWith('vision-official-provider')

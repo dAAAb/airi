@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useLLM } from '../../stores/ai/chat-llm/llm'
 import { useVisionActivityStore, useVisionStore } from '../../stores/modules/vision'
+import { useProviderConfigStore } from '../../stores/providers/config'
 import { useProviderStore } from '../../stores/providers/provider'
 import { useVisionInference } from './use-vision-inference'
 
@@ -94,9 +95,16 @@ describe('useVisionInference', () => {
     expect(activity.lastInference).toMatchObject({ provider: 'openai', model: 'mock-model', error: 'Provider unavailable' })
   })
 
-  it.each([false, true])('sends Ollama vision thinking=%s using the OpenAI-compatible reasoning field', async (thinkingEnabled) => {
+  it.each([
+    ['vision-ollama', false],
+    ['vision-ollama', true],
+    ['local-installer-ollama-test', false],
+    ['local-installer-ollama-test', true],
+  ] as const)('sends %s vision thinking=%s using the OpenAI-compatible reasoning field', async (providerId, thinkingEnabled) => {
     const vision = useVisionStore()
-    vision.activeProvider = 'vision-ollama'
+    if (providerId === 'local-installer-ollama-test')
+      useProviderConfigStore().ensureProvider(providerId, 'ollama')
+    vision.activeProvider = providerId
     vision.ollamaThinkingEnabled = thinkingEnabled
     const definition = getDefinedProvider('ollama')
     if (!definition)

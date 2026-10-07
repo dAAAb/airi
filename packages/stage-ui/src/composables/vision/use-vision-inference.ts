@@ -52,7 +52,10 @@ export function useVisionInference() {
 
   /** Reads one image with the given vision provider and returns the trimmed text. */
   async function describeImage(providerId: string, modelId: string, input: VisionInferenceInput) {
-    const provider = await providersStore.getChatProviderInstance(providerId, providerId === 'vision-ollama'
+    // Saved provider instances have their own IDs. Resolve their definition so
+    // the vision thinking switch applies to every configured Ollama instance.
+    const isOllama = providersStore.findProviderDefinition(providerId)?.id === 'ollama'
+    const provider = await providersStore.getChatProviderInstance(providerId, isOllama
       ? { reasoning: ollamaThinkingEnabled.value ? 'enabled' : 'disabled' }
       : undefined)
     const workload = getVisionWorkload(input.workloadId)
