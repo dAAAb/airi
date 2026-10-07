@@ -76,6 +76,24 @@ python3 course/ntu-vh2026/desktop/package-release.py \
 
 指定 `--upload-release TAG` 時，只允許上傳到已存在的 draft release。每段都要收到 GitHub 對應的大小與 SHA256 才刪除本機暫存，失敗則保留檔案。預設不會上傳，也不會建立 release。
 
+## 一鍵下載分片
+
+完成 multipart 封裝後，可另外產生小型 `*-Downloader.zip`。學生只需下載這個 ZIP、解壓後雙擊 `Download-*.command`。原本的手動 `*-Installer.zip` 保留。
+
+```sh
+python3 course/ntu-vh2026/desktop/generate-download-installer.py \
+  path/to/AIRI-Local-Full-0_1_0-arm64-parts.json \
+  --output path/to/downloaders \
+  --unpacked-bytes ACTUAL_APP_BYTES
+python3 course/ntu-vh2026/desktop/test-download-installer.py
+```
+
+`ACTUAL_APP_BYTES` 使用封裝前 App 的邏輯檔案總大小。下載器固定從 `dAAAb/airi` 的 `v0.1.0-ntu2026-local` release 下載 manifest 指定的分片，不接受自訂 URL。請等全部分片上傳完成、manifest 定案後再產生下載器。
+
+下載前檢查剩餘分片容量、解壓後 App 大小，再保留 2 GiB 餘裕。檔案放在解壓下載器的同一資料夾；空間不足時，先把整個資料夾搬到其他磁碟。已通過驗證的分片不重抓，未完成分片支援續傳。所有 SHA256 與大小通過後才解壓到新的資料夾，再執行 `codesign --verify` 並開啟資料夾。分片保留供離線搬運，下載器不修改 Gatekeeper。
+
+測試使用極小 App fixture 和 fake curl，涵蓋缺片下載、續傳、已驗證片重用、錯誤 hash 拒絕、磁碟不足、symlink／檔名越界拒絕及 ZIP 執行權限。
+
 ## 檢查
 
 ```sh
