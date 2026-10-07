@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-07",
+  "python": "3.12.3",
+  "environment": "Existing separate ASR26 and Breeze2 virtual environments, existing pinned model files. No weights redownloaded and no fresh pip install performed.",
+  "tests": {
+    "tokenizer_unit": {
+      "passed": 4
+    },
+    "tts_contract": {
+      "passed": 5
+    },
+    "fixture_download_regression": {
+      "passed": 3
+    },
+    "model_hash_checks": {
+      "asr26": "all manifest files passed",
+      "breeze2": "all manifest files passed"
+    },
+    "real_tokenizer": {
+      "eot_before": 50257,
+      "no_speech_before": 50257,
+      "no_speech_after": 50362,
+      "eot_suppressed_after": false,
+      "matches_generation_config": true
+    },
+    "portable_asr": {
+      "single_file": "passed",
+      "three_public_fixtures_times_two": "passed",
+      "result": "public-lab-asr-qa.json"
+    },
+    "portable_tts": {
+      "temporary_loopback_port": 8883,
+      "stopped_after_test": true,
+      "generated_wavs": 4,
+      "expected_422": 2,
+      "result": "public-lab-tts-qa.json"
+    },
+    "syntax": {
+      "python_compileall": "passed",
+      "shell_sh_n": "passed"
+    }
+  },
+  "scope": "CLI and HTTP validation. No fresh browser end-to-end test or new subjective listening score for this packaging pass. Existing AIRI classroom tests are documented separately."
+}

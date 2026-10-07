@@ -1,0 +1,74 @@
+{
+  "scope": "HTTP wall time. Not first-audio or conversation latency. No listening score.",
+  "results": [
+    {
+      "id": "course",
+      "status": 200,
+      "text": "臺大網媒所，虛擬人與遙現。你好，我是你的本機虛擬助教。",
+      "http_seconds": 1.157814750000398,
+      "audio_seconds": 4.347210884353742,
+      "sample_rate": 22050,
+      "file": "course.wav"
+    },
+    {
+      "id": "taiwan",
+      "status": 200,
+      "text": "歡迎來到臺灣。我們今天從臺北搭高鐵到高雄，下午再前往臺南。",
+      "http_seconds": 0.8701705839994247,
+      "audio_seconds": 5.247120181405895,
+      "sample_rate": 22050,
+      "file": "taiwan.wav"
+    },
+    {
+      "id": "polyphone",
+      "status": 200,
+      "text": "銀行的行長說，這個方法行得通。請重新播放這段重要的課程內容。",
+      "http_seconds": 0.9167780410007254,
+      "audio_seconds": 4.9563718820861675,
+      "sample_rate": 22050,
+      "file": "polyphone.wav"
+    },
+    {
+      "id": "mixed",
+      "status": 422,
+      "text": "今天我們用 OpenRouter 切換 AI 模型，再讓 VRM 角色說 Hello world。",
+      "http_seconds": 0.0010539579998294357,
+      "error": {
+        "detail": {
+          "message": "原版字典沒有英文詞與阿拉伯數字，會漏讀。請先改為中文文字再合成。",
+          "unsupported": [
+            "OpenRouter",
+            "AI",
+            "VRM",
+            "Hello",
+            "world"
+          ]
+        }
+      }
+    },
+    {
+      "id": "digits",
+      "status": 422,
+      "text": "今天是 2026 年，課程長度 60 分鐘。",
+      "http_seconds": 0.0009604169990780065,
+      "error": {
+        "detail": {
+          "message": "原版字典沒有英文詞與阿拉伯數字，會漏讀。請先改為中文文字再合成。",
+          "unsupported": [
+            "2026",
+            "60"
+          ]
+        }
+      }
+    },
+    {
+      "id": "numbers-spelled",
+      "status": 200,
+      "text": "今天是二零二六年十月七日，課程長度六十分鐘。",
+      "http_seconds": 0.751811332998841,
+      "audio_seconds": 4.414467120181406,
+      "sample_rate": 22050,
+      "file": "numbers-spelled.wav"
+    }
+  ]
+}

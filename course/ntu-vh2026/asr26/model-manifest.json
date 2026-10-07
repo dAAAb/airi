@@ -1,0 +1,79 @@
+{
+  "repo": "RayyTien/Breeze-ASR-26-mlx-4bit",
+  "revision": "4f05d1e9ad363554f42ef2380724ede531966046",
+  "downloaded_at": "2026-10-07T04:05:42.718560+00:00",
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 4229,
+      "sha256": "a177a03008be3359d08026a506257bd1422e791bc6ae25a18e08d7a61c3ceb0d",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "added_tokens.json",
+      "bytes": 34604,
+      "sha256": "9715fd2243b6f06a5858b5e32950d2853f73dd5bc201aafcf76f5082a2d8acd1",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "config.json",
+      "bytes": 1691,
+      "sha256": "feb09a1442c64f34c445f30b562cb8997512f495a821562b26b7e2641476c8c7",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "generation_config.json",
+      "bytes": 4289,
+      "sha256": "7847d293b436a6d190000b643e653a9f5527cae162988253103436fda9004d3e",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "merges.txt",
+      "bytes": 493869,
+      "sha256": "2df2990a395e35e8dfbc7511e08c12d56018d8d04691e0133e5d63b21e154dc6",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "model.safetensors",
+      "bytes": 987203850,
+      "sha256": "cd10da804a92764cd4e95d47375be29029733555a8adf2f5cf1739fabd8134cd",
+      "expected_lfs_sha256": "cd10da804a92764cd4e95d47375be29029733555a8adf2f5cf1739fabd8134cd"
+    },
+    {
+      "file": "model.safetensors.index.json",
+      "bytes": 151183,
+      "sha256": "dc14519b1f756bea3b6f846a795f80afc3c73edcbe1daacf0f5f1fd59c5956ec",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "normalizer.json",
+      "bytes": 52666,
+      "sha256": "bf1c507dc8724ca9cf9903640dacfb69dae2f00edee4f21ceba106a7392f26dd",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "preprocessor_config.json",
+      "bytes": 339,
+      "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "special_tokens_map.json",
+      "bytes": 2194,
+      "sha256": "e67ae3a0aaa99abcd9f187138e12db1f65c16a14761c50ef10eef2c174a7a691",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "tokenizer_config.json",
+      "bytes": 282713,
+      "sha256": "21a4fc0483c14b87f4e0bbc177a9a357479bfa7c95aaf21ad53d71e9c5afafb9",
+      "expected_lfs_sha256": null
+    },
+    {
+      "file": "vocab.json",
+      "bytes": 1036584,
+      "sha256": "50d6a919f0a0601d56a04eb583c780d18553aa388254ba3158eb6a00f13e2c1a",
+      "expected_lfs_sha256": null
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "tts": [
+    {
+      "id": "course",
+      "text": "臺大網媒所，虛擬人與遙現。你好，我是你的本機虛擬助教。",
+      "expect_status": 200
+    },
+    {
+      "id": "taiwan",
+      "text": "歡迎來到臺灣。我們今天從臺北搭高鐵到高雄，下午再前往臺南。",
+      "expect_status": 200
+    },
+    {
+      "id": "polyphone",
+      "text": "銀行的行長說，這個方法行得通。請重新播放這段重要的課程內容。",
+      "expect_status": 200
+    },
+    {
+      "id": "mixed",
+      "text": "今天我們用 OpenRouter 切換 AI 模型，再讓 VRM 角色說 Hello world。",
+      "expect_status": 422
+    },
+    {
+      "id": "digits",
+      "text": "今天是 2026 年，課程長度 60 分鐘。",
+      "expect_status": 422
+    },
+    {
+      "id": "numbers-spelled",
+      "text": "今天是二零二六年十月七日，課程長度六十分鐘。",
+      "expect_status": 200
+    }
+  ],
+  "record_your_own": [
+    {
+      "id": "mixed-training",
+      "text": "放進你的 training 裡面",
+      "language": "華語夾英文"
+    },
+    {
+      "id": "mixed-attention",
+      "text": "要求機器學到 attention",
+      "language": "華語夾英文"
+    },
+    {
+      "id": "taigi",
+      "text": "請用自己的台語說一段二十秒的日常對話，另附母語者核對的逐字稿及華語意思。",
+      "language": "台語",
+      "note": "請勿把華語文字交給華語 TTS，然後稱作台語測試。"
+    }
+  ]
+}

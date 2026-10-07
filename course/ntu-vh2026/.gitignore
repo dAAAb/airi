@@ -1,0 +1,14 @@
+local/
+**/model/
+**/.venv/
+**/__pycache__/
+*.pyc
+*.wav
+*.mp3
+*.aac
+*.log
+*.pid
+
+# Keep sanitized, committed experiment evidence despite root result* ignore.
+!/results/
+!/results/*.json

@@ -1,0 +1,84 @@
+{
+  "checked_at": "2026-10-07",
+  "policy": "No third-party audio bytes are redistributed. Download only after reviewing original source terms.",
+  "fixtures": [
+    {
+      "id": "ey_taigi_housework",
+      "label": "行政院性別平等處公開台語廣播",
+      "source_url": "https://gec.ey.gov.tw/File/D58708F85FF1CD5",
+      "bytes": 1189485,
+      "sha256": "518556fe049727cad3e4a3cd6785833e82fab17ab4099ae966eedf604ed7d664",
+      "ffprobe": {
+        "programs": [],
+        "streams": [
+          {
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "29.712000"
+        }
+      },
+      "unchanged_from_source": true,
+      "source_page": "https://gec.ey.gov.tw/PAGE/B442714C48EEC07/35e9d5c8-f4f5-4d22-913d-0ae605ff8f8f",
+      "license_note": "行政院網站一般政府資料開放授權第1版，影音/第三方例外仍適用；未另核媒體專屬授權，不宣稱無限制訓練或轉售。",
+      "license_source": "https://www.ey.gov.tw/Page/2EADDBFEDDB6357E",
+      "filename": "ey_taigi_housework_original.mp3"
+    },
+    {
+      "id": "ml2021_test_1279",
+      "label": "ML2021 test 1279 真人華語夾英文",
+      "source_url": "https://datasets-server.huggingface.co/rows?dataset=ky552%2FML2021_ASR_ST&config=default&split=test&offset=1279&length=1",
+      "bytes": 203578,
+      "sha256": "234934f0b8d6fe781a6f6cdebe7835ef5d2c290ebdd181b4736c79c28e5d2313",
+      "ffprobe": {
+        "programs": [],
+        "streams": [
+          {
+            "sample_rate": "16000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "1.590000"
+        }
+      },
+      "unchanged_from_source": true,
+      "source_page": "https://huggingface.co/datasets/ky552/ML2021_ASR_ST",
+      "license_note": "MIT，依資料集發布者metadata；下載音訊URL為短期簽名，可用source_url重新取同一列。",
+      "filename": "ml2021_test_1279.wav"
+    },
+    {
+      "id": "ml2021_test_1280",
+      "label": "ML2021 test 1280 真人華語夾英文",
+      "source_url": "https://datasets-server.huggingface.co/rows?dataset=ky552%2FML2021_ASR_ST&config=default&split=test&offset=1280&length=1",
+      "bytes": 221498,
+      "sha256": "9ae3b8f6e1747c7050561b27078f84195829113c49d4653f38dd380ef7cb07cd",
+      "ffprobe": {
+        "programs": [],
+        "streams": [
+          {
+            "sample_rate": "16000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "1.730000"
+        }
+      },
+      "unchanged_from_source": true,
+      "source_page": "https://huggingface.co/datasets/ky552/ML2021_ASR_ST",
+      "license_note": "MIT，依資料集發布者metadata；下載音訊URL為短期簽名，可用source_url重新取同一列。",
+      "filename": "ml2021_test_1280.wav"
+    }
+  ],
+  "official_taigi_tts": {
+    "id": "official_taigi_tts",
+    "label": "BreezyVoice26官方預錄台語展示；AAC轉MP3",
+    "source_url": "https://www.mediatek.com/hubfs/%E8%81%BD%E8%BC%B8%E5%87%BA%E8%AA%9E%E9%9F%B3.aac",
+    "source_page": "https://www.mediatek.com/zh-tw/tek-talk-blogs/mediatek-research-breeze-3",
+    "license_note": "官方公開展示，未核得獨立再授權條款；標示聯發科與官方預錄來源，不宣稱本機生成或可自由再授權。",
+    "note": "Link points to the original AAC. Prior classroom MP3 was transcoded, not byte-identical. No AAC hash is asserted here."
+  }
+}

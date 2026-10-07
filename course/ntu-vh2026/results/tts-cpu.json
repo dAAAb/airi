@@ -1,0 +1,82 @@
+{
+  "provider": "cpu",
+  "threads": 4,
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "sherpa_onnx": "1.13.8",
+  "model_load_seconds": 0.31934962500008623,
+  "scope": "Local file synthesis. No subjective listening score, no human microphone or full-duplex test.",
+  "runs": [
+    {
+      "label": "course",
+      "text": "臺大網媒所，虛擬人與遙現。你好，我是你的本機虛擬助教。",
+      "generation_seconds": 0.7987710829997923,
+      "duration_seconds": 4.480544217687075,
+      "rtf": 0.1782754603439959,
+      "sample_rate": 22050,
+      "peak": 0.07596562057733536,
+      "rms": 0.009870053840794655,
+      "path": "private-local-artifact/breeze2_course.wav",
+      "sha256": "964da4f9b3341a15028436cb93402a919da3f5381d8f01a01433bd8c682bbad0"
+    },
+    {
+      "label": "taiwan",
+      "text": "歡迎來到臺灣。我們今天從臺北搭高鐵到高雄，下午再前往臺南。",
+      "generation_seconds": 0.9008807909999632,
+      "duration_seconds": 5.24281179138322,
+      "rtf": 0.1718316099922943,
+      "sample_rate": 22050,
+      "peak": 0.07459945976734161,
+      "rms": 0.011477562068288715,
+      "path": "private-local-artifact/breeze2_taiwan.wav",
+      "sha256": "0d9a0e02b0096b3f7b224004fb944bee2a65f4b04ecae53da3fdea8a37c32e92"
+    },
+    {
+      "label": "polyphone",
+      "text": "銀行的行長說，這個方法行得通。請重新播放這段重要的課程內容。",
+      "generation_seconds": 0.9194440839996787,
+      "duration_seconds": 5.280272108843538,
+      "rtf": 0.17412816329290487,
+      "sample_rate": 22050,
+      "peak": 0.09184546023607254,
+      "rms": 0.012164888675859931,
+      "path": "private-local-artifact/breeze2_polyphone.wav",
+      "sha256": "bbb8621307b74116fda4db2dd023bbbb5ab2534be37b244fec0dab698feddb46"
+    },
+    {
+      "label": "mixed",
+      "text": "今天我們用 OpenRouter 切換 AI 模型，再讓 VRM 角色說 Hello world。",
+      "generation_seconds": 0.4521182499997849,
+      "duration_seconds": 2.547482993197279,
+      "rtf": 0.1774764546837438,
+      "sample_rate": 22050,
+      "peak": 0.07819166779518127,
+      "rms": 0.011928144342439936,
+      "path": "private-local-artifact/breeze2_mixed.wav",
+      "sha256": "d0c333c5c2fbf2d4a8c0bdac82e852f6c84ac18f52df907dce0d0c6f0daf950a"
+    },
+    {
+      "label": "numbers",
+      "text": "今天是二零二六年十月七日，課程長度六十分鐘。",
+      "generation_seconds": 0.6987021250001817,
+      "duration_seconds": 4.070748299319728,
+      "rtf": 0.17163972656254461,
+      "sample_rate": 22050,
+      "peak": 0.06044270843267441,
+      "rms": 0.010278491747945411,
+      "path": "private-local-artifact/breeze2_numbers.wav",
+      "sha256": "3acaad88ae680f96701a79fd03da0ae267e0633908754120c21150e541f6e2b8"
+    },
+    {
+      "label": "course_warm",
+      "text": "臺大網媒所，虛擬人與遙現。你好，我是你的本機虛擬助教。",
+      "generation_seconds": 0.8476698750000651,
+      "duration_seconds": 4.897052154195011,
+      "rtf": 0.17309798799547543,
+      "sample_rate": 22050,
+      "peak": 0.06947582215070724,
+      "rms": 0.010247764276549378,
+      "path": "private-local-artifact/breeze2_course_warm.wav",
+      "sha256": "ff3e0e454718920b76fb5b456f5f399c897d61355cf8ed1055c6e61eea947364"
+    }
+  ]
+}

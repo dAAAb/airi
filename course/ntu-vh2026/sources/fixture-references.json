@@ -1,0 +1,49 @@
+{
+  "fixtures": [
+    {
+      "id": "ml2021_test_1279",
+      "category": "mandarin_english_code_switching",
+      "reference": "放進你的 training 裡面",
+      "reference_type": "dataset_transcription_chinese_character_spaces_removed",
+      "source": "https://huggingface.co/datasets/ky552/ML2021_ASR_ST/viewer/default/test?row=1279",
+      "official_example_source": "https://huggingface.co/MediaTek-Research/Breeze-ASR-25",
+      "dataset_reference_raw": "放 進 你 的 training 裡 面",
+      "license": "MIT per dataset publisher metadata; independent of model Apache-2.0 license",
+      "duration_seconds": 1.59,
+      "sha256": "cf05b728b38972cf731c4dfa86379883469372715c4c18f979600f9a127af2a2",
+      "prepared_path": "audio16k/ml2021_test_1279.wav"
+    },
+    {
+      "id": "ml2021_test_1280",
+      "category": "mandarin_english_code_switching",
+      "reference": "要求機器學到 attention",
+      "reference_type": "dataset_transcription_chinese_character_spaces_removed",
+      "source": "https://huggingface.co/datasets/ky552/ML2021_ASR_ST/viewer/default/test?row=1280",
+      "dataset_reference_raw": "要 求 機 器 學 到 attention",
+      "license": "MIT per dataset publisher metadata",
+      "duration_seconds": 1.73,
+      "sha256": "a4b12c6a81adabb917511a50a32a55d54b82241f05558bb275dc4bb75fc16dc2",
+      "prepared_path": "audio16k/ml2021_test_1280.wav"
+    },
+    {
+      "id": "ey_taigi_housework",
+      "category": "taigi_to_mandarin_characters",
+      "reference": "阿豪啊，碗讓小惠洗就好，來這邊吃水果啦。媽沒關係，現在是性別平等的時代，夫妻都會一起分擔家事啦。對啊，媽，他平常都會做家事喔。老伴你看，我們女婿多好。嗯，好女婿。阿公趕快吃水果，我也要去洗盤子了。乖孫也很能幹喔。是啊。性別平等，從你我做起。以上廣告由行政院提供。",
+      "reference_type": "official_Mandarin_written_script_for_Taigi_audio_not_native_Taigi_orthography",
+      "source": "https://gec.ey.gov.tw/PAGE/B442714C48EEC07/35e9d5c8-f4f5-4d22-913d-0ae605ff8f8f",
+      "download_url": "https://gec.ey.gov.tw/File/D58708F85FF1CD5",
+      "publisher": "行政院性別平等處",
+      "published_date": "2018-12-11",
+      "duration_seconds": 29.689,
+      "license": "Official public PSA. Website general Government Data Open License v1 applies subject to audiovisual/third-party exceptions; no separate audio-specific license was verified. Retain attribution; do not imply an unrestricted training or redistribution license.",
+      "license_source": "https://www.ey.gov.tw/Page/2EADDBFEDDB6357E",
+      "limitations": [
+        "Not verified as one of the exact 30 items in the Breeze Taigi published benchmark.",
+        "Reference is the official Mandarin-character script, with punctuation added for readability; Taigi-to-Mandarin is not one-to-one, so CER is not absolute Taigi transcription accuracy.",
+        "Original MP3 is stereo 48 kHz; let the test preparation script resample consistently."
+      ],
+      "sha256": "f419fab165be33fe42acbd8b4f462df11e2a5e002f576d0156ad14b25a5ebe6d",
+      "prepared_path": "audio16k/ey_taigi_housework.wav"
+    }
+  ]
+}

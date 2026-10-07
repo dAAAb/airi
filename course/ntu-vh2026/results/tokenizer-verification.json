@@ -1,0 +1,18 @@
+{
+  "before": {
+    "eot": 50257,
+    "no_speech": 50257,
+    "eot_suppressed": true
+  },
+  "after": {
+    "compatibility_patch": "HF Whisper no-speech spelling",
+    "previous_no_speech_id": 50257,
+    "no_speech_spelling": "<|nocaptions|>",
+    "no_speech_id": 50362,
+    "eot_id": 50257,
+    "eot_suppressed": false,
+    "scope": "in-memory wrapper property only; site-packages unchanged"
+  },
+  "suppression_matches_generation_config": true,
+  "invalid_vocabulary_checks": 3
+}

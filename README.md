@@ -1,3 +1,31 @@
+## 台大「虛擬人與遙現」2026：本機語音實驗 fork
+
+這是 [dAAAb 的課堂 fork](https://github.com/dAAAb/airi)，上游是 [moeru-ai/airi](https://github.com/moeru-ai/airi)。
+讓第四週製作的 VRM，接上可替換的語言模型、語音辨識與語音合成。
+本分支以 `94fa5d7cc5bcfb927a65d78c25ae20377802bc32` 為基底，保留上游原始 README 於下方。
+
+**學生入口：[繁體中文實作指南、模型下載與測試指令](./course/ntu-vh2026/README.zh-TW.md)**
+
+下方的 `Try it` 與預編譯下載連到上游服務／發行版。本課修正請依學生入口從原始碼啟動。
+
+| 課堂案例 | 我們實際測到什麼 | 不把它當作什麼 |
+| --- | --- | --- |
+| 台灣華語 TTS：Breeze2-VITS-onnx | 本機 CPU 合成課程介紹，與 Kokoro 同句比較 | 台語發音、MLX 加速或完整即時對話延遲 |
+| 台語 ASR：Breeze-ASR-26 社群 MLX 4-bit | Apple Silicon 離線轉錄台語，輸出華語漢字 | 台語 TTS、台語正字評測或已接入 AIRI 的串流 STT |
+| 中英夾雜 | 短句 `training` 被辨成「春捲」，`attention` 變成「注意」 | 只看句子通順，就判定專有名詞辨識成功 |
+| 台語 TTS：BreezyVoice 26 | 聽官方預錄示範，和華語 TTS 區分 | 已下載權重、本機生成或已測過對應 MLX 版 |
+
+先 fork，再按指南啟動 `http://127.0.0.1:5174/`，用自己的角色與錄音重做實驗。
+固定角色與測句，每次只換一個 provider、ASR 或 TTS，記錄原音、辨識字、回覆與實際發聲。
+課堂資料包含可重現腳本、去除本機路徑的測試結果與來源。
+模型權重和第三方示範音訊由學生按需取得，不隨程式碼散布。
+
+程式修正與驗證：[本機 provider／圖片傳送／Ollama Vision 修正](./docs/classroom-local-fixes.md)。
+This classroom fork adds local speech experiments in Traditional Chinese and fixes provider and image transport errors.
+It is not an official AIRI or MediaTek release.
+
+---
+
 <picture>
   <source
     width="100%"

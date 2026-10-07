@@ -1,0 +1,105 @@
+{
+  "scope": "HTTP service, exact CORS, format validation, same-text TTS wall-time comparison, local synthetic-audio ASR cross-check (not human listening).",
+  "results": {
+    "health": {
+      "status": "ok",
+      "model": "breeze2-vits",
+      "engine": "sherpa-onnx",
+      "provider": "cpu",
+      "sample_rate": 22050,
+      "scope": "Traditional Chinese text; single voice; no English or digits in the stock lexicon"
+    },
+    "airi_cors": 200,
+    "foreign_origin_rejected": true,
+    "english_not_silently_dropped": {
+      "detail": {
+        "message": "原版字典沒有英文詞與阿拉伯數字，會漏讀。請先改為中文文字再合成。",
+        "unsupported": [
+          "AI",
+          "OpenRouter"
+        ]
+      }
+    },
+    "timings": [
+      {
+        "model": "breeze2",
+        "run": 0,
+        "http_seconds": 0.7598930839999412,
+        "audio_seconds": 4.5679365079365075,
+        "rtf": 0.16635368785876814,
+        "path": "private-local-artifact/http_breeze2_course_0.wav"
+      },
+      {
+        "model": "kokoro",
+        "run": 0,
+        "http_seconds": 1.1244575000000623,
+        "audio_seconds": 5.811458333333333,
+        "rtf": 0.19348972934218672,
+        "path": "private-local-artifact/http_kokoro_course_0.wav"
+      },
+      {
+        "model": "breeze2",
+        "run": 1,
+        "http_seconds": 0.7904187080002885,
+        "audio_seconds": 4.517732426303855,
+        "rtf": 0.174959168320414,
+        "path": "private-local-artifact/http_breeze2_course_1.wav"
+      },
+      {
+        "model": "kokoro",
+        "run": 1,
+        "http_seconds": 0.391389375000017,
+        "audio_seconds": 5.807083333333333,
+        "rtf": 0.06739861519696068,
+        "path": "private-local-artifact/http_kokoro_course_1.wav"
+      },
+      {
+        "model": "breeze2",
+        "run": 2,
+        "http_seconds": 0.8252897500001382,
+        "audio_seconds": 4.562947845804989,
+        "rtf": 0.18086767105148485,
+        "path": "private-local-artifact/http_breeze2_course_2.wav"
+      },
+      {
+        "model": "kokoro",
+        "run": 2,
+        "http_seconds": 0.3878137910000987,
+        "audio_seconds": 5.807125,
+        "rtf": 0.06678240799020146,
+        "path": "private-local-artifact/http_kokoro_course_2.wav"
+      }
+    ],
+    "mp3": {
+      "status": 200,
+      "bytes": 7882
+    },
+    "synthetic_audio_cross_check": [
+      {
+        "label": "course",
+        "synthetic_audio_stt_text": "来带我们据你人聊天,你好,我是你的粉机师你助教",
+        "note": "STT error and TTS pronunciation error are not separable by this cross-check alone."
+      },
+      {
+        "label": "taiwan",
+        "synthetic_audio_stt_text": "歡迎來到臺灣我們今天從臺被搭高鐵到高速照再簽完南",
+        "note": "STT error and TTS pronunciation error are not separable by this cross-check alone."
+      },
+      {
+        "label": "polyphone",
+        "synthetic_audio_stt_text": "銀行的行長說這個方法是痛緊重新不放這段重要的課程內容",
+        "note": "STT error and TTS pronunciation error are not separable by this cross-check alone."
+      },
+      {
+        "label": "mixed",
+        "synthetic_audio_stt_text": "今天我們用切放膜再讓著說",
+        "note": "STT error and TTS pronunciation error are not separable by this cross-check alone."
+      },
+      {
+        "label": "numbers",
+        "synthetic_audio_stt_text": "今天是2026年10月7日设成长度60分钟",
+        "note": "STT error and TTS pronunciation error are not separable by this cross-check alone."
+      }
+    ]
+  }
+}
