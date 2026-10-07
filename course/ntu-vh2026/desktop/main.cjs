@@ -99,8 +99,11 @@ async function stopManager() {
   })
 }
 
-function configureSession() {
+async function configureSession() {
   const localSession = session.fromPartition('persist:airi-local-classroom')
+  // A desktop update owns its web assets. Remove only stale PWA caches for
+  // this origin; character cards, conversations and settings stay in storage.
+  await localSession.clearStorageData({ origin: ORIGIN, storages: ['serviceworkers', 'cachestorage'] })
   if (offline) {
     localSession.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*'] }, (details, callback) => {
       callback({ cancel: !isOfflineRequestAllowed(details.url) })
@@ -125,7 +128,8 @@ function configureSession() {
   return localSession
 }
 
-function createWindow() {
+async function createWindow() {
+  const localSession = await configureSession()
   window = new BrowserWindow({
     title: 'AIRI Local',
     width: 1280,
@@ -135,7 +139,7 @@ function createWindow() {
     show: false,
     backgroundColor: '#101217',
     webPreferences: {
-      session: configureSession(),
+      session: localSession,
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
@@ -198,7 +202,7 @@ else {
   app.whenReady().then(async () => {
     try {
       await startManager()
-      createWindow()
+      await createWindow()
     }
     catch (error) {
       dialog.showErrorBox('AIRI Local 無法啟動', String(error.message || error))

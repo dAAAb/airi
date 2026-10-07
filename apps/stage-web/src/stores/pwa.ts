@@ -15,6 +15,11 @@ export const usePWAStore = defineStore('pwa', () => {
     if (import.meta.env.SSR) {
       return
     }
+    // The Mac app serves its bundled files. A web service worker can keep an
+    // older bundle active after an app update, so the installer owns updates.
+    if (import.meta.env.VITE_AIRI_LOCAL_INSTALLER === 'true') {
+      return
+    }
     if (isEnvTruthy(import.meta.env.VITE_APP_TARGET_HUGGINGFACE_SPACE)) {
       return
     }

@@ -194,6 +194,7 @@ export default defineConfig({
     ...(env.TARGET_HUGGINGFACE_SPACE
       ? []
       : [VitePWA({
+          disable: env.VITE_AIRI_LOCAL_INSTALLER === 'true',
           registerType: 'prompt',
           includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
           manifest: {

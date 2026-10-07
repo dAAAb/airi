@@ -78,4 +78,6 @@ python3 course/ntu-vh2026/desktop/test-build-app.py
 
 Lite 的測試另外確認只複製 Qwen manifest 引用的 blobs，不會連同原目錄裡的 SARC／Gemma 權重一起打包。主執行檔與 `CFBundleExecutable` 必須同時重新命名；保留 `Electron` 檔名可能讓 Electron 誤判為開發模式。啟動器也會驗證自家 `build-info.json` 的 Bundle ID 再定位固定 Resources。
 
+Mac build 的 `VITE_AIRI_LOCAL_INSTALLER=true` 會停用 PWA service worker 的產生與註冊，由 App 封裝管理前端更新。一般網頁版仍保留 PWA。更新測試若發現舊 service worker 接管，僅清除該 App origin 的 `serviceworkers`／`cachestorage`，保留 localStorage、IndexedDB 中的角色、設定及對話。
+
 參考：[Electron 官方手動打包文件](https://www.electronjs.org/docs/latest/tutorial/application-distribution)、[Electron 權限 API](https://www.electronjs.org/docs/latest/api/session)。
