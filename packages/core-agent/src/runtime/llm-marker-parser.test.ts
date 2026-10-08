@@ -107,6 +107,36 @@ describe('local model ACT whitespace compatibility', () => {
     expect(literals.join('')).toBe(' 無關係，下次閣努力。')
   })
 
+  it('preserves generated motion descriptions through every streaming split', async () => {
+    const description = 'A person raises both hands above their head and stretches.'
+    const marker = `< | ACT { "emotion": "happy", " motion ": " generate ", " motionPrompt ": " ${description} ", "url": "https://example.org" } | >`
+    for (let split = 1; split < marker.length; split++) {
+      const specials: string[] = []
+      const parser = useLlmmarkerParser({
+        onSpecial: (value) => { specials.push(value) },
+      })
+      await parser.consume(marker.slice(0, split))
+      await parser.consume(marker.slice(split))
+      await parser.end()
+      expect(specials, `split ${split}`).toEqual([`<|ACT ${JSON.stringify({ emotion: 'happy', motion: 'generate', motionPrompt: description })}|>`])
+    }
+  })
+
+  it.each([
+    { motion: 'wave', motionPrompt: 'wave' },
+    { motion: 'generate', motionPrompt: '' },
+    { motion: 'generate', motionPrompt: 'x'.repeat(501) },
+    { motion: 'generate', motionPrompt: { command: 'wave' } },
+  ])('drops unsupported generated descriptions: $motion', async (payload) => {
+    const specials: string[] = []
+    const parser = useLlmmarkerParser({
+      onSpecial: (value) => { specials.push(value) },
+    })
+    await parser.consume(`<|ACT ${JSON.stringify(payload)}|>`)
+    await parser.end()
+    expect(specials).toEqual([`<|ACT ${JSON.stringify({ motion: payload.motion })}|>`])
+  })
+
   it.each(['a < b and c > d', '<div>hello</div>', '< | CLOCK time | >', 'Value <          10'])('preserves non-ACT prose %s', async (input) => {
     const literals: string[] = []
     const specials: string[] = []

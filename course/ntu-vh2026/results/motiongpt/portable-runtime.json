@@ -1,0 +1,9 @@
+{
+  "runtime": "motiongpt",
+  "version": "3.12",
+  "relocated_startup": {
+    "prefix": "runtimes/motiongpt",
+    "version": "3.12.13 (main, Mar 10 2026, 18:18:07) [Clang 21.1.4 ]",
+    "ssl": "OpenSSL 3.5.5 27 Jan 2026"
+  }
+}

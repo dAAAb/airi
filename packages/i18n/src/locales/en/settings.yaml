@@ -562,6 +562,43 @@ pages:
           description: Configure 3D VRM models and settings
         scene: Scene
   modules:
+    motion:
+      title: Motion
+      description: Generate VRM body motion with a local model
+      intro: MotionGPT generates 22-joint motion sequences from text. Existing authored gestures remain available without this module.
+      vrm-only: This module requires a VRM character. Live2D and other renderers are not supported.
+      enable: Enable local MotionGPT
+      enable-description: Optional and off by default. This switch does not download or start the model service.
+      auto: Allow conversation to generate motions
+      auto-description: The language model can request a new motion. Generation runs locally and can delay the motion after speech.
+      endpoint: Local service address
+      endpoint-description: Only loopback HTTP addresses are accepted. Default port is 17905.
+      check: Test service
+      runtime: Motion inference device
+      runtime-description: Test the service to list available devices. Changing the device reloads the model. Auto prefers MLX when available.
+      runtime-fallback: Auto used a fallback device.
+      load-time: 'Model load: {seconds} s'
+      runtime-devices:
+        auto: Auto
+        cpu: CPU
+        mps: Apple Metal (PyTorch MPS)
+        mlx: Apple Metal (native MLX)
+      prompt: Motion description
+      prompt-description: Use a short English description of body movement. Start with one action and inspect the result.
+      generate: Generate and preview
+      replay: Replay last motion
+      stop: Cancel / restore idle
+      playback-rejected: The character is loading, paused or controlled by pose tracking. Stop tracking before previewing.
+      service-error: Check that the optional MotionGPT service is installed and running.
+      limits: Experimental in-place retargeting. Root travel is removed. No finger detail, foot IK or collision handling. Directions and appearance require visual inspection.
+      status:
+        idle: Not tested
+        checking: Checking service…
+        switching: Loading the selected motion device…
+        ready: Model service ready
+        generating: Generating motion…
+        generated: Motion received
+        error: Service unavailable or invalid result
     beat_sync:
       description: Vibe with beats from the audio source
       title: Beat Sync

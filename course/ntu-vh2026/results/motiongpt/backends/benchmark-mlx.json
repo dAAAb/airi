@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-10-08T14:29:21Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "backend": "mlx-metal",
+  "load_seconds": 1.0161,
+  "seed": 42,
+  "scope": "Same prompts and seed; different frameworks use different RNGs, so token lengths and motions may differ.",
+  "cases": [
+    {
+      "case": "right-wave",
+      "repeat": 1,
+      "output": "right-wave-mlx-1.json",
+      "generation_seconds": 0.8957,
+      "motion_tokens": 16,
+      "generated_frames": 64,
+      "returned_frames": 64,
+      "truncated": false
+    },
+    {
+      "case": "right-wave",
+      "repeat": 2,
+      "output": "right-wave-mlx-2.json",
+      "generation_seconds": 0.0759,
+      "motion_tokens": 16,
+      "generated_frames": 64,
+      "returned_frames": 64,
+      "truncated": false
+    },
+    {
+      "case": "bow",
+      "repeat": 1,
+      "output": "bow-mlx-1.json",
+      "generation_seconds": 0.0927,
+      "motion_tokens": 21,
+      "generated_frames": 84,
+      "returned_frames": 84,
+      "truncated": false
+    },
+    {
+      "case": "bow",
+      "repeat": 2,
+      "output": "bow-mlx-2.json",
+      "generation_seconds": 0.0955,
+      "motion_tokens": 21,
+      "generated_frames": 84,
+      "returned_frames": 84,
+      "truncated": false
+    },
+    {
+      "case": "dance",
+      "repeat": 1,
+      "output": "dance-mlx-1.json",
+      "generation_seconds": 0.1891,
+      "motion_tokens": 48,
+      "generated_frames": 192,
+      "returned_frames": 192,
+      "truncated": false
+    },
+    {
+      "case": "dance",
+      "repeat": 2,
+      "output": "dance-mlx-2.json",
+      "generation_seconds": 0.1821,
+      "motion_tokens": 48,
+      "generated_frames": 192,
+      "returned_frames": 192,
+      "truncated": false
+    },
+    {
+      "case": "stretch",
+      "repeat": 1,
+      "output": "stretch-mlx-1.json",
+      "generation_seconds": 0.1013,
+      "motion_tokens": 23,
+      "generated_frames": 92,
+      "returned_frames": 92,
+      "truncated": false
+    },
+    {
+      "case": "stretch",
+      "repeat": 2,
+      "output": "stretch-mlx-2.json",
+      "generation_seconds": 0.098,
+      "motion_tokens": 23,
+      "generated_frames": 92,
+      "returned_frames": 92,
+      "truncated": false
+    },
+    {
+      "case": "boxing",
+      "repeat": 1,
+      "output": "boxing-mlx-1.json",
+      "generation_seconds": 0.1836,
+      "motion_tokens": 48,
+      "generated_frames": 192,
+      "returned_frames": 192,
+      "truncated": false
+    },
+    {
+      "case": "boxing",
+      "repeat": 2,
+      "output": "boxing-mlx-2.json",
+      "generation_seconds": 0.1814,
+      "motion_tokens": 48,
+      "generated_frames": 192,
+      "returned_frames": 192,
+      "truncated": false
+    }
+  ]
+}

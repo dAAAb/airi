@@ -212,3 +212,14 @@ The default pack contains twelve generated chibi reactions of AIRI's official bl
 See [artwork provenance](src/assets/stickers/README.md) for references, exact prompts, and inspection notes.
 These are static assets. No runtime image-generation dependency is included.
 The four development-only Fluent Emoji images are removed. No old-ID migration is included.
+
+## Optional local motion generation
+
+`useMotionStore` owns MotionGPT configuration, generation status and cancellation. The module and automatic conversation generation default to off.
+Only VRM characters can use this module. The default service origin is `http://127.0.0.1:17905`.
+The client accepts loopback HTTP origins, refuses redirects and validates bounded HumanML3D JSON before playback.
+
+When enabled, ACT can contain `motion: "generate"` and a bounded `motionPrompt` text description.
+Generation runs asynchronously without delaying the speech pipeline. A new user turn, model change or cancellation discards stale results.
+The model's response selects content for the local generator. It never supplies executable code, asset URLs or shell commands.
+Authored gestures remain available when generation is disabled or unavailable.

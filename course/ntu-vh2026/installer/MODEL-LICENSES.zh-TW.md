@@ -1,6 +1,6 @@
 # 模型與執行環境的重新散布記錄
 
-查核日期：2026-10-07。這份記錄區分「公開程式」、「使用者從原作者下載」與「我們把權重／執行檔放入 GitHub Release」。以下依作者公開授權判讀，不把整個 bundle 統稱為 AIRI 的 MIT 授權。
+原有模型查核日期：2026-10-07；MotionGPT 追加查核：2026-10-08。這份記錄區分「公開程式」、「使用者從原作者下載」與「我們把權重／執行檔放入 GitHub Release」。以下依作者公開授權判讀，不把整個 bundle 統稱為 AIRI 的 MIT 授權。
 
 ## 模型權重
 
@@ -12,9 +12,22 @@
 | `asr26` | [聯發科原版](https://huggingface.co/MediaTek-Research/Breeze-ASR-26)與 [RayyTien MLX 轉換](https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit)均標 Apache 2.0 | 保留兩層來源、Apache 授權、量化／相容修正的修改記錄。MLX 轉換不會使原模型變成自己的 MIT 權重。 |
 | `kokoro` | [hexgrad/Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M)為 Apache 2.0 | 權重、使用的 voice 檔與來源聲明一起記錄。模型卡的資料／Creative Commons attribution 也保留；推論依賴另列。 |
 | `kaedetai` | [KaedeTai 模型卡](https://huggingface.co/KaedeTai/gpt-sovits-tw)的 metadata 和 License & credits 都明列 MIT；不是未授權模型 | 隨 S1/S2 保留作者、模型卡與 MIT；同時列出 GPT-SoVITS、Hubert、speaker encoder、Taibun 與參考音訊來源。不能只附一張 AIRI LICENSE 就宣稱所有部分同授權。 |
+| 選用 `motiongpt` | [MotionGPT Base 官方模型卡](https://huggingface.co/OpenMotionLab/MotionGPT-base/blob/a0a37a388137f15df8299c643a885a42b07772fe/README.md)只寫 `license: cc`，未明示 CC 變體；[程式授權副本](../motiongpt/vendor/LICENSE.MotionGPT)為 MIT | 本發行版不重新散布或代管權重。Thin／Full 由使用者選用後，直接向官方固定 revision 下載並驗證；Full 也不把它放進離線 payload。不能把程式的 MIT 延伸到權重。 |
 | 可選 `mms-tts-nan` | [Meta 模型卡](https://huggingface.co/facebook/mms-tts-nan)為 CC BY-NC 4.0 | [條款](https://creativecommons.org/licenses/by-nc/4.0/)允許非商業分享／改作，須署名、連結授權、標示修改且不可加限制。不要放入宣稱可不限用途商用的預設包。 |
 
 Gemma 3/SARC 的 NOTICE 必須包含條款指定的句子，並提供條款正文。安裝頁可展示來源與條款，讓使用者明確確認；點選框不會取代發行者本身的散布義務。
+
+## MotionGPT 的程式與權重分界
+
+本次固定 `OpenMotionLab/MotionGPT-base` revision `a0a37a388137f15df8299c643a885a42b07772fe`。它是用來重現課堂實驗的 Base checkpoint，不宣稱是最新模型。
+
+- 程式固定 OpenMotionLab commit `001aaca8d0ee218fc17f8265d11ac124044fe42f`，保留原作者 MIT、copyright 與修改記錄。
+- 權重模型卡只有 `cc`，不足以判斷署名、非商業、禁止改作或相同方式分享等具體條件。本發行版不把它解讀為已取得不限用途的再散布授權。
+- Thin／Full 只隨附程式、固定下載清單與必要 runtime；MotionGPT 首次由使用者選用後從官方來源取得，約 1.336 GB。**Full 不含這組模型權重**。
+- [固定檔案清單](../motiongpt/model-manifest.json)記錄 checkpoint、FLAN-T5 tokenizer 與 HumanML3D 統計檔的來源、revision、大小和 SHA-256。這些下載來源不會被改指向本專案的 Release。
+- Lite 不附 MotionGPT runtime 或安裝選項。手動連接既有的本機 MotionGPT 服務，不會改變上游權重的使用條件。
+
+使用者直接下載也不等於授權條件消失。若未來取得更明確的權重條款，需重新查核後才能改變本發行策略。Python、Torch、Transformers、tokenizer 與原作者程式各自的 notices 仍須保留。
 
 ## KaedeTai 的來源層次
 
@@ -46,6 +59,6 @@ Gemma 完整條款與禁止用途政策保存成純文字，供離線閱讀。�
 
 ## Release 判斷
 
-模型的公開條款並未一概禁止 GitHub Release：SARC、Gemma 4、Qwen、ASR、Kokoro、KaedeTai 可以依各自條件整理再散布。MMS 保留為標示非商用的可選實驗。最終產物需有逐檔 payload manifest、來源版本、SHA-256、完整授權與 notices，並滿足實際 bundled GPL 元件的來源提供要求。
+模型的公開條款並未一概禁止 GitHub Release：SARC、Gemma 4、Qwen、ASR、Kokoro、KaedeTai 可以依各自條件整理再散布。MMS 保留為標示非商用的可選實驗。MotionGPT 因權重 CC 變體未明示，保留官方直接下載途徑，不重包或代管。最終產物需有逐檔 payload manifest、來源版本、SHA-256、完整授權與 notices，並滿足實際 bundled GPL 元件的來源提供要求。
 
 此記錄不是「只要使用者勾選就全部清關」的宣告。發行前逐項確認實際打包檔案；尚未收齊的 runtime notices／對應來源必須補齊，或改用清楚記錄來源的使用者下載途徑。不要在尚未做乾淨環境驗收時宣稱安裝包可在所有 Mac 一鍵運作。

@@ -1,6 +1,6 @@
 import type { AiriCard } from '@proj-airi/stage-ui/types/airiCard'
 
-import { array, literal, object, parse, picklist, union } from 'valibot'
+import { array, check, literal, nullable, object, optional, parse, picklist, pipe, union } from 'valibot'
 
 export const LOCAL_INSTALLER_ORIGIN = 'http://127.0.0.1:17900'
 export const SARC_MODEL = 'hf.co/Speech-AI-Research-Center/SARC-Taigi-LLM-12b-GGUF:Q4_K_M'
@@ -8,12 +8,13 @@ export const GEMMA_MODEL = 'gemma4:12b-it-qat'
 export const QWEN_MODEL = 'qwen3.5:0.8b'
 export type LocalInstallerRole = 'mandarin' | 'taigi' | 'qwen'
 
-const localConfigSchema = object({
-  models: array(picklist(['sarc-taigi', 'gemma4', 'qwen', 'asr26', 'kokoro', 'kaedetai'])),
+const localConfigSchema = pipe(object({
+  models: array(picklist(['sarc-taigi', 'gemma4', 'qwen', 'asr26', 'kokoro', 'kaedetai', 'motiongpt'])),
   ollama: union([literal('http://127.0.0.1:12434/v1/'), literal('http://127.0.0.1:11434/v1/')]),
   asr: literal('http://127.0.0.1:18001/v1/'),
   speech: literal('http://127.0.0.1:18884/v1/'),
-})
+  motion: optional(nullable(literal('http://127.0.0.1:17905'))),
+}), check(config => config.models.includes('motiongpt') === !!config.motion, 'Motion endpoint must match the optional model selection.'))
 
 export function parseLocalInstallerConfig(value: unknown) {
   return parse(localConfigSchema, value)

@@ -57,6 +57,33 @@ class PackagingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Offline payload'):
             builder.validate_resources(self.root, 'full')
 
+    def test_full_allows_explicit_download_only_weights_but_rejects_redistribution(self):
+        self.manifest['files'][0]['model'] = 'motiongpt'
+        self.manifest['files'][0]['path'] = 'motiongpt/model.bin'
+        self.manifest['download_only_models'] = ['motiongpt']
+        (self.root / 'payload/ollama/blobs').mkdir(parents=True)
+        self.write_manifest()
+        builder.validate_resources(self.root, 'full')
+        model = self.root / 'payload/motiongpt/model.bin'
+        model.parent.mkdir()
+        model.write_bytes(b'x')
+        with self.assertRaisesRegex(ValueError, 'must not be redistributed'):
+            builder.validate_resources(self.root, 'full')
+
+    def test_full_payload_copy_excludes_download_only_research_weights(self):
+        source = self.root / 'model-source'
+        for name in ('asr26/model.bin', 'motiongpt/model.bin'):
+            target = source / name
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b'fixture')
+        manifest = {'download_only_models': ['motiongpt'], 'files': [
+            {'model': 'asr26', 'path': 'asr26/model.bin'},
+            {'model': 'motiongpt', 'path': 'motiongpt/model.bin'}]}
+        target = self.root / 'full-payload'
+        builder.copy_full_payload(source, target, manifest)
+        self.assertTrue((target / 'asr26/model.bin').is_file())
+        self.assertFalse((target / 'motiongpt').exists())
+
     def test_manifest_cannot_escape_resources(self):
         self.manifest['services'][0]['executable'] = '../python'
         self.write_manifest()

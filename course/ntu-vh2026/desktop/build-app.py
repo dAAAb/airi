@@ -75,8 +75,21 @@ def select_manifest(source, mode):
     else:
         manifest['available_models'] = sorted(all_models)
     manifest['default_models'] = (FULL_DEFAULT_MODELS if mode == 'full' else LITE_MODELS)[:]
+    manifest['download_only_models'] = [key for key in manifest.get('download_only_models', [])
+                                        if key in manifest['available_models']]
     manifest['offline'] = mode != 'thin'
     return manifest
+
+
+def copy_full_payload(source, target, manifest):
+    excluded = set(manifest.get('download_only_models', []))
+    folders = {check_relative(row['path']).parts[0] for row in manifest['files'] if row['model'] in excluded}
+    bundled_folders = {check_relative(row['path']).parts[0] for row in manifest['files'] if row['model'] not in excluded}
+    if folders & bundled_folders:
+        raise ValueError('Download-only models need a separate payload directory')
+    source = Path(source)
+    copy_tree(source, target, ignore=lambda directory, names:
+              [name for name in names if name in folders] if Path(directory) == source else [])
 
 
 def copy_lite_payload(source, target, manifest):
@@ -127,7 +140,10 @@ def validate_resources(resources, mode):
         relative = check_relative(item['path'])
         if not isinstance(item['bytes'], int) or item['bytes'] < 0 or len(item['sha256']) != 64:
             raise ValueError('Each model file needs its fixed size and SHA256')
-        if mode in ('full', 'lite'):
+        download_only = item['model'] in manifest.get('download_only_models', [])
+        if download_only and (resources / 'payload' / relative).exists():
+            raise ValueError(f'Download-only weights must not be redistributed in the app: {relative}')
+        if mode in ('full', 'lite') and not download_only:
             model = resources / 'payload' / relative
             if not model.is_file() or model.stat().st_size != item['bytes']:
                 raise ValueError(f'Offline payload is missing or incomplete: {relative}')
@@ -224,6 +240,9 @@ def main():
         if args.mode == 'lite' and item.name == 'payload':
             copy_lite_payload(item, resources / 'payload', manifest)
             continue
+        if args.mode == 'full' and item.name == 'payload':
+            copy_full_payload(item, resources / 'payload', manifest)
+            continue
         if item.is_dir():
             copy_tree(item, resources / item.name)
         else:
@@ -249,11 +268,11 @@ def main():
               ignore=shutil.ignore_patterns('resources', '__pycache__', '*.pyc', '*.log', '.DS_Store'))
     course_source = resources / 'course/ntu-vh2026'
     course_source.mkdir(parents=True, exist_ok=True)
-    for name in ('asr26', 'taigi-tts', 'local-speech-hub'):
-        if args.mode == 'lite' and name == 'taigi-tts':
+    for name in ('asr26', 'taigi-tts', 'local-speech-hub', 'motiongpt'):
+        if args.mode == 'lite' and name in ('taigi-tts', 'motiongpt'):
             continue
         copy_tree(COURSE / name, course_source / name,
-                  ignore=shutil.ignore_patterns('.venv*', 'local', 'models', 'output', 'logs', '__pycache__', '*.pyc', '*.log', '*.pid'))
+                  ignore=shutil.ignore_patterns('.venv*', '.models', '.upstream', '.evidence', '.cache', 'local', 'models', 'output', 'logs', '__pycache__', '*.pyc', '*.log', '*.pid'))
     notices = resources / 'notices'
     notices.mkdir(exist_ok=True)
     for name in ('LICENSE', 'LICENSES.chromium.html'):

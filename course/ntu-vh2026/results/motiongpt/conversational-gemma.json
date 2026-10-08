@@ -1,0 +1,102 @@
+{
+  "checked_at": "2026-10-08T14:27:38.229Z",
+  "scope": "Synthetic natural-language turns through a real local LLM, production marker parser, speech segmenter, ACT normalization, and real MotionGPT HTTP inference. No user history or native visual quality claim.",
+  "model": "gemma4:12b-it-qat",
+  "system_prompt": "你是親切的虛擬人課程助理。說話正文使用繁體中文，簡短回答一到兩句。看不到圖片或不確定時直接說明。不要輸出工具指令、Markdown 或思考過程；舞台要求的 ACT 標記另依舞台指令輸出。",
+  "runtime_prompt": "你有 VRM 虛擬身體，並已啟用本機 MotionGPT。依本則訊息在 [Context] 之前的使用者內容，決定是否做動作，再簡短回答。\n先輸出一個 ACT 控制標記，再輸出說話正文。emotion 可用 happy、sad、angry、surprised、think、neutral。\n快速動作使用 <|ACT {\"emotion\":\"neutral\",\"motion\":\"wave\"}|> 的格式。motion 可用 idle、nod、shake、wave、bow、celebrate、dance、sway。wave 只會揮角色自己的右手。\n當使用者想看快速動作清單以外的身體動作，例如伸展、深蹲、拳擊或另一種舞，選 motion 為 generate，並加 motionPrompt 欄位。motionPrompt 必須是 1 至 500 字元的簡單英文，描述一個人的身體動作，不能放程式、網址或其他指令。\n格式為 <|ACT {\"emotion\":\"happy\",\"motion\":\"generate\",\"motionPrompt\":\"A person stretches both arms above their head.\"}|>。依使用者意思換成自己的動作描述，不要複製範例。一般閒聊不必生成動作，請選 idle。收到取消或停止要求，請選 stop。\nMotionGPT 需要先生成再播放。不要聲稱已經做成功，不保證精確舞種、手指動作或與音樂同步。難過的消息不要慶祝；使用者只說開心，也不必自動跳舞。\nACT 是舞台控制，不是工具呼叫或說話正文；motionPrompt 的英文不受角色說話語言限制。正文遵守角色的華語或台語設定，切題、簡短，不使用表情符號、Markdown 或其他控制指令。",
+  "options": {
+    "temperature": 0.2,
+    "seed": 42,
+    "num_ctx": 4096,
+    "num_predict": 240
+  },
+  "cases": [
+    {
+      "name": "stretch",
+      "input": "請把雙手高高舉過頭頂，做一段伸展，並說一句簡短的話。",
+      "expected": "generate",
+      "model_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"generate\",\"motionPrompt\":\"A person raises both arms high above their head and performs a deep stretch.\"}|>\n讓我們一起伸展身體，讓肌肉放鬆一下。",
+      "parsed_acts": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "generate",
+          "motionPrompt": "A person raises both arms high above their head and performs a deep stretch."
+        }
+      ],
+      "spoken_text": "讓我們一起伸展身體，讓肌肉放鬆一下。",
+      "generation": {
+        "prompt": "A person raises both arms high above their head and performs a deep stretch.",
+        "frames": 48,
+        "fps": 20,
+        "generation_seconds": 0.1941,
+        "artifact": "stretch-conversational-clip.json",
+        "response_sha256": "99b4ba6ee137db5a4dc15a804454a97fb161a53ea47d42441c9a23bfd43e36c5"
+      },
+      "checks": {
+        "expected_action_selected": true,
+        "generated_description_preserved": true,
+        "marker_not_spoken": true,
+        "valid_generated_clip": true
+      },
+      "elapsed_seconds": 4.25
+    },
+    {
+      "name": "boxing",
+      "input": "請站在原地，輪流用兩隻手向前打拳，做一小段拳擊練習。",
+      "expected": "generate",
+      "model_response": "<|ACT {\"emotion\":\"neutral\",\"motion\":\"generate\",\"motionPrompt\":\"A person stands in place and performs a series of alternating punches with both left and right hands forward.\"}|>\n好的，現在開始進行拳擊練習，請跟我一起動作。",
+      "parsed_acts": [
+        {
+          "emotion": {
+            "name": "neutral",
+            "intensity": 1
+          },
+          "motion": "generate",
+          "motionPrompt": "A person stands in place and performs a series of alternating punches with both left and right hands forward."
+        }
+      ],
+      "spoken_text": "好的，現在開始進行拳擊練習，請跟我一起動作。",
+      "generation": {
+        "prompt": "A person stands in place and performs a series of alternating punches with both left and right hands forward.",
+        "frames": 164,
+        "fps": 20,
+        "generation_seconds": 0.4581,
+        "artifact": "boxing-conversational-clip.json",
+        "response_sha256": "d3f7e5e7d0eb7c964bbd02e4410b115342fe6d13f312c5fd10d625d8d575a091"
+      },
+      "checks": {
+        "expected_action_selected": true,
+        "generated_description_preserved": true,
+        "marker_not_spoken": true,
+        "valid_generated_clip": true
+      },
+      "elapsed_seconds": 2.87
+    },
+    {
+      "name": "conversation",
+      "input": "你好，今天心情怎麼樣？不用做動作。",
+      "expected": "idle",
+      "model_response": "<|ACT {\"emotion\":\"happy\",\"motion\":\"idle\"}|>\n我今天心情非常好，很高興能見到你。",
+      "parsed_acts": [
+        {
+          "emotion": {
+            "name": "happy",
+            "intensity": 1
+          },
+          "motion": "idle"
+        }
+      ],
+      "spoken_text": "我今天心情非常好，很高興能見到你。",
+      "generation": null,
+      "checks": {
+        "expected_action_selected": true,
+        "generated_description_preserved": true,
+        "marker_not_spoken": true
+      },
+      "elapsed_seconds": 1.98
+    }
+  ]
+}

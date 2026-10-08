@@ -1,0 +1,170 @@
+[
+  {
+    "startup": {
+      "status": "ok",
+      "ready": true,
+      "model": "OpenMotionLab/MotionGPT-base",
+      "device": "mlx",
+      "fps": 20,
+      "max_frames": 196,
+      "selected_device": "auto",
+      "available_devices": [
+        "cpu",
+        "mps",
+        "mlx"
+      ],
+      "load_seconds": 1.3663,
+      "busy": false,
+      "auto_fallback_reason": null,
+      "scope": "Optional local text-to-motion generation, no cloud"
+    }
+  },
+  {
+    "health": {
+      "status": "ok",
+      "ready": true,
+      "model": "OpenMotionLab/MotionGPT-base",
+      "device": "cpu",
+      "fps": 20,
+      "max_frames": 196,
+      "selected_device": "cpu",
+      "available_devices": [
+        "cpu",
+        "mps",
+        "mlx"
+      ],
+      "load_seconds": 3.1627,
+      "busy": false,
+      "auto_fallback_reason": null,
+      "scope": "Optional local text-to-motion generation, no cloud"
+    },
+    "generation": {
+      "format": "humanml3d-22",
+      "fps": 20,
+      "coordinate_system": "right-handed-y-up",
+      "initial_forward": "+Z",
+      "anatomical_left": "+X",
+      "prompt": "A person raises both arms overhead and stretches.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "cpu",
+      "generated_frames": 108,
+      "truncated": false,
+      "motion_tokens": 27,
+      "generation_seconds": 0.3474
+    },
+    "frames": 108
+  },
+  {
+    "health": {
+      "status": "ok",
+      "ready": true,
+      "model": "OpenMotionLab/MotionGPT-base",
+      "device": "mps",
+      "fps": 20,
+      "max_frames": 196,
+      "selected_device": "mps",
+      "available_devices": [
+        "cpu",
+        "mps",
+        "mlx"
+      ],
+      "load_seconds": 3.1159,
+      "busy": false,
+      "auto_fallback_reason": null,
+      "scope": "Optional local text-to-motion generation, no cloud"
+    },
+    "generation": {
+      "format": "humanml3d-22",
+      "fps": 20,
+      "coordinate_system": "right-handed-y-up",
+      "initial_forward": "+Z",
+      "anatomical_left": "+X",
+      "prompt": "A person raises both arms overhead and stretches.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "mps",
+      "generated_frames": 44,
+      "truncated": false,
+      "motion_tokens": 11,
+      "generation_seconds": 7.5232
+    },
+    "frames": 44
+  },
+  {
+    "health": {
+      "status": "ok",
+      "ready": true,
+      "model": "OpenMotionLab/MotionGPT-base",
+      "device": "mlx",
+      "fps": 20,
+      "max_frames": 196,
+      "selected_device": "mlx",
+      "available_devices": [
+        "cpu",
+        "mps",
+        "mlx"
+      ],
+      "load_seconds": 0.9788,
+      "busy": false,
+      "auto_fallback_reason": null,
+      "scope": "Optional local text-to-motion generation, no cloud"
+    },
+    "generation": {
+      "format": "humanml3d-22",
+      "fps": 20,
+      "coordinate_system": "right-handed-y-up",
+      "initial_forward": "+Z",
+      "anatomical_left": "+X",
+      "prompt": "A person raises both arms overhead and stretches.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "mlx",
+      "backend": "mlx-metal",
+      "precision": "float32",
+      "generated_frames": 88,
+      "truncated": false,
+      "motion_tokens": 22,
+      "generation_seconds": 0.1854
+    },
+    "frames": 88
+  },
+  {
+    "health": {
+      "status": "ok",
+      "ready": true,
+      "model": "OpenMotionLab/MotionGPT-base",
+      "device": "mlx",
+      "fps": 20,
+      "max_frames": 196,
+      "selected_device": "auto",
+      "available_devices": [
+        "cpu",
+        "mps",
+        "mlx"
+      ],
+      "load_seconds": 0.9976,
+      "busy": false,
+      "auto_fallback_reason": null,
+      "scope": "Optional local text-to-motion generation, no cloud"
+    },
+    "generation": {
+      "format": "humanml3d-22",
+      "fps": 20,
+      "coordinate_system": "right-handed-y-up",
+      "initial_forward": "+Z",
+      "anatomical_left": "+X",
+      "prompt": "A person raises both arms overhead and stretches.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "mlx",
+      "backend": "mlx-metal",
+      "precision": "float32",
+      "generated_frames": 88,
+      "truncated": false,
+      "motion_tokens": 22,
+      "generation_seconds": 0.1231
+    },
+    "frames": 88
+  }
+]

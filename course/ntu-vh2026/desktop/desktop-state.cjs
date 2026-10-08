@@ -37,6 +37,12 @@ function isStageHome(value) {
   return new URL(value).pathname === '/'
 }
 
+function modeForRouteChange(currentMode, preferredMode, previousUrl, nextUrl) {
+  if (!isStageHome(nextUrl))
+    return 'window'
+  return isStageHome(previousUrl) ? currentMode : preferredMode
+}
+
 function isTrustedDesktopSender(event, contents) {
   return Boolean(event && contents
     && event.sender === contents
@@ -73,4 +79,4 @@ function clampBounds(value, mode, workAreas) {
   }
 }
 
-module.exports = { defaultPreferences, sanitizePreferences, parseMode, parseFlag, isStageHome, isTrustedDesktopSender, clampBounds }
+module.exports = { defaultPreferences, sanitizePreferences, parseMode, parseFlag, isStageHome, modeForRouteChange, isTrustedDesktopSender, clampBounds }

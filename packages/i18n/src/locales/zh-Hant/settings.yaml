@@ -345,6 +345,43 @@ pages:
           description: 設定 3D VRM 模型與相關選項
         scene: 場景
   modules:
+    motion:
+      title: 動作
+      description: 用本機模型生成 VRM 身體動作
+      intro: MotionGPT 從文字生成 22 個人體關節的動作序列。原有的預編短動作不需啟用此模組。
+      vrm-only: 此模組只支援 VRM 角色，Live2D 與其他角色格式無法使用。
+      enable: 啟用本機 MotionGPT
+      enable-description: 選用功能，預設關閉。此開關不會下載模型或啟動服務。
+      auto: 允許對話自動生成動作
+      auto-description: 語言模型可以要求生成新動作。生成在本機執行，動作可能晚於說話開始。
+      endpoint: 本機服務位址
+      endpoint-description: 僅接受本機 loopback HTTP 位址，預設使用 17905 埠。
+      check: 測試服務
+      runtime: 動作推論裝置
+      runtime-description: 先測試服務以列出可用裝置。切換時會重新載入模型；自動模式優先使用可用的 MLX。
+      runtime-fallback: 自動模式已改用備援裝置。
+      load-time: 模型載入：{seconds} 秒
+      runtime-devices:
+        auto: 自動
+        cpu: CPU
+        mps: Apple Metal（PyTorch MPS）
+        mlx: Apple Metal（原生 MLX）
+      prompt: 動作描述
+      prompt-description: 用簡短英文描述身體動作。先從一個動作開始，檢查生成結果。
+      generate: 生成並預覽
+      replay: 重播上次動作
+      stop: 取消／恢復待機
+      playback-rejected: 角色正在載入、暫停或受姿態追蹤控制。請先停止追蹤再預覽。
+      service-error: 請確認選用的 MotionGPT 服務已安裝並啟動。
+      limits: 實驗性的原地骨架轉換，會移除角色根節點位移。沒有手指細節、腳部 IK 或碰撞處理。方向與外觀仍需目視檢查。
+      status:
+        idle: 尚未測試
+        checking: 正在檢查服務…
+        switching: 正在載入所選動作推論裝置…
+        ready: 模型服務已就緒
+        generating: 正在生成動作…
+        generated: 已收到動作
+        error: 服務無法使用或結果無效
     beat_sync:
       description: 依據音訊來源的節奏同步互動
       title: 節拍同步

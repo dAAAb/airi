@@ -4,19 +4,31 @@
 
 0.2.0 加入透明桌寵模式。角色頁的「桌寵模式」與原生「桌寵」選單可切換；`⌘⌥P` 或 Dock 圖示可解除滑鼠穿透並找回角色。模式切換保留同一個 renderer，不重啟錄音或對話。[完整操作與語意動作教學](../DESKTOP-PET.zh-TW.md)。
 
+從桌寵齒輪開啟設定時，App 暫時使用一般視窗。返回角色主頁後才恢復桌寵；同頁的網址或歷史紀錄更新不會觸發恢復。
+
 preload 只公開固定的模式／置頂／穿透控制，透過 Eventa 傳遞，主程序驗證視窗、主 frame 與精確 origin。建置會把既有 workspace 依賴編入 main 與 sandboxed preload。
 
 App 以同一個 `http://127.0.0.1:17900` origin 顯示安裝頁與編譯後的 AIRI。管理服務擁有自己的 Ollama（12434）及推論服務；資料放在 `~/Library/Application Support/AIRI Local Classroom/local`。關閉 App 時，管理服务會關閉它自己啟動的子程序。
 
 ## 三種產物
 
-- **lite — AIRI Local Lite.app**：離線包只帶 Qwen 3.5 0.8B、Breeze ASR-26、Kokoro，移除兩個 12B 模型、KaedeTai 與台語 TTS runtime。可以用 ASR 聽台語；Kokoro 仍是中文發聲，不能把 Lite 說成具備完整台語對話語音。Qwen 來自中國阿里巴巴，模型的小參數量與產地是不同維度。
-- **thin — AIRI Local.app**：帶瀏覽器、Python、Ollama、全部語音推論 runtime 與 AIRI。第一次開啟時勾選模型、閱讀必要條款並下載固定版本的權重。預設選 Lite 三項，可另外選完整台語組。
-- **full — AIRI Local Full.app**：另外帶全部六項模型 payload，預設原本的 SARC／Gemma 4／ASR／Kokoro／KaedeTai 五項，也可改選 Qwen。初次開啟仍先驗證模型與必要條款。
+- **lite — AIRI Local Lite.app**：離線包只帶 Qwen 3.5 0.8B、Breeze ASR-26、Kokoro，移除兩個 12B 模型、KaedeTai 與台語 TTS runtime。不含 MotionGPT runtime，也沒有 MotionGPT 安裝選項；動作頁仍可連接外部本機服務。可以用 ASR 聽台語；Kokoro 仍是中文發聲，不能把 Lite 說成具備完整台語對話語音。Qwen 來自中國阿里巴巴，模型的小參數量與產地是不同維度。
+- **thin — AIRI Local.app**：帶瀏覽器、Python、Ollama、全部語音推論 runtime 與 AIRI。第一次開啟時勾選模型、閱讀必要條款並下載固定版本的權重。預設選 Lite 三項，可另外選完整台語組。包含 MotionGPT 程式／runtime，安裝頁的 MotionGPT 選項預設不勾選；勾選後從官方下載。
+- **full — AIRI Local Full.app**：另外帶全部六項模型 payload，預設原本的 SARC／Gemma 4／ASR／Kokoro／KaedeTai 五項，也可改選 Qwen。初次開啟仍先驗證模型與必要條款。MotionGPT 程式／runtime 隨附，但權重不在這六項 payload 中；選項預設不勾選，首次使用仍需直接從官方下載約 1.336 GB。
 
-Lite 與 Full 的 Electron 會擋下非 loopback 的 HTTP／HTTPS 請求。模型缺漏時顯示錯誤，不能悄悄改用雲端。三種 App 共用課程 Bundle ID 與使用者資料，單次只開啟一個。
+Lite 與 Full 的 Electron renderer 會擋下非 loopback 的 HTTP／HTTPS 請求。原有離線模型缺漏時顯示錯誤，不能悄悄改用雲端。Full 的 MotionGPT 首次下載是安裝管理器在明確勾選後按固定官方清單執行，不代表開放 renderer 連網推論。三種 App 共用課程 Bundle ID 與使用者資料，單次只開啟一個。
 
 thin 也包含 Torch 等 runtime，不能把它描述成只有幾 MB 的下載器。模型權重大小、安裝後大小、壓縮檔大小與記憶體需求是不同數字。
+
+## MotionGPT：先預覽，再開啟對話生成
+
+使用的是固定 **MotionGPT Base**，不宣稱是最新模型。官方權重模型卡僅標 `cc`，未明示 CC 變體；本 Release 不代管或重包權重。Thin／Full 可選用官方直接下載，Lite 可自行連接外部本機服務。來源與授權政策見[模型記錄](../installer/MODEL-LICENSES.zh-TW.md)。
+
+在 VRM 角色的「機體模組 → 動作」啟用模組，確認 `http://127.0.0.1:17905`，按「測試服務」。先以簡短英文描述生成並預覽，再決定是否開啟「允許對話自動生成動作」；後者預設關閉。Live2D 不支援此模組。
+
+動作設定可切換 CPU、PyTorch Metal／MPS、原生 MLX；自動模式優先 MLX。此 Mac 的 MLX 暖機生成比先前 CPU／MPS 快，且已用相同 token 比對模型數值；這不是所有 Mac 的效能保證。[實測與限制](../motiongpt/README.zh-TW.md)。第一次使用 MLX 另建立約 1 GB 的私人權重快取，無需再次下載模型。
+
+生成的 22 關節序列轉為 VRM **原地骨架動作**。根節點走位被移除，沒有腳部 IK、碰撞、手指細節、指定舞種或精準節拍保證。預編短動作仍可使用，不會被改稱為 MotionGPT 生成結果。方向轉換、姿態恢復與原生視覺驗收要分開記錄。
 
 ## 安全界線
 
@@ -37,10 +49,11 @@ resources/
   runtimes/asr/...
   runtimes/taigi/...
   runtimes/kokoro/...
+  runtimes/motiongpt/...     # Thin／Full；由 build-runtimes.py --motiongpt-env 組裝
   runtimes/ollama/ollama
   upstream/kaedetai/...
   web/local-models/onnx-community/silero-vad/onnx/model.onnx
-  payload/...                # full 使用
+  payload/...                # Full 的原有六模型，不包含 MotionGPT
 ```
 
 從 repository root 執行：

@@ -16,6 +16,8 @@ This distribution contains separately licensed models, software, and data. The A
 - KaedeTai's bundled reference `demo_02_kin_a_jit_thinn_khi.mp3` is the author's synthetic demonstration from the MIT-licensed source repository. Its source and revision accompany the payload. No user recording is included.
 - **MMS-TTS nan is not part of the default Mac payload**. The separate research adapter documents that model's CC BY-NC 4.0 license.
 
+**Optional MotionGPT Base:** research weights are not included in the app or release assets. The installer downloads pinned, hash-verified files directly from OpenMotionLab only when selected. The upstream model card declares `cc` without an exact Creative Commons variant; this is not represented as a redistribution or commercial-use grant. MotionGPT code and the adapted VQ implementation retain the upstream MIT license in `course/ntu-vh2026/motiongpt/vendor/LICENSE.MotionGPT`. The pinned FLAN-T5 tokenizer retains its Apache-2.0 attribution separately in the download manifest. Model details and limitations are in the MotionGPT README. The native MLX implementation references Apple’s MIT-licensed T5 example; the retained license and pinned source are in `course/ntu-vh2026/motiongpt/vendor/`. The MLX/Metal packages retain their package notices in the standalone runtime. Locally converted MotionGPT caches are private model data and are not release assets.
+
 ## Runtime and codec components
 
 Python and each installed package retain their `LICENSE`, `COPYING`, `NOTICE`, and `*.dist-info` records inside `runtimes/`. These include the Python standalone distribution, MLX, Torch, NumPy, SciPy, and their bundled libraries. Their individual notices remain authoritative.

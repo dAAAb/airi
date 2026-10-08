@@ -1,0 +1,23 @@
+{
+  "scope": "Actual pinned MotionGPT-base neural generation; timing is this Mac only, not a general quality benchmark.",
+  "timestamp": "2026-10-08T13:49:51Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "torch": "2.8.0",
+  "cases": [
+    {
+      "case": "stretch",
+      "device": "cpu",
+      "load_seconds": 2.794,
+      "generation_seconds": 0.2599,
+      "frames": 92,
+      "motion_tokens": 23,
+      "duration_seconds": 4.6,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 1.2760130000000003,
+      "right_wrist_y_range_m": 1.2604199999999999,
+      "head_y_range_m": 0.025986000000000065,
+      "output": "stretch-cpu.json"
+    }
+  ]
+}

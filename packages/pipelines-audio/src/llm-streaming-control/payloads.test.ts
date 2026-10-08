@@ -46,3 +46,12 @@ describe('normalizeActPayload', () => {
     })
   })
 })
+
+describe('optional generated motion description', () => {
+  it('keeps bounded text only for the generate action', () => {
+    expect(normalizeActPayload({ motion: 'generate', motionPrompt: ' Raise the right arm. ' })).toEqual({ motion: 'generate', motionPrompt: 'Raise the right arm.' })
+    expect(normalizeActPayload({ motion: 'wave', motionPrompt: 'walk' })).toEqual({ motion: 'wave' })
+    expect(normalizeActPayload({ motion: 'generate', motionPrompt: 'x'.repeat(501) })).toEqual({ motion: 'generate' })
+    expect(normalizeActPayload({ motion: 'generate', motionPrompt: { script: 'run()' } })).toEqual({ motion: 'generate' })
+  })
+})

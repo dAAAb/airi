@@ -34,6 +34,16 @@ export const useDesktopPet = createSharedComposable(() => {
   const busy = ref(false)
   const error = ref<string>()
   const isDesktopPet = computed(() => available && state.value.mode === 'pet')
+  let stateRevision = 0
+
+  async function refreshState() {
+    if (!bridge)
+      return
+    const revision = ++stateRevision
+    const next = await bridge.getState()
+    if (revision === stateRevision)
+      state.value = next
+  }
 
   watch(isDesktopPet, (enabled) => {
     document.documentElement.classList.toggle('airi-desktop-pet', enabled)
@@ -44,8 +54,11 @@ export const useDesktopPet = createSharedComposable(() => {
   })
 
   if (bridge) {
-    const unsubscribe = bridge.onStateChanged(next => state.value = next)
-    void bridge.getState().then(next => state.value = next).catch((cause) => {
+    const unsubscribe = bridge.onStateChanged((next) => {
+      stateRevision++
+      state.value = next
+    })
+    void refreshState().catch((cause) => {
       error.value = errorMessageFrom(cause)
     })
     onScopeDispose(unsubscribe)
@@ -57,9 +70,10 @@ export const useDesktopPet = createSharedComposable(() => {
 
     busy.value = true
     error.value = undefined
+    stateRevision++
     try {
       await action(bridge)
-      state.value = await bridge.getState()
+      await refreshState()
     }
     catch (cause) {
       error.value = errorMessageFrom(cause)

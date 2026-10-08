@@ -38,6 +38,8 @@ MODEL_ROWS = [
     {'id': 'asr26', 'title': '聽覺 · Breeze ASR-26 MLX', 'bytes': 991000000, 'kind': 'files', 'license': 'breeze-asr26'},
     {'id': 'kokoro', 'title': '中文聲音 · Kokoro 82M', 'bytes': 330000000, 'kind': 'files', 'license': 'kokoro'},
     {'id': 'kaedetai', 'title': '台語聲音 · KaedeTai', 'bytes': 1410000000, 'kind': 'files', 'license': 'kaedetai'},
+    {'id': 'motiongpt', 'title': '選配動作 · MotionGPT Base（VRM）', 'bytes': 1335831259,
+     'kind': 'files', 'license': 'motiongpt', 'optional': True},
 ]
 CATALOG = {row['id']: row for row in MODEL_ROWS}
 
@@ -98,8 +100,16 @@ class LocalManager:
     def payload_path(self, relative):
         # An offline app reads immutable payload in Resources. Downloads live in
         # Application Support and never modify a signed .app bundle.
+        if any(item['path'] == relative and item['model'] in self.download_only_models()
+               for item in self.manifest().get('files', [])):
+            return confined(self.data / 'payload', relative)
         bundled = confined(self.resources / 'payload', relative)
         return bundled if self.manifest().get('offline') or bundled.is_file() else confined(self.data / 'payload', relative)
+
+    def download_only_models(self):
+        # Supported packaging policy: optional research weights come directly
+        # from the author. Offline speech/LLM payloads never fall back to downloads.
+        return set(self.manifest().get('download_only_models', [])) & {'motiongpt'}
 
     def runtime(self, relative):
         result = confined(self.resources, relative)
@@ -124,6 +134,7 @@ class LocalManager:
             if row['id'] not in self.available_models():
                 continue
             entry = dict(row)
+            entry['download_only'] = row['id'] in self.download_only_models()
             if row['kind'] == 'ollama':
                 try:
                     expected = self.expected_ollama_digests(row)
@@ -303,7 +314,7 @@ class LocalManager:
         target = self.payload_path(item['path'])
         if target.is_file() and target.stat().st_size == item['bytes'] and hash_file(target) == item['sha256']:
             return
-        if self.manifest().get('offline'):
+        if self.manifest().get('offline') and item['model'] not in self.download_only_models():
             raise RuntimeError('Offline model file is missing or damaged. Reinstall this release.')
         target = confined(self.data / 'payload', item['path'])
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -368,6 +379,10 @@ class LocalManager:
             env = dict(os.environ, HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
                        HF_HUB_DISABLE_TELEMETRY='1', TOKENIZERS_PARALLELISM='false')
             payload = self.resources / 'payload' if manifest.get('offline') else self.data / 'payload'
+            if set(service['requires']) & self.download_only_models():
+                if not set(service['requires']).issubset(self.download_only_models()):
+                    raise RuntimeError('A service cannot mix bundled and separately downloaded payload roots')
+                payload = self.data / 'payload'
             for key, value in service['env'].items():
                 env[key] = value.replace('{payload}', str(payload)).replace('{resources}', str(self.resources))
             args = [str(self.runtime(service['executable']))] + [arg.replace('{resources}', str(self.resources)) for arg in service['args']]
@@ -444,7 +459,8 @@ def make_handler(manager):
                 return self.send_data(200, {'token': manager.token, 'origin': ORIGIN})
             if path == '/api/airi-config':
                 return self.send_data(200, {'models': manager.selected, 'ollama': OLLAMA_URLS[manager.mode] + '/v1/',
-                    'asr': 'http://127.0.0.1:18001/v1/', 'speech': 'http://127.0.0.1:18884/v1/'})
+                    'asr': 'http://127.0.0.1:18001/v1/', 'speech': 'http://127.0.0.1:18884/v1/',
+                    'motion': 'http://127.0.0.1:17905' if 'motiongpt' in manager.selected else None})
             if path.startswith('/licenses/'):
                 root = manager.resources / 'licenses'
                 relative = path.removeprefix('/licenses/')

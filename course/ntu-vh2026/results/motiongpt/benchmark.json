@@ -1,0 +1,92 @@
+{
+  "scope": "Actual pinned MotionGPT-base neural generation; timing is this Mac only, not a general quality benchmark.",
+  "timestamp": "2026-10-08T13:34:58Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "torch": "2.8.0",
+  "cases": [
+    {
+      "case": "right-wave",
+      "device": "cpu",
+      "load_seconds": 2.9525,
+      "generation_seconds": 0.2177,
+      "frames": 68,
+      "duration_seconds": 3.4,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.03113699999999997,
+      "right_wrist_y_range_m": 0.9428550000000001,
+      "head_y_range_m": 0.014051999999999953,
+      "output": "right-wave-cpu.json"
+    },
+    {
+      "case": "bow",
+      "device": "cpu",
+      "load_seconds": 2.9525,
+      "generation_seconds": 0.2508,
+      "frames": 84,
+      "duration_seconds": 4.2,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.09146100000000001,
+      "right_wrist_y_range_m": 0.12921399999999994,
+      "head_y_range_m": 0.25289300000000003,
+      "output": "bow-cpu.json"
+    },
+    {
+      "case": "dance",
+      "device": "cpu",
+      "load_seconds": 2.9525,
+      "generation_seconds": 0.478,
+      "frames": 196,
+      "duration_seconds": 9.8,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 1.2605630000000003,
+      "right_wrist_y_range_m": 1.4579270000000002,
+      "head_y_range_m": 0.2529220000000001,
+      "output": "dance-cpu.json"
+    },
+    {
+      "case": "right-wave",
+      "device": "mps",
+      "load_seconds": 2.9905,
+      "generation_seconds": 0.9743,
+      "frames": 68,
+      "duration_seconds": 3.4,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.03113699999999997,
+      "right_wrist_y_range_m": 0.9428550000000001,
+      "head_y_range_m": 0.014051999999999953,
+      "output": "right-wave-mps.json"
+    },
+    {
+      "case": "bow",
+      "device": "mps",
+      "load_seconds": 2.9905,
+      "generation_seconds": 1.8002,
+      "frames": 104,
+      "duration_seconds": 5.2,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.062805,
+      "right_wrist_y_range_m": 0.057898000000000005,
+      "head_y_range_m": 0.2076,
+      "output": "bow-mps.json"
+    },
+    {
+      "case": "dance",
+      "device": "mps",
+      "load_seconds": 2.9905,
+      "generation_seconds": 1.6339,
+      "frames": 192,
+      "duration_seconds": 9.6,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.277795,
+      "right_wrist_y_range_m": 0.2566090000000001,
+      "head_y_range_m": 0.12882400000000005,
+      "output": "dance-mps.json"
+    }
+  ]
+}

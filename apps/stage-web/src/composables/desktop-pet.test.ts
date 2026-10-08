@@ -96,4 +96,32 @@ describe('native desktop pet state', () => {
     expect(desktop.busy.value).toBe(false)
     expect(desktop.isDesktopPet.value).toBe(false)
   })
+
+  it('does not restore pet from an initial state read that completes after opening settings', async () => {
+    const native = createBridge('pet')
+    const pending = Promise.withResolvers<DesktopPetState>()
+    vi.mocked(native.bridge.getState).mockImplementationOnce(() => pending.promise)
+    const desktop = mountDesktop(native.bridge)
+    await desktop.openSettings()
+    expect(desktop.state.value.mode).toBe('window')
+    pending.resolve({ mode: 'pet', alwaysOnTop: true, clickThrough: false })
+    await nextTick()
+    expect(desktop.state.value.mode).toBe('window')
+    expect(document.documentElement.classList.contains('airi-desktop-pet')).toBe(false)
+  })
+
+  it('keeps a newer native route change when an action state read finishes late', async () => {
+    const native = createBridge('pet')
+    const desktop = mountDesktop(native.bridge)
+    await nextTick()
+    const pending = Promise.withResolvers<DesktopPetState>()
+    vi.mocked(native.bridge.getState).mockImplementationOnce(() => pending.promise)
+    const action = desktop.setAlwaysOnTop(false)
+    await nextTick()
+    native.publish({ mode: 'window' })
+    pending.resolve({ mode: 'pet', alwaysOnTop: false, clickThrough: false })
+    await action
+    expect(desktop.state.value.mode).toBe('window')
+    expect(desktop.busy.value).toBe(false)
+  })
 })

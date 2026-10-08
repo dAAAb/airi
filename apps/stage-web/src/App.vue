@@ -42,10 +42,6 @@ const i18n = useI18n()
 const router = useRouter()
 const desktop = useDesktopPet()
 const { isDesktopPet, busy: desktopBusy } = desktop
-watch(isDesktopPet, (enabled) => {
-  if (enabled && router.currentRoute.value.path !== '/')
-    void router.push('/')
-})
 const activeRouteTransitionName = ref('')
 const displayModelsStore = useDisplayModelsStore()
 const settingsStore = useSettings()

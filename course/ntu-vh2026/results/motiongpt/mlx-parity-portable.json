@@ -1,0 +1,30 @@
+{
+  "backend": "mlx-metal",
+  "precision": "float32",
+  "device": "Device(gpu, 0)",
+  "scope": "Identical inputs and decoder tokens; not random-sample equivalence.",
+  "metrics": {
+    "memory": {
+      "max_abs": 1.7881393432617188e-07,
+      "rmse": 3.627349298159429e-08,
+      "finite": true
+    },
+    "logits": {
+      "max_abs": 6.103515625e-05,
+      "rmse": 1.6859237693181153e-05,
+      "finite": true,
+      "argmax_matches_all_steps": true
+    },
+    "features": {
+      "max_abs": 1.1377036571502686e-05,
+      "rmse": 7.81952111728104e-07,
+      "finite": true
+    },
+    "joints": {
+      "max_abs": 4.76837158203125e-07,
+      "rmse": 5.095584823975519e-08,
+      "finite": true
+    }
+  },
+  "passed": true
+}

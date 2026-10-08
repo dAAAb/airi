@@ -12,6 +12,7 @@ import { useDiscordStore } from '../stores/modules/discord'
 import { useFactorioStore } from '../stores/modules/gaming-factorio'
 import { useMinecraftStore } from '../stores/modules/gaming-minecraft'
 import { useHearingStore } from '../stores/modules/hearing'
+import { useMotionStore } from '../stores/modules/motion'
 import { useSpeechStore } from '../stores/modules/speech'
 import { useStickersStore } from '../stores/modules/stickers'
 import { useTwitterStore } from '../stores/modules/twitter'
@@ -45,6 +46,7 @@ export function useModulesList() {
   const minecraftStore = useMinecraftStore()
   const factorioStore = useFactorioStore()
   const artistryStore = useArtistryStore()
+  const motionStore = useMotionStore()
   const beatSyncState = ref<BeatSyncDetectorState>()
   const beatSyncSupported = isBeatSyncSupported()
 
@@ -87,6 +89,17 @@ export function useModulesList() {
       configured: visionStore.configured,
       category: 'essential',
     },
+    ...(motionStore.available
+      ? [{
+          id: 'motion',
+          name: t('settings.pages.modules.motion.title'),
+          description: t('settings.pages.modules.motion.description'),
+          icon: 'i-solar:running-round-bold-duotone',
+          to: '/settings/modules/motion',
+          configured: motionStore.configured,
+          category: 'essential',
+        }]
+      : []),
     {
       id: 'stickers',
       name: t('settings.pages.modules.stickers.title'),

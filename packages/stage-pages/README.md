@@ -25,3 +25,10 @@ Put primitive UI components in `@proj-airi/ui`. Put shared layouts in `@proj-air
 ## Provider settings
 
 The active chat and vision provider routes live under `/settings/providers`. They use `ProviderGenerationSettings` from stage-ui to render protocol and native search options from the provider catalog. The V2 editor is a separate consumer and does not replace these routes.
+
+## VRM motion module
+
+`/settings/modules/motion` configures an optional local MotionGPT service and previews generated motion on the selected VRM.
+The module card appears only for VRM characters. A direct route visit with another renderer explains that restriction.
+Enable the module, test the service, then generate a short English motion description. Enable automatic conversation generation separately.
+The page does not download model weights or launch the service. Replay and cancel controls operate on the last validated clip.

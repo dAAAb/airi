@@ -1,0 +1,163 @@
+{
+  "method": "Orthographic front (+Z camera) and left-side (+X camera) projections of original HumanML3D-22 joint coordinates.",
+  "playback": "One GIF frame for each saved joint frame, original 20 fps. Loops only at the end.",
+  "transformations": "Projection only. No mirrored axes, model rotations, root centering, interpolation, filtering, or resampling.",
+  "units": "Model coordinate meters, no independent physical scale calibration.",
+  "limitation": "Skeleton-output audit only. Does not validate native App or VRM retargeting.",
+  "records": [
+    {
+      "source": "right-wave-cpu.json",
+      "source_sha256": "c2cf5178d3d919d3341e527053ebbb7cf10df405849c68df303e097dfa472eaa",
+      "prompt": "A person waves their right hand to greet someone.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "cpu",
+      "generation_seconds": 0.2177,
+      "metrics": {
+        "frames": 68,
+        "fps": 20,
+        "playback_seconds": 3.4,
+        "right_wrist_y_range_m": [
+          0.882176,
+          1.825031
+        ],
+        "left_wrist_y_range_m": [
+          0.864554,
+          0.895691
+        ],
+        "right_wrist_peak_y_frame": 29,
+        "root_displacement_m": [
+          -0.002112,
+          -0.0037530000000000063,
+          -0.017392
+        ],
+        "root_range_xyz_m": [
+          0.011476,
+          0.010006999999999988,
+          0.022466
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": -3.961921121221713,
+          "maximum": -3.874752283169347,
+          "maximum_frame": 67,
+          "last": -3.874752283169347
+        }
+      },
+      "outputs": [
+        {
+          "path": "right-wave-cpu-skeleton.gif",
+          "bytes": 1533992,
+          "sha256": "17999b1ac63e69eca3c83b9f5ee58b814b0cd22d8673fe3afb2c929ae0a913ac"
+        },
+        {
+          "path": "right-wave-cpu-keyframes.png",
+          "bytes": 104002,
+          "sha256": "94cb9b94002796f322eba55c693b88bc6da441b384f5e79f9f09f21a45ec60ed"
+        }
+      ]
+    },
+    {
+      "source": "bow-cpu.json",
+      "source_sha256": "40b3406f00af70ee1498ea734e7d376491b075dac14d6d77527ac7e033225a5e",
+      "prompt": "A person slowly bows forward, then stands upright.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "cpu",
+      "generation_seconds": 0.2508,
+      "metrics": {
+        "frames": 84,
+        "fps": 20,
+        "playback_seconds": 4.2,
+        "right_wrist_y_range_m": [
+          0.72384,
+          0.853054
+        ],
+        "left_wrist_y_range_m": [
+          0.782855,
+          0.874316
+        ],
+        "right_wrist_peak_y_frame": 71,
+        "root_displacement_m": [
+          -0.01504,
+          -9.599999999998499e-05,
+          -0.059391
+        ],
+        "root_range_xyz_m": [
+          0.065345,
+          0.014780000000000015,
+          0.074691
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": -4.385666927672226,
+          "maximum": 42.89561293885778,
+          "maximum_frame": 35,
+          "last": -4.282165858240305
+        }
+      },
+      "outputs": [
+        {
+          "path": "bow-cpu-skeleton.gif",
+          "bytes": 1865695,
+          "sha256": "dfa9d4e161f45a9bec2447bd4a34e35aa086592e2fc19633c3fe2073affd603c"
+        },
+        {
+          "path": "bow-cpu-keyframes.png",
+          "bytes": 107916,
+          "sha256": "87c17e23c618ee6352dc0b2971189ad81de0fcdd36bd6494403c0b7be9437059"
+        }
+      ]
+    },
+    {
+      "source": "dance-cpu.json",
+      "source_sha256": "72f3e5e8c331c464268e9d0c913c11aca88690e88be02de683a863ab9646afba",
+      "prompt": "A person dances happily, swaying side to side and moving both arms.",
+      "model": "OpenMotionLab/MotionGPT-base",
+      "seed": 42,
+      "device": "cpu",
+      "generation_seconds": 0.478,
+      "metrics": {
+        "frames": 196,
+        "fps": 20,
+        "playback_seconds": 9.8,
+        "right_wrist_y_range_m": [
+          0.68506,
+          2.142987
+        ],
+        "left_wrist_y_range_m": [
+          0.793373,
+          2.053936
+        ],
+        "right_wrist_peak_y_frame": 43,
+        "root_displacement_m": [
+          -0.243236,
+          0.02066800000000002,
+          -0.416531
+        ],
+        "root_range_xyz_m": [
+          0.317942,
+          0.150822,
+          0.804365
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": 0.7465541207198416,
+          "maximum": 23.498772982703247,
+          "maximum_frame": 96,
+          "last": 3.427692807179145
+        }
+      },
+      "outputs": [
+        {
+          "path": "dance-cpu-skeleton.gif",
+          "bytes": 4222169,
+          "sha256": "04888fdd0fb08d235eddbc2a0c7266b25436e80e8d9fe537a72f44b0b6601eb9"
+        },
+        {
+          "path": "dance-cpu-keyframes.png",
+          "bytes": 106730,
+          "sha256": "c0f707cba8b2ad72ea74b4b7b46394fb15d9d0284d97dac6e3d7aa5e7111d413"
+        }
+      ]
+    }
+  ],
+  "preview_total_bytes": 7940504
+}

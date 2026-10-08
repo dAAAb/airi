@@ -8,6 +8,16 @@ export function formatBytes(bytes) {
   return `${(Math.max(0, Number(bytes) || 0) / 1e9).toFixed(2)} GB`
 }
 
+export function selectionNeedsDownload(status, selected) {
+  return !status.offline || status.catalog.some(row => selected.has(row.id) && row.download_only && !row.installed)
+}
+
+export function initialModelSelection(status) {
+  const available = new Set(status.catalog.map(row => row.id))
+  const saved = status.selected.filter(id => available.has(id))
+  return [...new Set(saved.length ? saved : status.default_models.filter(id => available.has(id)))]
+}
+
 export function createInstallRequest(catalog, selected, accepted, mode) {
   if (!['bundled', 'existing'].includes(mode))
     throw new Error('請選擇 Ollama 執行方式。')

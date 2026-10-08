@@ -10,6 +10,9 @@
 
 課程版提供勾選下載、輕量離線與完整台語離線包。內建 Ollama 使用獨立的埠與模型目錄，可與原有 Ollama 並存。下方的 `Try it` 與其他預編譯連結屬於上游。
 
+**新增 VRM 動作實驗：[MotionGPT 本機生成與 MLX／Metal 實測](./course/ntu-vh2026/motiongpt/README.zh-TW.md) · [什麼語句應該觸發什麼動作，以及 Decisions API 的角色](./course/ntu-vh2026/motiongpt/decisions-and-motion.md)**
+Thin／Full 安裝器可選配 MotionGPT，設定入口為「機體模組 → 動作」。權重另由官方下載；CPU、MPS、原生 MLX 可切換。Decisions API 僅列為教學設計，尚未串接或使用雲端 API。
+
 | 課堂案例 | 我們實際測到什麼 | 不把它當作什麼 |
 | --- | --- | --- |
 | 台灣華語 TTS：Breeze2-VITS-onnx | 本機 CPU 合成課程介紹，與 Kokoro 同句比較 | 台語發音、MLX 加速或完整即時對話延遲 |

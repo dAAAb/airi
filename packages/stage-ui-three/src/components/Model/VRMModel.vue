@@ -18,6 +18,7 @@ import type {
   WebGLRenderer,
 } from 'three'
 
+import type { GeneratedMotionClip } from '../../composables/vrm/generated-motion'
 import type {
   VrmDisposeHookContext,
   VrmFrameHookContext,
@@ -75,6 +76,7 @@ import {
 } from '../../composables/vrm/animation'
 import { loadVrm } from '../../composables/vrm/core'
 import { useVRMEmote } from '../../composables/vrm/expression'
+import { createVrmGeneratedMotion } from '../../composables/vrm/generated-motion'
 import { createVrmInteractionColliders } from '../../composables/vrm/interaction'
 import { resolveInternalVrmHooks } from '../../composables/vrm/internal-hooks'
 import { useVRMLipSync } from '../../composables/vrm/lip-sync'
@@ -194,6 +196,7 @@ const raycaster = new Raycaster()
 // Animation related ref
 const vrmAnimationMixer = ref<AnimationMixer>()
 const semanticMotion = createVrmSemanticMotion()
+const generatedMotion = createVrmGeneratedMotion()
 const { onBeforeRender, stop, start } = useLoop()
 
 const vrmHooks: readonly VrmHook[] = resolveInternalVrmHooks()
@@ -319,6 +322,7 @@ function getActiveManagedVrmInstance() {
 
 function clearActiveManagedVrmRefs() {
   semanticMotion.stop()
+  generatedMotion.stop()
   vrmAnimationMixer.value = undefined
   vrmEmote.value = undefined
   vrm.value = undefined
@@ -337,6 +341,7 @@ function applyModelTransform(group: Group) {
 
 function applyManagedVrmInstance(instance: ManagedVrmInstance) {
   semanticMotion.stop()
+  generatedMotion.stop()
   // A reload creates a new group while the saved transform can stay unchanged.
   // Apply it during every commit because the value watchers will not run again.
   applyModelTransform(instance.group)
@@ -465,6 +470,7 @@ function bindManagedVrmInstanceRenderLoop() {
 
     const animationMixerMs = measureFrameStep(tracingEnabled, () => {
       semanticMotion.restore()
+      generatedMotion.restore()
       vrmAnimationMixer.value?.update(delta)
     })
     const activeVrm = vrm.value
@@ -485,8 +491,12 @@ function bindManagedVrmInstanceRenderLoop() {
         runVrmFrameRuntimeHook(activeVrm, delta)
     })
     const humanoidMs = measureFrameStep(tracingEnabled, () => {
-      if (activeVrm && !vrmFrameRuntimeHook.value)
-        semanticMotion.update(activeVrm, delta)
+      if (activeVrm && !vrmFrameRuntimeHook.value) {
+        if (generatedMotion.active)
+          generatedMotion.update(activeVrm, delta)
+        else
+          semanticMotion.update(activeVrm, delta)
+      }
       activeVrm?.humanoid.update()
     })
     const lookAtMs = measureFrameStep(tracingEnabled, () => {
@@ -1113,7 +1123,19 @@ defineExpose({
   playMotion(name: string, intensity = 1) {
     if (!vrm.value || paused.value || vrmFrameRuntimeHook.value)
       return false
+    generatedMotion.stop()
     return semanticMotion.play(name, intensity)
+  },
+  playGeneratedMotion(clip: GeneratedMotionClip) {
+    if (!vrm.value || paused.value || vrmFrameRuntimeHook.value)
+      return false
+    if (!generatedMotion.play(clip))
+      return false
+    semanticMotion.stop()
+    return true
+  },
+  stopGeneratedMotion() {
+    generatedMotion.stop()
   },
   getInteractionColliders: () => interactionColliders.value?.colliders ?? [],
   setExpression(expression: string, intensity = 1) {
@@ -1123,8 +1145,10 @@ defineExpose({
   // External callers use it for live pose/tracking input; internal hooks remain reserved for
   // stage-ui-three's own model/material lifecycle extensions.
   setVrmFrameHook(hook?: VrmFrameRuntimeHook) {
-    if (hook)
+    if (hook) {
       semanticMotion.stop()
+      generatedMotion.stop()
+    }
     vrmFrameRuntimeHook.value = hook
   },
   scene: computed(() => vrm.value?.scene),

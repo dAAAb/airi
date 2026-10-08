@@ -1,0 +1,38 @@
+{
+  "scope": "Actual pinned MotionGPT-base neural generation; timing is this Mac only, not a general quality benchmark.",
+  "timestamp": "2026-10-08T13:44:02Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "torch": "2.8.0",
+  "cases": [
+    {
+      "case": "stretch",
+      "device": "cpu",
+      "load_seconds": 2.9681,
+      "generation_seconds": 0.3034,
+      "frames": 92,
+      "motion_tokens": 23,
+      "duration_seconds": 4.6,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 1.2760130000000003,
+      "right_wrist_y_range_m": 1.2604199999999999,
+      "head_y_range_m": 0.025986000000000065,
+      "output": "stretch-cpu.json"
+    },
+    {
+      "case": "boxing",
+      "device": "cpu",
+      "load_seconds": 2.9681,
+      "generation_seconds": 0.4185,
+      "frames": 156,
+      "motion_tokens": 39,
+      "duration_seconds": 7.8,
+      "truncated": false,
+      "finite": true,
+      "left_wrist_y_range_m": 0.49173,
+      "right_wrist_y_range_m": 0.33305699999999994,
+      "head_y_range_m": 0.19765199999999994,
+      "output": "boxing-cpu.json"
+    }
+  ]
+}

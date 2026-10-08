@@ -1,0 +1,126 @@
+{
+  "method": "Fixed orthographic projections of original 22-joint coordinates. No new GIFs or generated motion.",
+  "limitation": "No fingers, contacts, forces, native UI, or VRM retargeting were tested.",
+  "records": [
+    {
+      "source": "novel/stretch-cpu.json",
+      "source_sha256": "1382cfabf2df385c91131e84416792cdce7cdc5774ad76832c11bfbd258f52b1",
+      "prompt": "A person stretches both arms above their head.",
+      "seed": 42,
+      "device": "cpu",
+      "generation_seconds": 0.3034,
+      "truncated": false,
+      "metrics": {
+        "frames": 92,
+        "fps": 20,
+        "playback_seconds": 4.6,
+        "right_wrist_y_range_m": [
+          0.846378,
+          2.106798
+        ],
+        "left_wrist_y_range_m": [
+          0.844699,
+          2.120712
+        ],
+        "right_wrist_peak_y_frame": 51,
+        "root_displacement_m": [
+          -0.029168,
+          0.0026920000000000277,
+          -0.027351
+        ],
+        "root_range_xyz_m": [
+          0.030754,
+          0.02451900000000007,
+          0.031023
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": -2.815995899230595,
+          "maximum": -0.0941324169192822,
+          "maximum_frame": 89,
+          "last": -0.6584459509341288
+        },
+        "both_wrists_above_head_frames": 57,
+        "left_shoulder_to_wrist_reach_range_m": [
+          0.35399201133500174,
+          0.6198305368066342
+        ],
+        "right_shoulder_to_wrist_reach_range_m": [
+          0.33820510378910607,
+          0.6046980333819517
+        ],
+        "keyframe_indices_zero_based": [
+          0,
+          23,
+          45,
+          69,
+          91
+        ]
+      },
+      "output": {
+        "path": "stretch-cpu-keyframes.png",
+        "bytes": 120415,
+        "sha256": "2dac7051d3700cf0d46f8e1473bb608836017968bb2a78888344adac7db2eb1e"
+      }
+    },
+    {
+      "source": "novel/boxing-cpu.json",
+      "source_sha256": "787964425a56ae675a42b52d0a37edf8f84e8541b2d230261c849991c11a4c7d",
+      "prompt": "A person performs a short boxing combination with both arms.",
+      "seed": 42,
+      "device": "cpu",
+      "generation_seconds": 0.4185,
+      "truncated": false,
+      "metrics": {
+        "frames": 156,
+        "fps": 20,
+        "playback_seconds": 7.8,
+        "right_wrist_y_range_m": [
+          1.200105,
+          1.533162
+        ],
+        "left_wrist_y_range_m": [
+          1.205456,
+          1.697186
+        ],
+        "right_wrist_peak_y_frame": 114,
+        "root_displacement_m": [
+          -0.191352,
+          0.034924999999999984,
+          -0.240032
+        ],
+        "root_range_xyz_m": [
+          1.302861,
+          0.15850200000000003,
+          0.745939
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": -6.959350162330118,
+          "maximum": 9.783408608699409,
+          "maximum_frame": 154,
+          "last": 9.413691053753631
+        },
+        "both_wrists_above_head_frames": 0,
+        "left_shoulder_to_wrist_reach_range_m": [
+          0.1833874885754205,
+          0.5495899084026197
+        ],
+        "right_shoulder_to_wrist_reach_range_m": [
+          0.18343929113742233,
+          0.4711606601712414
+        ],
+        "keyframe_indices_zero_based": [
+          0,
+          47,
+          77,
+          117,
+          155
+        ]
+      },
+      "output": {
+        "path": "boxing-cpu-keyframes.png",
+        "bytes": 119200,
+        "sha256": "e5161c50725c9ff8ed2542d24d0a841a9f53f3bc31be0b6e655936ed416ccaa6"
+      }
+    }
+  ]
+}

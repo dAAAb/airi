@@ -1,6 +1,7 @@
 import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
 import { useConsciousnessSettingsStore } from '@proj-airi/stage-ui/stores/modules/consciousness-settings'
 import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
+import { useMotionStore } from '@proj-airi/stage-ui/stores/modules/motion'
 import { useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision'
 import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
 import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
@@ -51,6 +52,7 @@ export function useLocalInstaller() {
   const providers = useProviderConfigStore()
   const cards = useAiriCardStore()
   const hearing = useHearingStore()
+  const motion = useMotionStore()
   const vision = useVisionStore()
   const settings = useConsciousnessSettingsStore()
   const onboarding = useOnboardingStore()
@@ -115,6 +117,9 @@ export function useLocalInstaller() {
       vision.useForChat = true
       vision.ollamaThinkingEnabled = false
     }
+    motion.enabled = config.models.includes('motiongpt')
+    if (config.motion)
+      motion.endpoint = config.motion
     await settings.setReasoning(false)
     const preferred = plannedCards.find(row => row.key === 'mandarin')
       ?? plannedCards.find(row => row.key === 'qwen')

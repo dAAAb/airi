@@ -54,6 +54,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for key in ('python311', 'python312', 'asr-env', 'taigi-env', 'kokoro-env', 'taibun-env', 'destination'):
         parser.add_argument('--'+key, type=Path, required=True)
+    parser.add_argument('--motiongpt-env', type=Path, help='Optional CPython 3.12 MotionGPT environment; weights are downloaded separately')
     args = parser.parse_args()
     out = args.destination.resolve()
     reports = []
@@ -64,6 +65,8 @@ def main():
         ('kokoro', args.python312, args.kokoro_env, '3.12'),
     ]:
         reports.append(build(base, env, out/name, version))
+    if args.motiongpt_env is not None:
+        reports.append(build(args.python312, args.motiongpt_env, out/'motiongpt', '3.12'))
     # Taibun itself is pure Python. Its msgpack dependency already exists in
     # the Torch runtime with the correct CPython 3.11 ABI.
     taibun_site = args.taibun_env/'lib/python3.12/site-packages'

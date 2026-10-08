@@ -1,0 +1,17 @@
+{
+  "native_files": 57,
+  "issues": [],
+  "build_metadata": [
+    {
+      "file": "lib/python3.12/site-packages/torch/_C.cpython-312-darwin.so",
+      "kind": "search-path",
+      "value": "/Users/runner/work/_temp/anaconda/envs/wheel_py312/lib"
+    },
+    {
+      "file": "lib/python3.12/site-packages/torch/lib/libomp.dylib",
+      "kind": "install-id",
+      "value": "/opt/homebrew/opt/libomp/lib/libomp.dylib"
+    }
+  ],
+  "scope": "Static load paths plus separately recorded imports. Not a codesign/notarization check."
+}

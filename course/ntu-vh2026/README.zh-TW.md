@@ -8,6 +8,8 @@
 
 **2026-10-08：** [桌寵與 AI 語意動作](DESKTOP-PET.zh-TW.md) 說明透明桌面模式、語意選動作的控制流程及學生實驗。
 
+**新增：[MotionGPT 生成新動作](motiongpt/README.zh-TW.md)**，包含原生 MLX／Metal、CPU／MPS 比較、左右前後座標檢查、實際骨架圖與可重現結果。Thin／Full 可選配安裝，入口為「機體模組 → 動作」，僅適用 VRM。另有[語意判斷與 Decisions API](motiongpt/decisions-and-motion.md)教學，區分「談論動作」、「要求動作」與「不要做動作」。
+
 | 名稱 | 耳朵／嘴巴 | 這次真的做了什麼 |
 | --- | --- | --- |
 | MediaTek Breeze2-VITS-onnx | 嘴巴：台灣華語 | Sherpa-ONNX CPU、本機 HTTP 服務、AIRI TTS 測試通過。不是台語 TTS，也沒有用 MLX。 |

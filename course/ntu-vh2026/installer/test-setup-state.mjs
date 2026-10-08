@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 // eslint-disable-next-line no-restricted-syntax -- The Node ESM runtime requires the source file extension.
-import { createInstallRequest, MODEL_PRESETS, safeLaunchUrl, selectedMatchesStatus } from './web/setup-state.js'
+import { createInstallRequest, initialModelSelection, MODEL_PRESETS, safeLaunchUrl, selectedMatchesStatus, selectionNeedsDownload } from './web/setup-state.js'
 
 const catalog = [{ id: 'sarc-taigi', license: 'gemma' }, { id: 'kokoro', license: 'kokoro' }]
 
@@ -55,3 +55,60 @@ test('lightweight and full presets form valid plans with distinct language capab
 function expectModels(actual, expected) {
   assert.deepEqual(new Set(actual), new Set(expected))
 }
+
+test('MotionGPT is opt-in and an offline package labels its first download correctly', () => {
+  for (const preset of Object.values(MODEL_PRESETS))
+    assert.equal(preset.includes('motiongpt'), false)
+  const status = { offline: true, catalog: [
+    { id: 'kokoro', installed: true },
+    { id: 'motiongpt', installed: false, download_only: true },
+  ] }
+  assert.equal(selectionNeedsDownload(status, new Set(['kokoro'])), false)
+  assert.equal(selectionNeedsDownload(status, new Set(['kokoro', 'motiongpt'])), true)
+  status.catalog[1].installed = true
+  assert.equal(selectionNeedsDownload(status, new Set(['motiongpt'])), false)
+})
+
+test('first launch uses the package defaults without selecting optional MotionGPT', () => {
+  const status = {
+    catalog: [...MODEL_PRESETS.full, 'motiongpt'].map(id => ({ id })),
+    selected: [],
+    default_models: MODEL_PRESETS.full,
+  }
+  assert.deepEqual(initialModelSelection(status), MODEL_PRESETS.full)
+  assert.equal(initialModelSelection(status).includes('motiongpt'), false)
+})
+
+test('reopening restores a saved MotionGPT choice without adding default models', () => {
+  const status = {
+    catalog: [...MODEL_PRESETS.full, 'motiongpt'].map(id => ({ id })),
+    selected: ['kokoro', 'motiongpt'],
+    default_models: MODEL_PRESETS.full,
+  }
+  assert.deepEqual(initialModelSelection(status), ['kokoro', 'motiongpt'])
+  assert.deepEqual(status.selected, ['kokoro', 'motiongpt'])
+})
+
+test('switching packages filters saved choices and falls back only when none remain', () => {
+  const status = {
+    catalog: MODEL_PRESETS.lite.map(id => ({ id })),
+    selected: ['sarc-taigi', 'kokoro', 'motiongpt'],
+    default_models: MODEL_PRESETS.lite,
+  }
+  assert.deepEqual(initialModelSelection(status), ['kokoro'])
+  status.selected = ['sarc-taigi', 'motiongpt']
+  assert.deepEqual(initialModelSelection(status), MODEL_PRESETS.lite)
+  status.default_models = [...MODEL_PRESETS.lite, 'unavailable']
+  assert.deepEqual(initialModelSelection(status), MODEL_PRESETS.lite)
+})
+
+test('restoring saved SARC still requires explicit license acceptance', () => {
+  const restored = new Set(initialModelSelection({
+    catalog,
+    selected: ['sarc-taigi'],
+    default_models: ['kokoro'],
+  }))
+  const accepted = new Set()
+  assert.throws(() => createInstallRequest(catalog, restored, accepted, 'bundled'), /授權/)
+  assert.equal(accepted.size, 0)
+})

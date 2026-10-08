@@ -100,3 +100,24 @@ The trace bus is intentionally local to `stage-ui-three`. Desktop apps can bridg
 - Do not use the `trace` submodule for Live2D or non-Three runtime telemetry.
 - Do not route renderer-to-main control flow through the `trace` submodule; keep control IPC in app-level contracts.
 - Do not use the VRM instance cache as a general shared asset cache across apps or windows.
+
+## Generated joint motion
+
+`createVrmGeneratedMotion` accepts HumanML3D 22-joint positions at 20 fps, with 2–196 frames and finite coordinates.
+`ThreeScene.playGeneratedMotion(clip)` starts one bounded preview. `stopGeneratedMotion()` restores the animated base pose.
+The player rejects playback during external pose tracking and cancels on model changes.
+
+The source axes are +X anatomical left, +Y up and initial forward +Z. VRM 0 reverses the X/Z directions.
+The player converts world segment directions into normalized bone rotations. It preserves generated body turns, but removes root travel.
+Joint positions cannot recover axial twist, finger detail or facial expressions. This adapter provides no foot IK or collision handling.
+Use it for experimental VRM previews. Do not use it for Live2D or claim that retargeting establishes semantic action quality.
+
+Run the node-transform probe with a saved generated clip and local VRMs:
+
+```sh
+node course/ntu-vh2026/desktop/probe-generated-motion-retarget.mjs \
+  course/ntu-vh2026/results/motiongpt/right-wave-mps.json \
+  packages/stage-ui/src/assets/vrm/models/AvatarSample-A/AvatarSample_A.vrm
+```
+
+This command runs from the repository root. Its report measures source-direction preservation and restoration, not rendered appearance.

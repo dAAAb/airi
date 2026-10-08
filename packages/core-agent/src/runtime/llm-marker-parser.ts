@@ -69,7 +69,7 @@ async function readStream<T>(stream: ReadableStream<T>, handler: (value: T) => P
   }
 }
 
-/** Normalize only the two stage ACT fields; never interpret model text as code or a URL. */
+/** Keep supported stage ACT fields. Motion descriptions remain bounded text, never executable instructions. */
 function normalizeActMarker(marker: string) {
   const match = /^<\|ACT\s+(\{[\s\S]*\})\s*\|>$/.exec(marker)
   if (!match)
@@ -80,6 +80,11 @@ function normalizeActMarker(marker: string) {
       return marker
     const entries = Object.entries(payload).filter(([key]) => key.trim() === 'emotion' || key.trim() === 'motion')
     const normalized = Object.fromEntries(entries.map(([key, value]) => [key.trim(), typeof value === 'string' ? value.trim() : value]))
+    const motionPrompt = Object.entries(payload).find(([key]) => key.trim() === 'motionPrompt')?.[1]
+    if (normalized.motion === 'generate' && typeof motionPrompt === 'string'
+      && motionPrompt.trim().length > 0 && motionPrompt.trim().length <= 500) {
+      normalized.motionPrompt = motionPrompt.trim()
+    }
     return `<|ACT ${JSON.stringify(normalized)}|>`
   }
   catch {

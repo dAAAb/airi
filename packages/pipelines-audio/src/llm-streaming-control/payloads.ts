@@ -32,6 +32,8 @@ export interface NormalizedActPayload {
   emotion?: StreamingControlEmotionPayload
   /** Motion cue emitted by the model, when present. */
   motion?: string
+  /** Bounded text description for an optional motion generation provider. */
+  motionPrompt?: string
 }
 
 /**
@@ -164,5 +166,8 @@ export function normalizeActPayload(
   return {
     ...(emotion && { emotion }),
     ...(motion && { motion }),
+    ...(motion === 'generate' && typeof payload.motionPrompt === 'string'
+      && payload.motionPrompt.trim().length > 0 && payload.motionPrompt.trim().length <= 500
+      && { motionPrompt: payload.motionPrompt.trim() }),
   }
 }

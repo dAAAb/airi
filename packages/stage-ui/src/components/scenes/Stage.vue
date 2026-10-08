@@ -3,6 +3,7 @@ import type { Live2DLipSync, Live2DLipSyncOptions } from '@proj-airi/model-drive
 import type { Profile } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
 import type { CaptionChannelEvent, PresenceBubbleState } from '@proj-airi/stage-shared'
 import type { VrmInteractionTarget } from '@proj-airi/stage-ui-three'
+import type { GeneratedMotionClip } from '@proj-airi/stage-ui-three/composables/vrm'
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 import type { UnElevenLabsOptions } from 'unspeech'
 
@@ -47,6 +48,7 @@ import { useAudioContext, useSpeakingStore } from '../../stores/audio'
 import { useBackgroundStore } from '../../stores/background'
 import { useChatStore } from '../../stores/chat'
 import { useAiriCardStore } from '../../stores/modules'
+import { useMotionStore } from '../../stores/modules/motion'
 import { useSpeechStore } from '../../stores/modules/speech'
 import { useSettingsPresenceBubble } from '../../stores/presence-bubble'
 import { useProviderConfigStore } from '../../stores/providers/config'
@@ -301,6 +303,13 @@ const emotionsQueue = createQueue<EmotionPayload>({
 })
 
 const streamingControl = useLlmStreamingControlStore()
+const motionStore = useMotionStore()
+
+watch([() => motionStore.enabled, () => motionStore.autoGenerate, stageModelSelected, stageModelRenderer], () => {
+  motionStore.cancel()
+  vrmViewerRef.value?.stopGeneratedMotion()
+})
+onUnmounted(() => motionStore.cancel())
 
 function toStageEmotionPayload(payload: { name: string, intensity: number }): EmotionPayload | undefined {
   switch (payload.name) {
@@ -336,7 +345,17 @@ chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
         return
       }
       else if (stageModelRenderer.value === 'vrm') {
-        vrmViewerRef.value?.playMotion(act.motion)
+        if (act.motion === 'generate' && act.motionPrompt && motionStore.enabled && motionStore.autoGenerate) {
+          vrmViewerRef.value?.playMotion('idle')
+          void motionStore.generateFromAct(act).then((clip) => {
+            if (clip)
+              vrmViewerRef.value?.playGeneratedMotion(clip)
+          })
+        }
+        else {
+          motionStore.cancel()
+          vrmViewerRef.value?.playMotion(act.motion)
+        }
       }
     }
     if (act.emotion) {
@@ -835,6 +854,8 @@ watch(speechMuted, (muted) => {
 }, { immediate: true })
 
 chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
+  motionStore.cancel()
+  vrmViewerRef.value?.stopGeneratedMotion()
   playbackManager.stopAll('new-message')
   resetAssistantSpeechSurface('new-message')
 
@@ -1016,6 +1037,8 @@ defineExpose({
       await vrmViewerRef.value?.setExpression(expression, intensity)
     }
   },
+  playGeneratedMotion: (clip: GeneratedMotionClip) => stageModelRenderer.value === 'vrm' && (vrmViewerRef.value?.playGeneratedMotion(clip) ?? false),
+  stopGeneratedMotion: () => vrmViewerRef.value?.stopGeneratedMotion(),
   playMotion: (name: string, intensity = 1) => {
     if (stageModelRenderer.value === 'vrm')
       return vrmViewerRef.value?.playMotion(name, intensity) ?? false

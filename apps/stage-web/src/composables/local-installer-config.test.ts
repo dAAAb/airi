@@ -19,11 +19,18 @@ describe('explicit local installer boundary', () => {
   })
 
   it('rejects remote or unexpected inference endpoints before importing', () => {
-    for (const key of ['ollama', 'asr', 'speech']) {
+    for (const key of ['ollama', 'asr', 'speech', 'motion']) {
       expect(() => parseLocalInstallerConfig({ ...config, [key]: 'https://example.com/v1/' })).toThrow()
     }
     expect(() => parseLocalInstallerConfig({ ...config, models: ['unknown'] })).toThrow()
     expect(parseLocalInstallerConfig({ ...config, ollama: 'http://127.0.0.1:11434/v1/' }).ollama).toContain('11434')
+  })
+
+  it('requires the fixed local motion endpoint only when MotionGPT is selected', () => {
+    expect(() => parseLocalInstallerConfig({ ...config, models: [...config.models, 'motiongpt'] })).toThrow()
+    expect(() => parseLocalInstallerConfig({ ...config, motion: 'http://127.0.0.1:17905' })).toThrow()
+    expect(parseLocalInstallerConfig({ ...config, models: [...config.models, 'motiongpt'], motion: 'http://127.0.0.1:17905' }).motion)
+      .toBe('http://127.0.0.1:17905')
   })
 
   it('routes two roles to their own model and voice while sharing vision', () => {

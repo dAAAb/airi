@@ -7,7 +7,7 @@ const process = require('node:process')
 const { app, BrowserWindow, dialog, globalShortcut, ipcMain, Menu, screen, session, shell, systemPreferences } = require('electron')
 
 const { bindDesktopIpc } = require('./desktop-ipc.mjs')
-const { clampBounds, isStageHome, sanitizePreferences } = require('./desktop-state.cjs')
+const { clampBounds, isStageHome, modeForRouteChange, sanitizePreferences } = require('./desktop-state.cjs')
 const { ORIGIN, isLocalPage, microphoneAllowed, isExternalWebLink, isOfflineRequestAllowed } = require('./policy.cjs')
 
 app.setName('AIRI Local')
@@ -136,6 +136,7 @@ class DesktopWindowController {
   constructor(target) {
     this.window = target
     this.mode = 'window'
+    this.routeUrl = target.webContents.getURL()
     this.clickThrough = false
     this.switching = false
     this.file = path.join(app.getPath('userData'), 'desktop-window.json')
@@ -151,10 +152,10 @@ class DesktopWindowController {
       screen.on(event, this.displayChanged)
     target.on('move', () => this.queueSave())
     target.on('resize', () => this.queueSave())
-    target.webContents.on('did-navigate', () => this.syncRoute())
-    target.webContents.on('did-navigate-in-page', (_event, _url, isMainFrame) => {
+    target.webContents.on('did-navigate', (_event, url) => this.syncRoute(url))
+    target.webContents.on('did-navigate-in-page', (_event, url, isMainFrame) => {
       if (isMainFrame)
-        this.syncRoute()
+        this.syncRoute(url)
     })
     target.on('closed', () => {
       clearTimeout(this.saveTimer)
@@ -236,7 +237,7 @@ class DesktopWindowController {
   }
 
   setMode(mode, remember = true) {
-    if (mode === 'pet' && !isStageHome(this.window.webContents.getURL()))
+    if (mode === 'pet' && !isStageHome(this.routeUrl))
       throw new Error('請先回到角色主畫面，再開啟桌寵模式。')
     if (remember)
       this.preferences.mode = mode
@@ -281,9 +282,10 @@ class DesktopWindowController {
     return this.getState()
   }
 
-  syncRoute() {
-    const home = isStageHome(this.window.webContents.getURL())
-    const next = home ? this.preferences.mode : 'window'
+  syncRoute(url) {
+    // History updates on the same home route must not undo opening settings.
+    const next = modeForRouteChange(this.mode, this.preferences.mode, this.routeUrl, url)
+    this.routeUrl = url
     if (next !== this.mode)
       this.setMode(next, false)
     else
@@ -315,7 +317,7 @@ class DesktopWindowController {
   }
 
   updateMenu() {
-    const home = isStageHome(this.window.webContents.getURL())
+    const home = isStageHome(this.routeUrl)
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       { label: 'AIRI Local', submenu: [{ role: 'about' }, { type: 'separator' }, { role: 'quit' }] },
       { role: 'editMenu' },

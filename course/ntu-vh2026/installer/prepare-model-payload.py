@@ -34,9 +34,12 @@ def validate(manifest):
             raise ValueError('Repeated payload path')
         paths.add(row['path'])
         parsed = urlsplit(row['url'])
-        if parsed.scheme != 'https' or parsed.hostname != 'huggingface.co' or not re.search(r'/resolve/[0-9a-f]{40}/', parsed.path):
-            raise ValueError('Speech downloads require a pinned Hugging Face HTTPS revision')
-        if row['model'] not in ('asr26', 'kaedetai', 'kokoro') or type(row['bytes']) is not int or row['bytes'] < 1:
+        pinned_hf = parsed.hostname == 'huggingface.co' and re.search(r'/resolve/[0-9a-f]{40}/', parsed.path)
+        pinned_motion_meta = (row['model'] == 'motiongpt' and parsed.hostname == 'raw.githubusercontent.com'
+                              and re.fullmatch(r'/OpenMotionLab/MotionGPT/[0-9a-f]{40}/assets/meta/(mean|std)\.npy', parsed.path))
+        if parsed.scheme != 'https' or not (pinned_hf or pinned_motion_meta):
+            raise ValueError('Model downloads require a pinned, allowlisted HTTPS revision')
+        if row['model'] not in ('asr26', 'kaedetai', 'kokoro', 'motiongpt') or type(row['bytes']) is not int or row['bytes'] < 1:
             raise ValueError('Invalid model or file size')
         if not re.fullmatch(r'[0-9a-f]{64}', row['sha256']):
             raise ValueError('Invalid SHA256')
@@ -98,6 +101,10 @@ def main():
     validate(manifest)
     args.resources.mkdir(parents=True, exist_ok=True)
     for row in manifest['files']:
+        # Download-only research weights belong in each user's data directory,
+        # never in the public installer payload, even when preparing a Full app.
+        if row['model'] in manifest.get('download_only_models', []):
+            continue
         if args.download_speech:
             print(download(row, args.resources/'payload'), row['path'])
         elif args.verify_speech:

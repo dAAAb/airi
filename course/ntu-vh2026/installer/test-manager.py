@@ -126,6 +126,60 @@ class ManagerTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'Reinstall'):
                 self.app.install_file(item)
 
+    def motion_fixture(self):
+        item = {**self.item(), 'model': 'motiongpt', 'path': 'motiongpt/weights.tar'}
+        (self.resources / 'payload-manifest.json').write_text(json.dumps({
+            'offline': True, 'download_only_models': ['motiongpt'], 'files': [item], 'services': []}))
+        return item
+
+    def test_optional_motion_download_never_writes_signed_resources(self):
+        item = self.motion_fixture()
+        with patch.object(manager.urllib.request, 'urlopen', return_value=io.BytesIO(b'model')) as download:
+            self.app.install_file(item)
+        download.assert_called_once()
+        self.assertEqual(self.app.payload_path(item['path']).read_bytes(), b'model')
+        self.assertTrue(self.app.payload_path(item['path']).is_relative_to(self.app.data))
+        self.assertFalse((self.resources / 'payload').exists())
+
+    def test_download_only_policy_does_not_weaken_offline_speech_integrity(self):
+        self.motion_fixture()
+        with patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('offline speech must not fetch')):
+            with self.assertRaisesRegex(RuntimeError, 'Reinstall'):
+                self.app.install_file(self.item())
+
+    def test_existing_optional_weights_are_verified_without_downloading(self):
+        item = self.motion_fixture()
+        target = self.app.payload_path(item['path'])
+        target.parent.mkdir(parents=True)
+        target.write_bytes(b'model')
+        with patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('already verified')):
+            self.app.install_file(item)
+
+    def test_motion_service_uses_user_payload_and_remains_unstarted_when_unselected(self):
+        item = self.motion_fixture()
+        executable = self.resources / 'runtime/python'
+        executable.parent.mkdir()
+        executable.write_bytes(b'fixture')
+        service = {'id': 'motiongpt', 'requires': ['motiongpt'], 'executable': 'runtime/python',
+                   'args': [], 'env': {'MODEL_DIR': '{payload}/motiongpt'}, 'port': 17905, 'health': '/health'}
+        (self.resources / 'payload-manifest.json').write_text(json.dumps({
+            'offline': True, 'download_only_models': ['motiongpt'], 'files': [item], 'services': [service]}))
+        with patch.object(self.app, 'spawn') as spawn:
+            self.app._launch_services()
+            spawn.assert_not_called()
+        self.app.selected = ['motiongpt']
+        self.app.processes['motiongpt'] = Mock(poll=lambda: None)
+        with patch.object(self.app, 'spawn') as spawn, patch.object(manager, 'request_json', return_value={'ready': True}):
+            self.app._launch_services()
+            self.assertEqual(spawn.call_args.args[2]['MODEL_DIR'], str(self.app.data / 'payload/motiongpt'))
+
+    def test_bootstrap_exposes_motion_only_for_selected_optional_model(self):
+        _, body = self.http_get('/api/airi-config')
+        self.assertIsNone(json.loads(body)['motion'])
+        self.app.selected = ['motiongpt']
+        _, body = self.http_get('/api/airi-config')
+        self.assertEqual(json.loads(body)['motion'], 'http://127.0.0.1:17905')
+
     def test_ollama_payload_requires_actual_blob_integrity(self):
         row, _record, blob = self.ollama_fixture()
         self.app.verify_bundled_ollama(row)

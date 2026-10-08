@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-10-08T14:30:58Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "backend": "pytorch-cpu",
+  "load_seconds": 3.0153,
+  "seed": 42,
+  "scope": "Same prompts and seed; different frameworks use different RNGs, so token lengths and motions may differ.",
+  "cases": [
+    {
+      "case": "right-wave",
+      "repeat": 1,
+      "output": "right-wave-cpu-1.json",
+      "generation_seconds": 0.2763,
+      "motion_tokens": 17,
+      "generated_frames": 68,
+      "returned_frames": 68,
+      "truncated": false
+    },
+    {
+      "case": "right-wave",
+      "repeat": 2,
+      "output": "right-wave-cpu-2.json",
+      "generation_seconds": 0.2706,
+      "motion_tokens": 17,
+      "generated_frames": 68,
+      "returned_frames": 68,
+      "truncated": false
+    },
+    {
+      "case": "bow",
+      "repeat": 1,
+      "output": "bow-cpu-1.json",
+      "generation_seconds": 0.3096,
+      "motion_tokens": 21,
+      "generated_frames": 84,
+      "returned_frames": 84,
+      "truncated": false
+    },
+    {
+      "case": "bow",
+      "repeat": 2,
+      "output": "bow-cpu-2.json",
+      "generation_seconds": 0.3033,
+      "motion_tokens": 21,
+      "generated_frames": 84,
+      "returned_frames": 84,
+      "truncated": false
+    },
+    {
+      "case": "dance",
+      "repeat": 1,
+      "output": "dance-cpu-1.json",
+      "generation_seconds": 0.6102,
+      "motion_tokens": 49,
+      "generated_frames": 196,
+      "returned_frames": 196,
+      "truncated": false
+    },
+    {
+      "case": "dance",
+      "repeat": 2,
+      "output": "dance-cpu-2.json",
+      "generation_seconds": 0.6086,
+      "motion_tokens": 49,
+      "generated_frames": 196,
+      "returned_frames": 196,
+      "truncated": false
+    },
+    {
+      "case": "stretch",
+      "repeat": 1,
+      "output": "stretch-cpu-1.json",
+      "generation_seconds": 0.3259,
+      "motion_tokens": 23,
+      "generated_frames": 92,
+      "returned_frames": 92,
+      "truncated": false
+    },
+    {
+      "case": "stretch",
+      "repeat": 2,
+      "output": "stretch-cpu-2.json",
+      "generation_seconds": 0.3252,
+      "motion_tokens": 23,
+      "generated_frames": 92,
+      "returned_frames": 92,
+      "truncated": false
+    },
+    {
+      "case": "boxing",
+      "repeat": 1,
+      "output": "boxing-cpu-1.json",
+      "generation_seconds": 0.4838,
+      "motion_tokens": 39,
+      "generated_frames": 156,
+      "returned_frames": 156,
+      "truncated": false
+    },
+    {
+      "case": "boxing",
+      "repeat": 2,
+      "output": "boxing-cpu-2.json",
+      "generation_seconds": 0.4808,
+      "motion_tokens": 39,
+      "generated_frames": 156,
+      "returned_frames": 156,
+      "truncated": false
+    }
+  ]
+}

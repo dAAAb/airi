@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VRM } from '@pixiv/three-vrm'
 /*
   * - Root vue component of stage-ui-three package
   * - This scene component the root for all the sub components in the 3d scene
@@ -6,12 +7,11 @@
   * - Pinia store is used to store the data/configuration of the model, camera, lighting, etc.
   * - Src of model is obtained from stage-ui via props, which is NOT a part of stage-ui-three package
 */
-
-import type { VRM } from '@pixiv/three-vrm'
 import type { PresenceBubblePalette, PresenceBubbleState } from '@proj-airi/stage-shared'
 import type { TresContext } from '@tresjs/core'
 import type { DirectionalLight, SphericalHarmonics3, Texture, WebGLRenderer, WebGLRenderTarget } from 'three'
 
+import type { GeneratedMotionClip } from '../composables/vrm/generated-motion'
 import type { VrmInteractionTarget } from '../composables/vrm/interaction'
 import type { SceneBootstrap, ScenePhase, Vec3 } from '../stores/model-store'
 import type { VrmLifecycleReason } from '../trace'
@@ -981,6 +981,8 @@ watch(directionalLightRotation, (newRotation) => {
 }, { deep: true })
 
 defineExpose({
+  playGeneratedMotion: (clip: GeneratedMotionClip) => modelRef.value?.playGeneratedMotion(clip) ?? false,
+  stopGeneratedMotion: () => modelRef.value?.stopGeneratedMotion(),
   playMotion: (name: string, intensity = 1) => modelRef.value?.playMotion(name, intensity) ?? false,
   setExpression: (expression: string, intensity = 1) => {
     modelRef.value?.setExpression(expression, intensity)

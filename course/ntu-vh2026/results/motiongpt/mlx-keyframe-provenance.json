@@ -1,0 +1,136 @@
+{
+  "method": "Original MLX-2 joint frames in fixed +Z front and +X left-side projections. No coordinate changes.",
+  "limitation": "Output skeleton QA only. No native App, VRM retargeting, fingers, physics or contact validation.",
+  "records": [
+    {
+      "source": "backends/stretch-mlx-2.json",
+      "source_sha256": "e0aa1715a8e8ef23d93d1678db8df09a685267980fafaa55b9e25b84ad202df9",
+      "prompt": "A person stretches both arms above their head.",
+      "seed": 42,
+      "device": "mlx",
+      "generation_seconds": 0.098,
+      "truncated": false,
+      "metrics": {
+        "frames": 92,
+        "fps": 20,
+        "playback_seconds": 4.6,
+        "right_wrist_y_range_m": [
+          0.846378,
+          2.106798
+        ],
+        "left_wrist_y_range_m": [
+          0.844699,
+          2.120712
+        ],
+        "right_wrist_peak_y_frame": 51,
+        "root_displacement_m": [
+          -0.029168,
+          0.0026920000000000277,
+          -0.027351
+        ],
+        "root_range_xyz_m": [
+          0.030754,
+          0.02451900000000007,
+          0.031023
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": -2.815995899230595,
+          "maximum": -0.0941324169192822,
+          "maximum_frame": 89,
+          "last": -0.6584459509341288
+        },
+        "both_wrists_above_head_frames": 57,
+        "left_shoulder_to_wrist_reach_range_m": [
+          0.35399201133500174,
+          0.6198304502886255
+        ],
+        "right_shoulder_to_wrist_reach_range_m": [
+          0.33820510378910607,
+          0.6046980333819517
+        ],
+        "keyframe_indices_zero_based": [
+          0,
+          23,
+          45,
+          69,
+          91
+        ],
+        "minimum_joint_y_m": -0.003135,
+        "left_ankle_peak_y_m": 0.069223,
+        "right_ankle_peak_y_m": 0.055838
+      },
+      "output": {
+        "path": "stretch-mlx-2-keyframes.png",
+        "bytes": 120531,
+        "sha256": "39330091b1fe5198aea77ad2c098a43dc3bfb0bdc11b1079d48ee034ccffcbfd"
+      },
+      "backend": "mlx-metal",
+      "precision": "float32"
+    },
+    {
+      "source": "backends/boxing-mlx-2.json",
+      "source_sha256": "b6b2476b711aff2216e98e80061377d58bfb27ef24dd12535a1d0951dc18feac",
+      "prompt": "A person performs a short boxing combination with both arms.",
+      "seed": 42,
+      "device": "mlx",
+      "generation_seconds": 0.1814,
+      "truncated": false,
+      "metrics": {
+        "frames": 192,
+        "fps": 20,
+        "playback_seconds": 9.6,
+        "right_wrist_y_range_m": [
+          1.126004,
+          1.520368
+        ],
+        "left_wrist_y_range_m": [
+          1.074603,
+          1.715085
+        ],
+        "right_wrist_peak_y_frame": 21,
+        "root_displacement_m": [
+          -0.054867,
+          0.05589200000000005,
+          -0.526774
+        ],
+        "root_range_xyz_m": [
+          0.6747920000000001,
+          0.10558500000000004,
+          0.7076009999999999
+        ],
+        "neck_to_pelvis_forward_lean_degrees": {
+          "first": 3.8044535912517627,
+          "maximum": 7.342346326201177,
+          "maximum_frame": 46,
+          "last": 0.07000356541987943
+        },
+        "both_wrists_above_head_frames": 0,
+        "left_shoulder_to_wrist_reach_range_m": [
+          0.18753883072313315,
+          0.5748646612455839
+        ],
+        "right_shoulder_to_wrist_reach_range_m": [
+          0.18319225833260536,
+          0.4723924521433424
+        ],
+        "keyframe_indices_zero_based": [
+          0,
+          22,
+          134,
+          144,
+          191
+        ],
+        "minimum_joint_y_m": -0.005338,
+        "left_ankle_peak_y_m": 0.114718,
+        "right_ankle_peak_y_m": 0.186979
+      },
+      "output": {
+        "path": "boxing-mlx-2-keyframes.png",
+        "bytes": 128004,
+        "sha256": "5b52c6a5fa35a14bbe089ccb9faf476bc3c41dbbeab3b5d7c7ca191a930a9e85"
+      },
+      "backend": "mlx-metal",
+      "precision": "float32"
+    }
+  ]
+}

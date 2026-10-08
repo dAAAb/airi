@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-syntax -- Native browser modules require the served file extension.
-import { createInstallRequest, formatBytes, INSTALLER_ORIGIN, MODEL_PRESETS, safeLaunchUrl, selectedMatchesStatus } from './setup-state.js'
+import { createInstallRequest, formatBytes, initialModelSelection, INSTALLER_ORIGIN, MODEL_PRESETS, safeLaunchUrl, selectedMatchesStatus, selectionNeedsDownload } from './setup-state.js'
 
 const descriptions = {
   'sarc-taigi': '台灣團隊微調的 Gemma 3。產生台語漢字，再交給台語聲音模型。',
@@ -8,6 +8,7 @@ const descriptions = {
   'asr26': '聯發科語音辨識的社群 MLX 量化版。聽華語、台語與英語片段。',
   'kokoro': '82M 小型語音合成。以 zf_xiaobei 中文聲線回答。',
   'kaedetai': '社群 GPT-SoVITS 台語模型。漢字經 Taibun 轉音，再以 CPU 發音。',
+  'motiongpt': '實驗性文字生成動作，僅適用 VRM。預設不選用；權重從作者官方來源另行下載，生成後再播放。',
 }
 const licenses = {
   'gemma': { title: 'SARC · Gemma 使用條款', url: '/licenses/gemma-terms.txt', official: 'https://ai.google.dev/gemma/terms', note: '包含 Gemma 禁止用途政策與下游散布要求。' },
@@ -16,6 +17,7 @@ const licenses = {
   'breeze-asr26': { title: 'Breeze ASR-26 MLX · Apache 2.0', url: 'https://huggingface.co/RayyTien/Breeze-ASR-26-mlx-4bit', note: '保留 MediaTek Research 與 MLX 轉換作者來源。' },
   'kokoro': { title: 'Kokoro · Apache 2.0', url: 'https://huggingface.co/hexgrad/Kokoro-82M', note: '聲線、模型與推論套件各自保留授權聲明。' },
   'kaedetai': { title: 'KaedeTai · MIT 與相依資料授權', url: 'https://huggingface.co/KaedeTai/gpt-sovits-tw', note: 'GPT-SoVITS 與 Taibun 程式為 MIT，Taibun 字典為 CC BY-SA 4.0。' },
+  'motiongpt': { title: 'MotionGPT · 官方模型卡與授權', url: 'https://huggingface.co/OpenMotionLab/MotionGPT-base', note: '程式為 MIT；模型卡僅標示 CC，未註明類型與版本。本 App 不重新散布權重，選用時從官方下載；商用或散布前請向作者確認。' },
 }
 const stateLabels = { idle: '等待選擇', installing: '下載與驗證中', ready: '模型已驗證', starting: '啟動本機服務', running: '本機服務已啟動', error: '需要處理', canceled: '已停止下載' }
 const selected = new Set()
@@ -178,20 +180,24 @@ function renderStatus() {
   if (!current)
     return
   const busy = pending || ['installing', 'starting'].includes(current.job.state)
-  const installLabel = current.offline ? '驗證內建模型' : '下載並驗證'
+  const needsDownload = selectionNeedsDownload(current, selected)
+  const hasDownloadOption = current.catalog.some(row => row.download_only)
+  const installLabel = needsDownload ? '下載並驗證' : '驗證模型'
   elements.install.textContent = installLabel
-  elements.cancel.textContent = current.offline ? '停止驗證' : '停止下載'
+  elements.cancel.textContent = needsDownload ? '停止下載' : '停止驗證'
   elements.scope.textContent = current.offline
-    ? '模型已隨安裝包內建，無須再下載。這組推論服務只連到本機；麥克風需由您在瀏覽器授權。'
+    ? hasDownloadOption
+      ? '語音與對話模型已內建。MotionGPT 是另行下載的選配；未勾選就不下載、不啟動。推論只連本機。'
+      : '模型已隨安裝包內建，無須再下載。這組推論服務只連到本機；麥克風需由您在瀏覽器授權。'
     : '模型首次下載需要網路。這組推論服務只連到本機；麥克風需由您在瀏覽器授權。'
   const rows = current.catalog.filter(row => selected.has(row.id))
   elements['size-summary'].textContent = `${rows.length} 個模型 · 權重約 ${formatBytes(rows.reduce((sum, row) => sum + row.bytes, 0))}`
-  elements['disk-summary'].textContent = current.offline
+  elements['disk-summary'].textContent = !needsDownload
     ? `可用空間 ${formatBytes(current.free_bytes)}。內建模型將驗證完整性，無須再下載；請保留推論快取與紀錄的空間。`
     : `可用空間 ${formatBytes(current.free_bytes)}。另需執行環境、下載暫存與安全餘裕；已存在的檔案仍會驗證。`
   for (const row of current.catalog) {
     const label = elements.models.querySelector(`[data-status-id="${row.id}"]`)
-    label.textContent = row.verified ? '已驗證' : row.installed ? '檔案已存在 · 待驗證' : '尚未安裝'
+    label.textContent = row.verified ? '已驗證' : row.installed ? '檔案已存在 · 待驗證' : row.download_only ? '選配 · 需另行下載' : '尚未安裝'
   }
   for (const input of document.querySelectorAll('input'))
     input.disabled = busy
@@ -212,9 +218,9 @@ function renderStatus() {
   elements.start.disabled = busy || !validSelection || !['ready', 'running'].includes(current.job.state) || !selectedMatchesStatus(selected, mode(), current)
   elements.cancel.hidden = current.job.state !== 'installing'
   elements.cancel.disabled = pending
-  elements['status-title'].textContent = current.offline && current.job.state === 'installing'
-    ? '驗證內建模型中'
-    : current.offline && current.job.state === 'canceled' ? '已停止驗證' : stateLabels[current.job.state] || current.job.state
+  elements['status-title'].textContent = !needsDownload && current.job.state === 'installing'
+    ? '驗證模型中'
+    : !needsDownload && current.job.state === 'canceled' ? '已停止驗證' : stateLabels[current.job.state] || current.job.state
   elements['status-message'].textContent = !current.packaged
     ? '這是原始碼預覽，尚未附執行環境。請使用包含 runtime 的 AIRI Local 安裝包。'
     : current.job.message || (validSelection ? `準備完成。按下「${installLabel}」開始。` : '請選擇模型；選用 SARC 時，需先閱讀並確認 Gemma 條款。')
@@ -300,7 +306,7 @@ async function initialize() {
       throw new Error('本機安裝服務驗證失敗。')
     token = bootstrap.token
     current = await request('/api/status')
-    for (const id of current.default_models)
+    for (const id of initialModelSelection(current))
       selected.add(id)
     renderModels()
     renderLicenses()

@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   providerRows: new Map<string, { definitionId: string, config?: Record<string, unknown> }>(),
   cardRows: new Map<string, AiriCard>(),
   hearing: { activeTranscriptionProvider: '', activeTranscriptionModel: '', autoSendEnabled: false },
+  motion: { enabled: false, autoGenerate: false, endpoint: '' },
   vision: { useForChat: false, ollamaThinkingEnabled: true },
   markSetupCompleted: vi.fn(),
   activateCard: vi.fn(),
@@ -40,6 +41,7 @@ vi.mock('@proj-airi/stage-ui/stores/modules/airi-card', () => ({
   }),
 }))
 vi.mock('@proj-airi/stage-ui/stores/modules/hearing', () => ({ useHearingStore: () => mocks.hearing }))
+vi.mock('@proj-airi/stage-ui/stores/modules/motion', () => ({ useMotionStore: () => mocks.motion }))
 vi.mock('@proj-airi/stage-ui/stores/modules/vision', () => ({ useVisionStore: () => mocks.vision }))
 vi.mock('@proj-airi/stage-ui/stores/modules/consciousness-settings', () => ({ useConsciousnessSettingsStore: () => ({ setReasoning: mocks.setReasoning }) }))
 vi.mock('@proj-airi/stage-ui/stores/onboarding', () => ({ useOnboardingStore: () => ({ markSetupCompleted: mocks.markSetupCompleted }) }))
@@ -63,6 +65,7 @@ describe('local installer store integration', () => {
     })
     mocks.providerRows.clear()
     mocks.cardRows.clear()
+    Object.assign(mocks.motion, { enabled: false, autoGenerate: false, endpoint: '' })
     vi.stubEnv('VITE_AIRI_LOCAL_INSTALLER', 'true')
     vi.stubGlobal('location', { origin: 'http://127.0.0.1:17900', search: '?localSetup=1', href: 'http://127.0.0.1:17900/?localSetup=1' })
     vi.stubGlobal('history', { state: null, replaceState: vi.fn() })
@@ -118,5 +121,15 @@ describe('local installer store integration', () => {
     const taigi = [...mocks.cardRows.values()].find(card => card.metadata?.localInstallerRole === 'taigi')
     expect(taigi?.extensions.airi.modules.speech.provider).toBe('speech-noop')
     expect(taigi?.extensions.airi.modules.vision.provider).toBe('')
+  })
+
+  it('enables the selected MotionGPT service without opting into automatic generation', async () => {
+    const { useLocalInstaller } = await import('./local-installer')
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ ...config, models: [...config.models, 'motiongpt'], motion: 'http://127.0.0.1:17905' }) })))
+    await useLocalInstaller().applyLocalInstallerConfiguration()
+    expect(mocks.motion).toEqual({ enabled: true, autoGenerate: false, endpoint: 'http://127.0.0.1:17905' })
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => config })))
+    await useLocalInstaller().applyLocalInstallerConfiguration()
+    expect(mocks.motion.enabled).toBe(false)
   })
 })
