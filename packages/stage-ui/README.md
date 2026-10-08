@@ -223,3 +223,10 @@ When enabled, ACT can contain `motion: "generate"` and a bounded `motionPrompt` 
 Generation runs asynchronously without delaying the speech pipeline. A new user turn, model change or cancellation discards stale results.
 The model's response selects content for the local generator. It never supplies executable code, asset URLs or shell commands.
 Authored gestures remain available when generation is disabled or unavailable.
+
+`useMotionDecisionsStore` adds optional OpenAI Decisions selection, disabled by default. It sends only the current message text through the authenticated local manager.
+Session keys remain in a closure until the app session ends. Users can instead select an existing OpenAI provider without copying its key.
+The first usable local ACT or cloud decision wins each turn. Idle can win. Refusal, low confidence and unavailable generation templates defer to local ACT.
+Local ACT reaches motion control before TTS playback. A queued copy still controls emotion but cannot replay the same motion.
+Cancellation, character changes and new turns invalidate pending decisions. The stage checks ownership again before consuming a cloud result.
+These checks cannot refund a cloud request already sent. See the [Decisions integration notes](../../course/ntu-vh2026/motiongpt/decisions-and-motion.md) for scope and validation limits.

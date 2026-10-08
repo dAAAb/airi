@@ -53,6 +53,16 @@ Thin／Full 的模型清單有 **MotionGPT 動作生成**，預設不勾選。Fu
 
 模型生成 22 關節位置序列，再轉成 VRM 的**原地骨架動作**。角色根節點走位會移除，沒有腳部 IK、碰撞、手指細節或精準舞蹈／音樂節拍保證。預編 `wave`／`dance` 等短動作仍可使用；新模型生成與預編動作是不同來源。
 
+## v0.4.0 選配 OpenAI Decisions
+
+在 VRM 的「機體模組 → 動作」可啟用雲端動作判斷，**預設關閉**，不需要為本機功能提供 API key。明確啟用並提供 key 後，才由本機管理器把當前使用者文字送到固定的 `https://api.openai.com/v1/decisions`，使用 `gpt-6-luna`。此功能不傳送圖片、原始音訊、歷史對話、VRM 或骨架；動作生成與播放仍在本機，原本選用的語音與視覺 provider 不變。
+
+可輸入只保留於本次 App 工作階段的 key，或明確選用已設定的 OpenAI provider key；既有 provider key 的儲存方式不變。不要把「本次 key 不落盤」理解成既有 provider 設定也改成暫存。沒有 key、未啟用或非 VRM 時，不發出這項雲端請求。
+
+本機 LLM 與雲端判斷共用每回合的動作仲裁，第一個有效結果先執行，晚回結果不覆寫。雲端拒答、低信心或連線失敗會保留本機路徑。生成動作的固定選項仍受 MotionGPT 啟用與「允許對話自動生成動作」開關限制。Lite／Full 原有離線模型缺漏時不會改用這個 API 補上。
+
+尚未用付費 API 實測速度或判斷品質。現有測試使用模擬回應，不能當成雲端加速證據；說明與課堂案例見[Decisions 與動作](../motiongpt/decisions-and-motion.md)。
+
 ## 原始碼與本機邊界
 
 - `manager.py` 只綁 `127.0.0.1:17900`，安裝動作需要同源請求與本次程序 token。下載與啟動都受固定清單限制。
@@ -60,11 +70,12 @@ Thin／Full 的模型清單有 **MotionGPT 動作生成**，預設不勾選。Fu
 - `web/` 是無外部套件的安裝頁，不載入分析碼或遠端 JS。
 - AIRI 的匯入需同時符合編譯旗標 `VITE_AIRI_LOCAL_INSTALLER=true`、精確本機 origin 與 `?localSetup=1`。
 - 選用的 MotionGPT 只綁本機 `17905`；安裝器只按固定清單從官方來源下載其檔案，不接受任意模型網址。
+- Decisions 請求需精確本機 origin 與管理器 token；後端只接受固定 OpenAI 端點與模型，不跟隨重新導向，不記錄或儲存 key／文字，也不接受任意服務網址。
 - App 內的 ASR 為 `18001`，華語 TTS 為 `18880`，台語 TTS 為 `18883`，共用 speech hub 為 `18884`。這與手動教學用的 `8001/8880/8883/8884` 分開。
 - 發現不屬於安裝器的埠占用時會回報，避免終止未知程序。
 - Ollama 模型 digest、模型檔 SHA-256 與 payload manifest 用於確認版本；不把模型「存在」等同「已驗證」。
 
-安裝器不會把 ChatGPT 訂閱轉成 API 額度。切到雲端 provider 後，相應請求會送往該雲端服務。
+安裝器不會把 ChatGPT 訂閱轉成 API 額度。選用 Decisions 可能產生 OpenAI API 費用；切到其他雲端 provider 後，相應請求會送往該雲端服務，與 Decisions 的資料範圍分開計算。
 
 ## 授權與 release 資料
 
@@ -81,6 +92,7 @@ python3 course/ntu-vh2026/installer/collect-license-notices.py
 ```sh
 node --test course/ntu-vh2026/installer/test-setup-state.mjs
 python3 course/ntu-vh2026/installer/test-manager.py
+python3 course/ntu-vh2026/installer/test-decisions.py
 pnpm -F @proj-airi/stage-web exec vitest run src/composables/local-installer-config.test.ts src/composables/local-installer.test.ts --project unit
 pnpm -F @proj-airi/stage-web typecheck
 ```

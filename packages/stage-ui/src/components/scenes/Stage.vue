@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Live2DLipSync, Live2DLipSyncOptions } from '@proj-airi/model-driver-lipsync'
 import type { Profile } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+import type { NormalizedActPayload } from '@proj-airi/pipelines-audio'
 import type { CaptionChannelEvent, PresenceBubbleState } from '@proj-airi/stage-shared'
 import type { VrmInteractionTarget } from '@proj-airi/stage-ui-three'
 import type { GeneratedMotionClip } from '@proj-airi/stage-ui-three/composables/vrm'
@@ -14,7 +15,7 @@ import { defineInvokeHandler } from '@moeru/eventa'
 import { errorMessageFrom, sleep } from '@moeru/std'
 import { createLive2DLipSync } from '@proj-airi/model-driver-lipsync'
 import { wlipsyncProfile } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
-import { createPlaybackManager, createSpeechPipeline, normalizeActPayload } from '@proj-airi/pipelines-audio'
+import { createPlaybackManager, createSpeechPipeline, createStreamingControlParser, normalizeActPayload } from '@proj-airi/pipelines-audio'
 import { presenceBubbleIdle, presenceBubbleThinking } from '@proj-airi/stage-shared'
 import { defaultLive2DMotionControlDynamics, Live2DScene, useLive2DMotionControl, useLive2dParams, useSettingsLive2d } from '@proj-airi/stage-ui-live2d'
 import { MMDScene } from '@proj-airi/stage-ui-mmd'
@@ -47,8 +48,10 @@ import { useLlmStreamingControlStore } from '../../stores/ai/chat-llm/streaming-
 import { useAudioContext, useSpeakingStore } from '../../stores/audio'
 import { useBackgroundStore } from '../../stores/background'
 import { useChatStore } from '../../stores/chat'
+import { useChatSessionStore } from '../../stores/chat/session-store'
 import { useAiriCardStore } from '../../stores/modules'
 import { useMotionStore } from '../../stores/modules/motion'
+import { useMotionDecisionsStore } from '../../stores/modules/motion-decisions'
 import { useSpeechStore } from '../../stores/modules/speech'
 import { useSettingsPresenceBubble } from '../../stores/presence-bubble'
 import { useProviderConfigStore } from '../../stores/providers/config'
@@ -304,12 +307,50 @@ const emotionsQueue = createQueue<EmotionPayload>({
 
 const streamingControl = useLlmStreamingControlStore()
 const motionStore = useMotionStore()
+const motionDecisions = useMotionDecisionsStore()
+const immediateMotionControl = createStreamingControlParser()
+
+function applyVrmMotion(act: NormalizedActPayload) {
+  if (act.motion === 'generate' && act.motionPrompt && motionStore.enabled && motionStore.autoGenerate) {
+    vrmViewerRef.value?.playMotion('idle')
+    void motionStore.generateFromAct(act).then((clip) => {
+      if (clip)
+        vrmViewerRef.value?.playGeneratedMotion(clip)
+    })
+  }
+  else if (act.motion) {
+    motionStore.cancel()
+    vrmViewerRef.value?.playMotion(act.motion)
+  }
+}
+
+chatHookCleanups.push(immediateMotionControl.onSignal((signal, context) => {
+  if (signal.type !== 'act' || stageModelRenderer.value !== 'vrm' || !context.turnId)
+    return
+  const act = normalizeActPayload(signal.payload)
+  if (motionDecisions.claimLocal(context.turnId, act))
+    applyVrmMotion(act)
+}))
+chatHookCleanups.push(useChatStore().$onAction(({ name, args }) => {
+  if (name === 'cancelTurn')
+    motionDecisions.cancelTurn(args[0].turnId)
+  else if (name === 'cancelPendingSends')
+    motionDecisions.cancelSession(args[0])
+}))
+watch(() => useChatSessionStore().activeSessionId, () => motionDecisions.cancelTurn())
+watch(() => motionDecisions.cancellationEpoch, () => {
+  motionStore.cancel()
+  vrmViewerRef.value?.playMotion('idle')
+}, { flush: 'sync' })
 
 watch([() => motionStore.enabled, () => motionStore.autoGenerate, stageModelSelected, stageModelRenderer], () => {
   motionStore.cancel()
   vrmViewerRef.value?.stopGeneratedMotion()
 })
-onUnmounted(() => motionStore.cancel())
+onUnmounted(() => {
+  motionDecisions.cancelTurn()
+  motionStore.cancel()
+})
 
 function toStageEmotionPayload(payload: { name: string, intensity: number }): EmotionPayload | undefined {
   switch (payload.name) {
@@ -336,7 +377,7 @@ function toStageEmotionPayload(payload: { name: string, intensity: number }): Em
   }
 }
 
-chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
+chatHookCleanups.push(streamingControl.onSignal(async (signal, context) => {
   if (signal.type === 'act') {
     const act = normalizeActPayload(signal.payload)
     if (act.motion) {
@@ -345,16 +386,10 @@ chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
         return
       }
       else if (stageModelRenderer.value === 'vrm') {
-        if (act.motion === 'generate' && act.motionPrompt && motionStore.enabled && motionStore.autoGenerate) {
-          vrmViewerRef.value?.playMotion('idle')
-          void motionStore.generateFromAct(act).then((clip) => {
-            if (clip)
-              vrmViewerRef.value?.playGeneratedMotion(clip)
-          })
-        }
-        else {
-          motionStore.cancel()
-          vrmViewerRef.value?.playMotion(act.motion)
+        const disposition = motionDecisions.disposition(context.turnId)
+        if (disposition === 'external'
+          || (disposition !== 'stale' && context.turnId && motionDecisions.claimLocal(context.turnId, act))) {
+          applyVrmMotion(act)
         }
       }
     }
@@ -853,9 +888,13 @@ watch(speechMuted, (muted) => {
     stopSpeechOutput('muted')
 }, { immediate: true })
 
-chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
+chatHookCleanups.push(onBeforeMessageComposed(async (message, context) => {
   motionStore.cancel()
   vrmViewerRef.value?.stopGeneratedMotion()
+  void motionDecisions.beginTurn(context.turnId, context.sessionId, message).then((act) => {
+    if (act && stageModelRenderer.value === 'vrm' && motionDecisions.consumeCloudMotion(context.turnId))
+      applyVrmMotion(act)
+  })
   playbackManager.stopAll('new-message')
   resetAssistantSpeechSurface('new-message')
 
@@ -879,6 +918,8 @@ chatHookCleanups.push(onTokenLiteral(async (literal) => {
 }))
 
 chatHookCleanups.push(onTokenSpecial(async (special, context) => {
+  if (stageModelRenderer.value === 'vrm' && motionDecisions.disposition(context.turnId) !== 'stale')
+    await immediateMotionControl.dispatchWith(special, { turnId: context.turnId })
   // Muting speech must not suppress non-audio signals such as emotion, motion,
   // delay, or plugin calls that normally travel through the TTS session.
   if (speechMuted.value) {

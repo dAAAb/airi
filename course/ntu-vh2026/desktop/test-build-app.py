@@ -16,7 +16,7 @@ class PackagingTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
-        for name in ('runtimes/python/bin/python3', 'runtimes/ollama/ollama', 'web/index.html', 'installer/manager.py',
+        for name in ('runtimes/python/bin/python3', 'runtimes/ollama/ollama', 'web/index.html', 'installer/manager.py', 'installer/decisions.py',
                      'web/local-models/onnx-community/silero-vad/onnx/model.onnx',
                      'web/local-assets/onnx/ort-wasm-simd-threaded.wasm'):
             target = self.root / name

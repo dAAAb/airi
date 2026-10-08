@@ -32,3 +32,5 @@ The active chat and vision provider routes live under `/settings/providers`. The
 The module card appears only for VRM characters. A direct route visit with another renderer explains that restriction.
 Enable the module, test the service, then generate a short English motion description. Enable automatic conversation generation separately.
 The page does not download model weights or launch the service. Replay and cancel controls operate on the last validated clip.
+An independent, default-off OpenAI Decisions section offers a session-only password input or an existing OpenAI provider key.
+It explains the text sent to the cloud, possible charges and local fallback. The authenticated proxy requires the packaged local manager origin.

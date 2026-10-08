@@ -5,6 +5,7 @@ supplies the payload. This manager never installs arbitrary commands from HTTP.
 """
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import secrets
@@ -21,6 +22,10 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
+# Load only this bundled sibling, including when QA imports manager.py by path.
+_decisions_spec = importlib.util.spec_from_file_location('airi_local_decisions', ROOT / 'decisions.py')
+motion_decisions = importlib.util.module_from_spec(_decisions_spec)
+_decisions_spec.loader.exec_module(motion_decisions)
 COURSE = ROOT.parent
 PORT = 17900
 ORIGIN = f'http://127.0.0.1:{PORT}'
@@ -83,6 +88,7 @@ class LocalManager:
         self.mode = 'bundled'
         self.selected = []
         self.verified = set()
+        self.motion_decisions = motion_decisions.MotionDecisionClient()
         config = self.data / 'selection.json'
         if config.exists():
             saved = json.loads(config.read_text())
@@ -491,6 +497,8 @@ def make_handler(manager):
                 if not isinstance(body, dict):
                     raise ValueError('JSON object required')
                 path = urlsplit(self.path).path
+                if path == '/api/motion-decision':
+                    return self.send_data(200, manager.motion_decisions.decide(body))
                 if path == '/api/install':
                     manager.start_job(body)
                     return self.send_data(202, {'accepted': True})
@@ -500,6 +508,8 @@ def make_handler(manager):
                 if path == '/api/start':
                     return self.send_data(202, manager.start_services())
                 return self.send_data(404, {'error': 'Unknown action'})
+            except motion_decisions.DecisionError as error:
+                return self.send_data(error.status, {'error': str(error), 'code': error.code})
             except (ValueError, KeyError, RuntimeError, OSError) as error:
                 return self.send_data(400, {'error': str(error)})
     return Handler

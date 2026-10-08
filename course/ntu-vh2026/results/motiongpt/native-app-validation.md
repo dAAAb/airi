@@ -1,6 +1,6 @@
 # AIRI Local 0.3.0 原生驗證紀錄
 
-日期：2026-10-08，Apple Silicon M4 Max／128 GB。
+日期：2026-10-08～09，Apple Silicon M4 Max／128 GB。
 
 ## 已在原生 App 看見的結果
 
@@ -24,6 +24,10 @@
 - 三後端共 30 段真實生成有效；MLX 同 token 數值比對通過。
 - 正式 standalone runtime 的 runtime API 切換與生成（CPU、MPS、MLX、auto）通過，見[API 原始結果](portable-runtime-backends.json)。
 - MLX 原始骨架伸展／拳擊方向與外觀檢查通過，限制見[骨架 QA](mlx-skeleton-preview-audit.md)。
-- **最新版 App 的 MLX 選單操作與修正後自動對話動作，尚未完成原生目視驗證。** 準備重新啟動新版時 Mac 鎖定，Computer Use 無法繼續；待操作者解鎖後驗證。先前 CPU 手動播放成功不取代這兩項驗證。
+- 2026-10-09 解鎖後，以 `v0.3.0-metal/AIRI Local Full.app` 完成原生驗證：安裝器保留原本五個模型選項，啟動後 MotionGPT 為 MLX。
+- 「動作」頁先由 MLX 切到 CPU（顯示載入 3.06 秒），再切回 MLX（0.99 秒），服務健康與 UI 狀態一致。這是切換載入時間，不是生成時間。
+- 原生 UI 手動生成 `A person stretches both arms above their head.`，連續畫面確認 VRM 雙臂抬高過頭並回復。
+- 新對話輸入「請把雙手高高舉過頭頂，做一段伸展，並說一句簡短的話。」後，Gemma 回覆「來幫你一起伸展一下，感覺整個人都精神多了。」；連續擷取的 9.65 秒畫面可見雙臂舉高的生成動作。此為單次原生對話成功，不是效能統計。
+- 桌寵齒輪進入設定與動作子頁穩定，返回主頁恢復桌寵；也能明確切回一般視窗。
 
 這是 ad-hoc 簽署的本機測試包，沒有 Developer ID 公證；MotionGPT 模型與私人轉換快取不包含在公開 App／Git 中。

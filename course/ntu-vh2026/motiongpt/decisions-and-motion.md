@@ -1,6 +1,7 @@
 # 從一句話到身體動作：語意判斷與 MotionGPT
 
-查核日期：2026-10-08。本地 ACT 與 MotionGPT 流程已存在於本專案。本文的 OpenAI Decisions 路由是**選配設計，尚未整合或實測**。
+查核日期：2026-10-09。本地 ACT 與 MotionGPT 是預設路徑。新版加入**可選的 OpenAI Decisions 動作判斷**。
+目前沒有使用真實付費 API 測量延遲、語意正確率或費用，不能宣稱這台 Mac 已獲得加速。
 
 ## 先判斷使用者要什麼
 
@@ -78,22 +79,79 @@ API 接收文字與 inline 圖片。它不直接接收音訊，也不回傳自�
 官方的語音案例正是「逐字稿＋目前狀態 → 選擇可用動作 → 程式執行」。其中明列機器人手勢範例。
 文件也要求執行前重新檢查動作是否仍可用，已取消的請求不能繼續執行。[語音連接 Decisions](https://developers.openai.com/api/docs/guides/decisions-voice)
 
-因此，選配雲端設計可以是：
+## 這次實作：本地和雲端比誰先選出有效動作
+
+選配判斷器在「設定 → 動作」啟用。預設關閉，關閉時不發送 Decisions 請求。
+目前只能從 AIRI Local 的 `http://127.0.0.1:17900` 使用這個功能，開發站或外部網站不會接收金鑰。
+沒有金鑰、服務失敗或未選用雲端時，保留本地語言模型的 ACT 路徑。
 
 ```text
-Breeze ASR 在本機辨識
-  → 送出必要文字與角色狀態給 Decisions
-  → 取回 idle／stop／已知動作／generate 的選擇
-  → 若選 generate，再由本地 LLM 產生英文描述
-  → 本地 MotionGPT 生成，VRM 播放
+這一輪使用者文字／本地 ASR 逐字稿
+  ├─ 原本的語言模型 → ACT → 動作
+  └─ 明確選用 Decisions → 本地 manager → OpenAI 固定選項判斷
+                              → 驗證結果 → 動作
+第一個有效的結果取得這一輪的動作執行權，另一個不能再重播。
 ```
 
-Decisions 本身不替 `generate` 撰寫新的 `motionPrompt`。需要任意欄位、解釋或新文字時，可以使用另一個本地 LLM 呼叫，或採用 Responses 的 Structured Outputs。[Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+雲端只取得這一輪的文字和固定分類規則。本整合不把麥克風音訊、圖片附件、歷史對話或骨架送給 Decisions。
+角色的說話和 TTS 繼續走原本設定，選動作不會改變對話模型或聲音。
+本文以課堂的本地語言模型為例。若自行換成雲端聊天 provider，原本的 ACT 路徑也會依該 provider 傳送資料。
 
-目前 AIRI 沒有加入這條雲端路由，也沒有測量它的延遲、準確率或費用。
-官方的速度宣稱不能當成這台 Mac 的課堂實測。這條路徑需要網路，辨識文字會離開本機。
-若未來實作，保留本地預設，讓使用者明確選用雲端判斷。金鑰放在服務端，不能包進公開 App 或前端 JavaScript。
-選項保留「不動／無合適動作」，不把每次輸入都強迫配上一個表演。停止按鈕維持本地控制，不等待雲端判斷。
+雲端結果的初始 confidence 門檻為 `0.6`，低於門檻就交回本地。這是未校準的保守預設，不代表 60% 正確率。
+拒答、缺少信心值或無效格式也不會取得執行權。
+
+兩個判斷器平行執行，不是先等雲端失敗才開始本地模型。
+因此既有模型若先傳回有效 ACT，就直接使用它。這個設計不能保證雲端一定更快或更準。
+
+| Decisions 選項 | 本地執行方式 |
+| --- | --- |
+| `idle`、`stop`、`wave` 等已知動作 | 執行既有程序動畫，`wave` 固定使用角色右手。 |
+| `generated_stretch` | 使用固定英文模板，請本機 MotionGPT 生成雙手向上伸展。 |
+| `generated_squat`、`generated_boxing` | 使用固定英文模板，生成蹲起或拳擊。 |
+| `generated_left_wave` | 使用左手英文模板生成，不拿右手 `wave` 代替。 |
+| `defer`、拒答、低信心或無效輸出 | 不取得動作執行權，保留本地 ACT。 |
+
+這些模板由應用程式事先定義，不是 Decisions 寫出新文字。
+新的複雜動作仍靠原本的語言模型產生英文 `motionPrompt`，再交給 MotionGPT。
+若需要雲端產生任意新欄位或文字，那是另一個生成流程，例如 Responses 的 [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)。本整合沒有加入該流程。
+
+所有生成選項仍要求 VRM、動作模組啟用，以及「允許對話自動生成動作」開啟。
+雲端選到生成模板，不會越過這三個條件。未開啟自動生成時，仍可判斷可用的程序動畫。
+
+### 金鑰與資料範圍
+
+使用者可以提供本次工作階段的金鑰，或明確選取已設定的 OpenAI provider。
+本次工作階段的金鑰保存在記憶體，不寫入新的 localStorage、設定檔或後端日誌。
+選取既有 provider 時，沿用該 provider 原有的金鑰保存方式，不能稱為「所有金鑰都只存記憶體」。
+
+前端把金鑰送到同一來源的本地 manager。後端才用 `Authorization: Bearer` 呼叫固定的 `https://api.openai.com/v1/decisions`。
+請求還需通過本地 Host、Origin、JSON 格式與工作階段 token 驗證。
+金鑰不包進 App，不放在 URL，不在回應或錯誤訊息回顯。後端不持久保存金鑰或這一輪文字。
+
+官方 API 範例使用 Bearer 驗證和 JSON，模型為 `gpt-6-luna`，沒有要求額外的 beta header。[API reference](https://developers.openai.com/api/reference/resources/decisions/methods/create)
+
+### 超時、取消與重複動作
+
+前端等待上限為 5 秒，超時就放棄雲端結果。本地模型持續執行。
+後端網路操作以 4 秒預算限制，不自動重試。作業系統 DNS 解析不保證遵守這個上限。
+取消前端等待不代表已送達 OpenAI 的請求沒有處理或計費。
+
+新對話輪、停止、換角色、離開舞台或停用判斷器會撤銷舊結果的執行資格。
+延遲回來的結果不能在新角色或新對話中播放。動作一輪只選一次，後來隨 TTS 到達的同輪 ACT 不能再觸發同一動作。
+情緒控制與正常語音仍各自處理。
+
+### 延遲與費用要怎麼教
+
+官方指南列出 Decisions 的 `gpt-6-luna` 價格為每百萬 input tokens US$0.10，只對 input 計費。
+區域處理與長上下文另有加價條件。這是查核當天的公開價格，課堂使用前再確認。[官方價格說明](https://developers.openai.com/api/docs/guides/decisions#pricing-and-availability)
+
+官方所述的約 10 倍速度是對 Responses API 的比較，不是對這台 Mac、本地模型或 MotionGPT 的保證。
+介面顯示的毫秒數，是本地 manager 呼叫 OpenAI 到解析回應的時間，包含網路往返。
+它不包含 ASR、TTS、MotionGPT、VRM 播放或前端到 manager 的耗時，也不等同於模型純推論時間。
+
+有真實 API 授權後，再以同一組標註句子比較純本地與選配模式。
+記錄首次動作延遲、p50／p95、誰先取得執行權、選錯或漏做、超時比例與 API input tokens。
+測試要分開記錄冷啟動、暖啟動、網路條件及語言。假回應只能證明程式分支，不代表模型速度或理解能力。
 
 ## 分清楚四種成功
 
@@ -110,3 +168,44 @@ Decisions 的 confidence 也不能直接當作課堂正確率。門檻需要由�
 
 課堂可讓不同本地模型及選配雲端判斷器，回答同一組要求、否定、敘述與停止案例。
 分別記錄路由結果、錯誤觸發次數、漏做次數、延遲與動作品質，不把所有錯誤都歸給「模型太小」。
+
+## 已驗證的程式邊界與課堂實驗
+
+2026-10-09 的後端驗證使用假金鑰和模擬 transport，沒有發送真實 OpenAI 請求。
+`python3 course/ntu-vh2026/installer/test-decisions.py`：16 項通過。
+測試包含固定官方契約、停用／缺金鑰零請求、拒答、錯誤去敏、錯誤來源攔截、限時與不跟隨 redirect。
+
+前端使用同樣的假回應，兩個測試檔共 22 項通過（包含後續補上的本地 ACT 即時分派測試）：
+
+```sh
+./node_modules/.bin/vitest run --config packages/stage-ui/vitest.config.ts --project node src/libs/motion-decisions.test.ts src/stores/modules/motion-decisions.test.ts
+```
+
+上述自動化驗證未輸入使用者金鑰。後續 0.4.0 原生 App 的開關、金鑰欄位、缺 key 本地伸展及桌寵設定驗證，另見[交付驗證紀錄](../results/motiongpt/decisions-validation.md)。
+
+| 測試情境 | 要確認的行為 |
+| --- | --- |
+| 第一次啟動、未勾選 Decisions | 本地 ACT 正常。雲端 transport 呼叫次數為 0。 |
+| 已勾選，但沒有金鑰 | 顯示缺金鑰，保留本地。雲端呼叫次數為 0。 |
+| 一般聊天、否定動作、引用別人說話 | 對照標註語意，不把關鍵字自動當成命令。 |
+| `confidence=0`、低於 `0.6` | 不取得動作執行權，本地仍可接手。 |
+| 拒答、缺欄位、NaN、未知動作 | 不執行無效雲端動作。 |
+| 本地 ACT 先到 | 本地動作只播放一次，晚到雲端與同輪 TTS ACT 不重播。 |
+| 雲端有效結果先到 | 雲端動作只播放一次，本地 ACT 保留語音／情緒用途。 |
+| 雲端超時、401、429、服務失敗 | 不重試，不回顯金鑰，本地繼續。 |
+| 關閉自動生成，雲端選拳擊模板 | 不啟動 MotionGPT。 |
+| 等待期間按停止、換角色或開始新輪 | 舊回應即使到達也不能觸發播放。 |
+| 取回結果後，播放前立即取消 | 播放前的第二次驗證攔截過期結果。 |
+| 清除工作階段金鑰 | 後續需要重新輸入。既有 provider 金鑰不受此按鈕影響。 |
+
+前兩列的零請求指 Decisions 功能，不包含使用者自行選用的其他雲端聊天或語音 provider。
+語意句子的正確率仍需用真正模型評量。模擬 `wave` 回應成功，不能證明模型真的理解「揮手」。
+
+實作入口：
+
+- [後端固定 API 與動作模板](../installer/decisions.py)
+- [後端契約與保密測試](../installer/test-decisions.py)
+- [前端回應驗證與同源呼叫](../../../packages/stage-ui/src/libs/motion-decisions.ts)
+- [本地／雲端執行權與取消狀態](../../../packages/stage-ui/src/stores/modules/motion-decisions.ts)
+- [前端請求與回應測試](../../../packages/stage-ui/src/libs/motion-decisions.test.ts)
+- [動作執行權、取消與停用測試](../../../packages/stage-ui/src/stores/modules/motion-decisions.test.ts)

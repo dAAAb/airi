@@ -1,5 +1,7 @@
 # MotionGPT 實測原始輸出
 
+後續：[原生 MLX 與對話動作驗證](native-app-validation.md) · [0.4.0 Decisions 選配與安裝包驗證](decisions-validation.md)
+
 2026-10-08，Apple M4 Max／128 GB，Python 3.12.3、PyTorch 2.8.0、Transformers 4.44.2。
 
 這些 JSON 是本機神經模型產生的 22 關節序列；未用手寫動畫取代，也未為了讓圖好看而修改座標。`prompt`、`seed`、模型 ID、實際 device、動作 token 數、20 fps 格數及生成耗時均保留。量測腳本與固定來源位於 `../../motiongpt/`。

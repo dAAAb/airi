@@ -16,7 +16,7 @@ App 以同一個 `http://127.0.0.1:17900` origin 顯示安裝頁與編譯後的 
 - **thin — AIRI Local.app**：帶瀏覽器、Python、Ollama、全部語音推論 runtime 與 AIRI。第一次開啟時勾選模型、閱讀必要條款並下載固定版本的權重。預設選 Lite 三項，可另外選完整台語組。包含 MotionGPT 程式／runtime，安裝頁的 MotionGPT 選項預設不勾選；勾選後從官方下載。
 - **full — AIRI Local Full.app**：另外帶全部六項模型 payload，預設原本的 SARC／Gemma 4／ASR／Kokoro／KaedeTai 五項，也可改選 Qwen。初次開啟仍先驗證模型與必要條款。MotionGPT 程式／runtime 隨附，但權重不在這六項 payload 中；選項預設不勾選，首次使用仍需直接從官方下載約 1.336 GB。
 
-Lite 與 Full 的 Electron renderer 會擋下非 loopback 的 HTTP／HTTPS 請求。原有離線模型缺漏時顯示錯誤，不能悄悄改用雲端。Full 的 MotionGPT 首次下載是安裝管理器在明確勾選後按固定官方清單執行，不代表開放 renderer 連網推論。三種 App 共用課程 Bundle ID 與使用者資料，單次只開啟一個。
+Lite 與 Full 的 Electron renderer 會擋下非 loopback 的 HTTP／HTTPS 請求。原有離線模型缺漏時顯示錯誤，不能悄悄改用雲端。Full 的 MotionGPT 首次下載是安裝管理器在明確勾選後按固定官方清單執行。v0.4.0 的 Decisions 是另一個明確選配的連網入口：由本機管理器轉送當前文字到固定 OpenAI API，預設關閉，並未全面開放 renderer 連網。三種 App 共用課程 Bundle ID 與使用者資料，單次只開啟一個。
 
 thin 也包含 Torch 等 runtime，不能把它描述成只有幾 MB 的下載器。模型權重大小、安裝後大小、壓縮檔大小與記憶體需求是不同數字。
 
@@ -29,6 +29,16 @@ thin 也包含 Torch 等 runtime，不能把它描述成只有幾 MB 的下載�
 動作設定可切換 CPU、PyTorch Metal／MPS、原生 MLX；自動模式優先 MLX。此 Mac 的 MLX 暖機生成比先前 CPU／MPS 快，且已用相同 token 比對模型數值；這不是所有 Mac 的效能保證。[實測與限制](../motiongpt/README.zh-TW.md)。第一次使用 MLX 另建立約 1 GB 的私人權重快取，無需再次下載模型。
 
 生成的 22 關節序列轉為 VRM **原地骨架動作**。根節點走位被移除，沒有腳部 IK、碰撞、手指細節、指定舞種或精準節拍保證。預編短動作仍可使用，不會被改稱為 MotionGPT 生成結果。方向轉換、姿態恢復與原生視覺驗收要分開記錄。
+
+## v0.4.0：選配雲端動作判斷
+
+VRM 的「機體模組 → 動作」可明確啟用 OpenAI Decisions，**預設關閉**。啟用且有 API key 時，僅傳送當前使用者文字（含 STT 辨識文字），不傳送圖片、原始錄音、聊天歷史、VRM 或骨架。端點固定為 OpenAI Decisions API、模型固定為 `gpt-6-luna`。語音與視覺保留原本的 provider 設定；動作生成與播放仍在本機。
+
+可輸入只保留於本次 App 工作階段的 key，或明確選用已設定的 OpenAI provider key。後者沿用原有 provider 儲存方式，並未改成暫存或新增加密。沒有 key 時不送出請求。API 額度與 ChatGPT 訂閱分開計費。
+
+雲端只在固定動作選項中判斷；伸展、深蹲、拳擊、左手揮手等選項對應固定的本機 MotionGPT 描述。其他新動作仍交由本機 LLM。每回合第一個有效動作結果先執行，晚回結果不覆寫。信心值低於 0.6、拒答、逾時或失敗時繼續本機路徑；0.6 是初始策略門檻，不是校準後的準確率。
+
+雲端選到生成動作時，仍需已啟用本機 MotionGPT，並明確開啟「允許對話自動生成動作」。此 API 不能繞過這兩項設定。模擬測試涵蓋請求格式、錯誤與競速處理；**尚未驗證付費 API 的實際速度與判斷品質**。[設計、範例與限制](../motiongpt/decisions-and-motion.md)。
 
 ## 安全界線
 

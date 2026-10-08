@@ -583,6 +583,30 @@ pages:
         cpu: CPU
         mps: Apple Metal (PyTorch MPS)
         mlx: Apple Metal (native MLX)
+      decisions:
+        enable: Use OpenAI Decisions to help select motions
+        description: Optional cloud selection, off by default. Local conversation continues while the first usable motion decision wins.
+        privacy: Only the current message text is sent to OpenAI, including transcribed speech. No history, audio or images. Requests can incur charges even when cancelled or when the local model wins.
+        manager-required: Open this feature in the packaged local AIRI app at 127.0.0.1:17900.
+        key-source: OpenAI key source
+        key-description: Choose a session key or reuse an existing OpenAI provider. Existing provider storage settings remain in effect.
+        session-key: Session key
+        api-key: OpenAI API Key
+        session-description: Held in memory until this app session ends. This field does not save a key to provider settings.
+        use-key: Use for this session
+        clear-key: Clear session key
+        key-ready: Session key ready
+        confidence: 'Decision confidence: {value}'
+        race: Idle is a valid decision. Low-confidence results below 0.6 defer to local ACT. This initial threshold is not a calibrated accuracy score. Generated templates require MotionGPT and automatic generation.
+        status:
+          idle: Waiting for the next message
+          pending: Selecting a motion alongside the local model…
+          local-won: Local ACT selected the motion first
+          cloud-won: Decisions selected the motion first
+          deferred: Decisions deferred to the local model
+          fallback: Cloud request failed or timed out; local ACT continues
+          missing-key: Add a key to enable cloud selection; local ACT continues
+          unavailable: Local manager unavailable; local ACT continues
       prompt: Motion description
       prompt-description: Use a short English description of body movement. Start with one action and inspect the result.
       generate: Generate and preview

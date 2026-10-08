@@ -10,6 +10,10 @@
 
 **新增：[MotionGPT 生成新動作](motiongpt/README.zh-TW.md)**，包含原生 MLX／Metal、CPU／MPS 比較、左右前後座標檢查、實際骨架圖與可重現結果。Thin／Full 可選配安裝，入口為「機體模組 → 動作」，僅適用 VRM。另有[語意判斷與 Decisions API](motiongpt/decisions-and-motion.md)教學，區分「談論動作」、「要求動作」與「不要做動作」。
 
+**2026-10-09，v0.4.0：選配 OpenAI Decisions 動作判斷已整合。** 在 VRM 的「機體模組 → 動作」明確啟用並提供 API key 後，才把當前使用者文字（含語音辨識後的文字）送到 OpenAI。預設關閉；此功能不傳送原始音訊、圖片、歷史對話或角色骨架，動作生成與播放仍在本機。本機 LLM 與雲端的第一個有效動作結果先執行，較晚結果不覆寫；拒答、低信心或連線失敗則保留本機路徑。尚未做付費 API 的速度或品質實測。
+
+可輸入僅供本次 App 工作階段使用的 key，或明確選用既有 OpenAI provider key；後者的原有儲存方式不變。API 費用與 ChatGPT 訂閱分開。Lite／Full 原有模型仍預設離線；啟用 Decisions 不會替你開啟 MotionGPT 的「允許對話自動生成動作」。
+
 | 名稱 | 耳朵／嘴巴 | 這次真的做了什麼 |
 | --- | --- | --- |
 | MediaTek Breeze2-VITS-onnx | 嘴巴：台灣華語 | Sherpa-ONNX CPU、本機 HTTP 服務、AIRI TTS 測試通過。不是台語 TTS，也沒有用 MLX。 |

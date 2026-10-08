@@ -12,6 +12,8 @@ describe('motion settings locale paths', () => {
     expect(document.errors).toEqual([])
     expect(document.getIn(['pages', 'modules', 'motion', 'title'])).toBe(title)
     expect(document.getIn(['pages', 'modules', 'motion', 'status', 'ready'])).toBeTypeOf('string')
+    expect(document.getIn(['pages', 'modules', 'motion', 'decisions', 'enable'])).toBeTypeOf('string')
+    expect(document.getIn(['pages', 'modules', 'motion', 'decisions', 'confidence'])).toBeTypeOf('string')
     expect(document.getIn(['pages', 'data', 'sections', 'modules', 'title'])).toBe(dataTitle)
     expect(document.getIn(['pages', 'data', 'motion'])).toBeUndefined()
   })

@@ -187,9 +187,9 @@ function renderStatus() {
   elements.cancel.textContent = needsDownload ? '停止下載' : '停止驗證'
   elements.scope.textContent = current.offline
     ? hasDownloadOption
-      ? '語音與對話模型已內建。MotionGPT 是另行下載的選配；未勾選就不下載、不啟動。推論只連本機。'
-      : '模型已隨安裝包內建，無須再下載。這組推論服務只連到本機；麥克風需由您在瀏覽器授權。'
-    : '模型首次下載需要網路。這組推論服務只連到本機；麥克風需由您在瀏覽器授權。'
+      ? '語音與對話模型已內建。MotionGPT 是另行下載的選配；未勾選就不下載、不啟動。預設推論在本機，雲端選動作需另行啟用。'
+      : '模型已隨安裝包內建，無須再下載。預設使用本機推論服務；麥克風需由您在瀏覽器授權。'
+    : '模型首次下載需要網路。預設使用本機推論服務；麥克風需由您在瀏覽器授權。'
   const rows = current.catalog.filter(row => selected.has(row.id))
   elements['size-summary'].textContent = `${rows.length} 個模型 · 權重約 ${formatBytes(rows.reduce((sum, row) => sum + row.bytes, 0))}`
   elements['disk-summary'].textContent = !needsDownload

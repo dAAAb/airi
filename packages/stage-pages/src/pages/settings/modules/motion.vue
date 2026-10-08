@@ -3,6 +3,7 @@ import type { MotionRuntimeDevice } from '@proj-airi/stage-ui/libs/motion-genera
 
 import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useMotionStore } from '@proj-airi/stage-ui/stores/modules/motion'
+import { useMotionDecisionsStore } from '@proj-airi/stage-ui/stores/modules/motion-decisions'
 import { Button, FieldCheckbox, FieldInput, FieldSelect } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -10,6 +11,13 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const motion = useMotionStore()
+const decisions = useMotionDecisionsStore()
+const { enabled: decisionsEnabled, keySource, hasSessionKey, openAiProviders, managerAvailable, status: decisionStatus, elapsedMs, confidence } = storeToRefs(decisions)
+const sessionKeyInput = ref('')
+const keyOptions = computed(() => [
+  { value: 'session', label: t('settings.pages.modules.motion.decisions.session-key') },
+  ...openAiProviders.value.map(provider => ({ value: provider.id, label: provider.label })),
+])
 const { enabled, autoGenerate, endpoint, runtimePreference, available, configured, busy, status, lastError, healthDetails, lastClip } = storeToRefs(motion)
 const preview = ref<InstanceType<typeof WidgetStage>>()
 const previewState = ref<'pending' | 'loading' | 'mounted'>('pending')
@@ -25,8 +33,14 @@ const selectedRuntime = computed({
 })
 
 function stop() {
+  decisions.cancelTurn()
   motion.cancel()
   preview.value?.stopGeneratedMotion()
+}
+
+function applySessionKey() {
+  decisions.setSessionKey(sessionKeyInput.value)
+  sessionKeyInput.value = ''
 }
 
 function play() {
@@ -118,6 +132,50 @@ onUnmounted(stop)
     <p :class="['text-sm', 'text-neutral-500', 'dark:text-neutral-400']">
       {{ t('settings.pages.modules.motion.limits') }}
     </p>
+    <section :class="['flex', 'flex-col', 'gap-4', 'border-t', 'border-neutral-200', 'pt-6', 'dark:border-neutral-700']">
+      <FieldCheckbox
+        v-model="decisionsEnabled" :disabled="!available || !managerAvailable"
+        :label="t('settings.pages.modules.motion.decisions.enable')"
+        :description="t('settings.pages.modules.motion.decisions.description')"
+      />
+      <p :class="['text-sm', 'text-neutral-500', 'dark:text-neutral-400']">
+        {{ t('settings.pages.modules.motion.decisions.privacy') }}
+      </p>
+      <p v-if="!managerAvailable" role="status">
+        {{ t('settings.pages.modules.motion.decisions.manager-required') }}
+      </p>
+      <template v-if="decisionsEnabled && managerAvailable">
+        <FieldSelect
+          v-model="keySource" :options="keyOptions"
+          :label="t('settings.pages.modules.motion.decisions.key-source')"
+          :description="t('settings.pages.modules.motion.decisions.key-description')"
+        />
+        <template v-if="keySource === 'session'">
+          <FieldInput
+            v-model="sessionKeyInput" type="password" autocomplete="off"
+            :label="t('settings.pages.modules.motion.decisions.api-key')"
+            :description="t('settings.pages.modules.motion.decisions.session-description')"
+          />
+          <div :class="['flex', 'flex-wrap', 'gap-3']">
+            <Button :disabled="!sessionKeyInput.trim()" @click="applySessionKey">
+              {{ t('settings.pages.modules.motion.decisions.use-key') }}
+            </Button>
+            <Button :disabled="!hasSessionKey" @click="decisions.setSessionKey('')">
+              {{ t('settings.pages.modules.motion.decisions.clear-key') }}
+            </Button>
+            <span v-if="hasSessionKey">{{ t('settings.pages.modules.motion.decisions.key-ready') }}</span>
+          </div>
+        </template>
+        <p role="status" aria-live="polite">
+          {{ t(`settings.pages.modules.motion.decisions.status.${decisionStatus}`) }}
+          <span v-if="elapsedMs !== undefined"> · {{ elapsedMs.toFixed(0) }} ms</span>
+          <span v-if="confidence !== undefined"> · {{ t('settings.pages.modules.motion.decisions.confidence', { value: confidence.toFixed(2) }) }}</span>
+        </p>
+        <p :class="['text-sm', 'text-neutral-500', 'dark:text-neutral-400']">
+          {{ t('settings.pages.modules.motion.decisions.race') }}
+        </p>
+      </template>
+    </section>
   </div>
 </template>
 

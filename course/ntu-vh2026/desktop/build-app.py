@@ -126,7 +126,7 @@ def copy_lite_payload(source, target, manifest):
 
 def validate_resources(resources, mode):
     manifest = json.loads((resources / 'payload-manifest.json').read_text())
-    for entry in ('runtimes/python/bin/python3', 'runtimes/ollama/ollama', 'web/index.html', 'installer/manager.py',
+    for entry in ('runtimes/python/bin/python3', 'runtimes/ollama/ollama', 'web/index.html', 'installer/manager.py', 'installer/decisions.py',
                   'web/local-models/onnx-community/silero-vad/onnx/model.onnx',
                   'web/local-assets/onnx/ort-wasm-simd-threaded.wasm'):
         if not (resources / entry).is_file():

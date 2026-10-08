@@ -11,7 +11,11 @@
 課程版提供勾選下載、輕量離線與完整台語離線包。內建 Ollama 使用獨立的埠與模型目錄，可與原有 Ollama 並存。下方的 `Try it` 與其他預編譯連結屬於上游。
 
 **新增 VRM 動作實驗：[MotionGPT 本機生成與 MLX／Metal 實測](./course/ntu-vh2026/motiongpt/README.zh-TW.md) · [什麼語句應該觸發什麼動作，以及 Decisions API 的角色](./course/ntu-vh2026/motiongpt/decisions-and-motion.md)**
-Thin／Full 安裝器可選配 MotionGPT，設定入口為「機體模組 → 動作」。權重另由官方下載；CPU、MPS、原生 MLX 可切換。Decisions API 僅列為教學設計，尚未串接或使用雲端 API。
+Thin／Full 安裝器可選配 MotionGPT，設定入口為「機體模組 → 動作」。權重另由官方下載；CPU、MPS、原生 MLX 可切換。
+
+**v0.4.0 新增選配 OpenAI Decisions 動作判斷，預設關閉。** 明確啟用並提供 API key 後，僅把當前使用者文字送往 OpenAI；此功能不傳送圖片、音訊、對話歷史或骨架。動作生成與播放仍在本機，本機語音與視覺設定不變。雲端與本機 LLM 的第一個有效動作結果先執行；失敗或不確定時繼續使用本機路徑。尚未實測付費 API 的速度或判斷品質。
+
+新輸入的 key 僅保留於本次 App 工作階段；也可明確選用已設定的 OpenAI provider key，其原有儲存方式不變。預設本機功能不需要 API key，Lite／Full 原有離線模型也不會因缺漏而自動改用雲端。完整設定與資料流見上方 Decisions 教學。
 
 | 課堂案例 | 我們實際測到什麼 | 不把它當作什麼 |
 | --- | --- | --- |
