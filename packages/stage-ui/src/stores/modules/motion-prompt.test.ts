@@ -37,6 +37,38 @@ describe('manual motion translation lifecycle', () => {
     expect(translateMotionPrompt).not.toHaveBeenCalled()
     expect(motion.generate).toHaveBeenCalledWith('A person jumps.')
     expect(store.actualPrompt).toBe('A person jumps.')
+    expect(store.normalizationSource).toBe('direct')
+    expect(store.translatedBy).toBe('')
+  })
+
+  it.each([
+    ['跪地上！', 'A person kneels on the ground.'],
+    ['趴下來。', 'A person lies down on their stomach on the floor.'],
+    ['跌倒', 'A person falls to the ground.'],
+  ])('uses the exact phrase %s without a provider and labels its source', async (input, expected) => {
+    consciousness.activeModel = ''
+    consciousness.activeProvider = ''
+    const store = useMotionPromptStore()
+    await store.generate(input)
+    expect(store.originalInput).toBe(input)
+    expect(store.actualPrompt).toBe(expected)
+    expect(store.normalizationSource).toBe('builtin')
+    expect(store.translatedBy).toBe('')
+    expect(consciousness.getChatProviderInstance).not.toHaveBeenCalled()
+    expect(translateMotionPrompt).not.toHaveBeenCalled()
+    expect(motion.generate).toHaveBeenCalledWith(expected)
+    store.clear()
+    expect(store.normalizationSource).toBe('direct')
+    expect(store.actualPrompt).toBe('')
+  })
+
+  it.each(['不要跪地上', '跪地上再站起來', '用右膝跪地上'])('keeps the full description for local translation: %s', async (input) => {
+    const store = useMotionPromptStore()
+    await store.generate(input)
+    expect(consciousness.getChatProviderInstance).toHaveBeenCalledWith('local-a')
+    expect(translateMotionPrompt).toHaveBeenCalledWith(input, expect.any(Object), 'chosen-a', expect.any(AbortSignal))
+    expect(store.normalizationSource).toBe('local-model')
+    expect(store.translatedBy).toBe('chosen-a')
   })
 
   it('shows original and translated input before sending only English to MotionGPT', async () => {
@@ -49,6 +81,7 @@ describe('manual motion translation lifecycle', () => {
     await store.generate('跳高')
     expect(motion.generate).toHaveBeenCalledWith('A person jumps upward and lands on both feet.')
     expect(store.translatedBy).toBe('chosen-a')
+    expect(store.normalizationSource).toBe('local-model')
   })
 
   it('fails clearly when no current model exists and never forwards Chinese', async () => {

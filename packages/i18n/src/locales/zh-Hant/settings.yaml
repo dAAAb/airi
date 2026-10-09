@@ -391,12 +391,13 @@ pages:
           missing-key: 請加入金鑰以使用雲端判斷，本地 ACT 繼續
           unavailable: 本機管理服務無法使用，本地 ACT 繼續
       prompt: 動作描述
-      prompt-description: 可輸入中文或英文。中文先由目前選用的本機對話模型轉成英文，英文直接送進 MotionGPT。
+      prompt-description: 可輸入中文或英文。「跪地上」「趴下來」「跌倒」使用內建短句對照，其他中文由目前的本機對話模型轉成英文，英文直接送進 MotionGPT。
       prompt-normalization:
         translating: 正在用目前的本機對話模型轉成英文動作描述…
         original: 原始輸入：
         actual: 實際送進 MotionGPT 的英文描述
         model: '由本機 {model} 轉換。請檢查肢體、左右及方向是否符合原意。'
+        builtin: 內建短句對照，未使用語言模型翻譯。
         errors:
           empty: 請輸入身體動作描述。
           too-long: 請使用 500 字元以內的描述。

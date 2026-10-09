@@ -3,7 +3,7 @@ import type { GenerationProvider } from '@proj-airi/provider-inference'
 import { streamFrom } from '@proj-airi/core-agent'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { isEnglishMotionPrompt, localMotionPromptProvider, motionPromptInput, parseMotionPromptResponse, translateMotionPrompt } from './motion-prompt'
+import { builtinMotionPrompt, isEnglishMotionPrompt, localMotionPromptProvider, motionPromptInput, parseMotionPromptResponse, translateMotionPrompt } from './motion-prompt'
 
 vi.mock('@proj-airi/core-agent', () => ({ chatMessagesToTurns: (messages: unknown) => messages, streamFrom: vi.fn() }))
 
@@ -17,13 +17,26 @@ afterEach(() => {
 })
 
 describe('manual body-motion prompt normalization', () => {
-  it('bounds input and detects Chinese/mixed input without a keyword dictionary', () => {
+  it('bounds input and detects Chinese or mixed input', () => {
     expect(motionPromptInput('  跳起來然後雙腳落地。  ')).toBe('跳起來然後雙腳落地。')
     expect(() => motionPromptInput('')).toThrow('empty')
     expect(() => motionPromptInput('x'.repeat(501))).toThrow('too-long')
     expect(isEnglishMotionPrompt('A person jumps and lands on both feet.')).toBe(true)
     expect(isEnglishMotionPrompt('jump 然後落地')).toBe(false)
     expect(isEnglishMotionPrompt('跤手攏伸直')).toBe(false)
+  })
+
+  it.each([
+    ['跪地上', 'A person kneels on the ground.'],
+    ['趴下來', 'A person lies down on their stomach on the floor.'],
+    ['跌倒', 'A person falls to the ground.'],
+  ])('matches only the complete built-in phrase %s with optional final punctuation', (input, expected) => {
+    for (const suffix of ['', '。', '！', '？', '.', '!', '?', '！？'])
+      expect(builtinMotionPrompt(`  ${input}${suffix}  `)).toBe(expected)
+  })
+
+  it.each(['不要跪地上', '跪地上再站起來', '用右膝跪地上', '請跪地上', '跪在地上', '跪地上，', '跪地上。然後站起來', '左手趴下來', '不要跌倒', '跌倒後爬起來', '跌 倒', 'kneel', ''])('does not match modified or compound descriptions: %s', (input) => {
+    expect(builtinMotionPrompt(input)).toBeUndefined()
   })
 
   it('accepts only bounded English JSON and preserves direction without inventing translations', () => {

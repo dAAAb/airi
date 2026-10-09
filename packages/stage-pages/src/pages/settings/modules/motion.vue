@@ -14,7 +14,7 @@ const { t } = useI18n()
 const motion = useMotionStore()
 const decisions = useMotionDecisionsStore()
 const manualPrompt = useMotionPromptStore()
-const { translating, originalInput, actualPrompt, translatedBy, errorCode: promptError } = storeToRefs(manualPrompt)
+const { translating, originalInput, actualPrompt, translatedBy, normalizationSource, errorCode: promptError } = storeToRefs(manualPrompt)
 const { enabled: decisionsEnabled, keySource, hasSessionKey, openAiProviders, managerAvailable, status: decisionStatus, elapsedMs, confidence } = storeToRefs(decisions)
 const sessionKeyInput = ref('')
 const keyOptions = computed(() => [
@@ -131,7 +131,10 @@ onUnmounted(stop)
       <p :class="['whitespace-pre-wrap', 'break-words']">
         {{ actualPrompt }}
       </p>
-      <p v-if="translatedBy">
+      <p v-if="normalizationSource === 'builtin'">
+        {{ t('settings.pages.modules.motion.prompt-normalization.builtin') }}
+      </p>
+      <p v-else-if="translatedBy">
         {{ t('settings.pages.modules.motion.prompt-normalization.model', { model: translatedBy }) }}
       </p>
     </div>

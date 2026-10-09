@@ -608,12 +608,13 @@ pages:
           missing-key: Add a key to enable cloud selection; local ACT continues
           unavailable: Local manager unavailable; local ACT continues
       prompt: Motion description
-      prompt-description: Enter Chinese or English. Chinese uses your selected local chat model first. English goes directly to MotionGPT.
+      prompt-description: Enter Chinese or English. Three exact Chinese phrases use built-in translations. Other Chinese uses your selected local model. English goes directly to MotionGPT.
       prompt-normalization:
         translating: Converting the motion description to English with your selected local chat model…
         original: 'Original input:'
         actual: Actual English description sent to MotionGPT
         model: 'Converted locally by {model}. Check the requested limbs and direction.'
+        builtin: Built-in phrase translation. No language model was used.
         errors:
           empty: Enter a body-motion description.
           too-long: Use a description of 500 characters or fewer.

@@ -26,6 +26,20 @@ export function motionPromptInput(value: string) {
   return input
 }
 
+const builtinPrompts = new Map([
+  ['跪地上', 'A person kneels on the ground.'],
+  ['趴下來', 'A person lies down on their stomach on the floor.'],
+  ['跌倒', 'A person falls to the ground.'],
+])
+
+// NOTICE:
+// Small local models can confuse kneeling with lying prone despite valid English output.
+// Native preview testing with qwen3.5:0.8b reproduced this error for 跪地上.
+// Keep only these complete phrases. Remove the mapping when local translation reliably preserves their meaning.
+export function builtinMotionPrompt(value: string) {
+  return builtinPrompts.get(value.trim().replace(/[。！？.!?]+$/, ''))
+}
+
 /** ASCII English bypasses translation. Other scripts and mixed-language text require normalization. */
 export function isEnglishMotionPrompt(value: string) {
   return /[A-Z]/i.test(value) && /^[\x20-\x7E\r\n\t]+$/.test(value)

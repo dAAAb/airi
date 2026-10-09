@@ -104,3 +104,6 @@ pnpm -F @proj-airi/stage-web typecheck
 ```
 
 前端狀態 5 項、AIRI 設定匯入 10 項測試通過，stage-web typecheck 通過。安裝管理器測試以其最新輸出為準。完整根目錄 `pnpm lint` 仍因此開發 checkout 缺少 `docs` 的 `@radix-ui/colors` 而失敗；本次變更的 scoped ESLint 通過。
+
+
+0.4.3 的動作測試新增「跪地上」「趴下來」「跌倒」三句完整匹配對照，頁面標明內建來源；其他中文仍交本機對話模型，不能保證生成品質。

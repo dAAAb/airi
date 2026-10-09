@@ -5,7 +5,7 @@ import type { MotionPromptErrorCode } from '../../libs/motion-prompt'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-import { isEnglishMotionPrompt, MotionPromptError, motionPromptInput, translateMotionPrompt } from '../../libs/motion-prompt'
+import { builtinMotionPrompt, isEnglishMotionPrompt, MotionPromptError, motionPromptInput, translateMotionPrompt } from '../../libs/motion-prompt'
 import { useSettings } from '../settings'
 import { useConsciousnessStore } from './consciousness'
 import { useMotionStore } from './motion'
@@ -31,6 +31,7 @@ export const useMotionPromptStore = defineStore('motion-prompt', () => {
   const originalInput = ref('')
   const actualPrompt = ref('')
   const translatedBy = ref('')
+  const normalizationSource = ref<'direct' | 'builtin' | 'local-model'>('direct')
   const errorCode = ref<MotionPromptErrorCode>()
   let operation = 0
   let controller: AbortController | undefined
@@ -57,6 +58,7 @@ export const useMotionPromptStore = defineStore('motion-prompt', () => {
     originalInput.value = ''
     actualPrompt.value = ''
     translatedBy.value = ''
+    normalizationSource.value = 'direct'
     errorCode.value = undefined
   }
 
@@ -74,8 +76,10 @@ export const useMotionPromptStore = defineStore('motion-prompt', () => {
     try {
       const text = motionPromptInput(input)
       originalInput.value = text
-      let prompt = text
-      if (!isEnglishMotionPrompt(text)) {
+      const builtin = builtinMotionPrompt(text)
+      const needsTranslation = !builtin && !isEnglishMotionPrompt(text)
+      let prompt = builtin ?? text
+      if (needsTranslation) {
         if (!model || !providerId)
           throw new MotionPromptError('local-model-required')
         translating.value = true
@@ -88,7 +92,8 @@ export const useMotionPromptStore = defineStore('motion-prompt', () => {
         return
       clearTimeout(timeout)
       translating.value = false
-      translatedBy.value = isEnglishMotionPrompt(text) ? '' : model
+      translatedBy.value = needsTranslation ? model : ''
+      normalizationSource.value = builtin ? 'builtin' : needsTranslation ? 'local-model' : 'direct'
       actualPrompt.value = prompt
       const clip = await motion.generate(prompt)
       if (id === operation && !currentController.signal.aborted && avatar === settings.stageModelSelected) {
@@ -111,5 +116,5 @@ export const useMotionPromptStore = defineStore('motion-prompt', () => {
 
   watch([() => consciousness.activeProvider, () => consciousness.activeModel, () => consciousness.customModelName, () => settings.stageModelSelected, () => settings.stageModelRenderer, () => motion.enabled, () => motion.endpoint], clear, { flush: 'sync' })
 
-  return { translating, originalInput, actualPrompt, translatedBy, errorCode, generate, consumeClip, cancel, clear }
+  return { translating, originalInput, actualPrompt, translatedBy, normalizationSource, errorCode, generate, consumeClip, cancel, clear }
 })

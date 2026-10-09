@@ -51,8 +51,36 @@ pnpm -F @proj-airi/stage-ui-three exec vitest run \
 
 此輪 generated／semantic 共 48 tests 通過，涵蓋低姿勢起始、膝／手支撐、負 Y 誤差、缺 toes、跳躍、重播、停止與換角色。i18n 22 tests 通過。stage-ui-three、stage-ui、stage-pages、stage-web、i18n 的 typecheck 通過，production web build 通過。Root typecheck 被 Turbo 子程序嘗試安裝 pnpm 11.24 時的本機權限阻擋；root lint 被既有 docs 缺少 `@radix-ui/colors` 阻擋，不能宣稱整個 monorepo 的檢查都通過。
 
-本機 Full App v0.4.2 已打包，通過 `codesign --verify --deep --strict`（ad-hoc，未 notarize）。本輪原生 App 畫面驗證暫未完成，因測試時 Mac 鎖定；不要把骨架數值測試當成網格接觸外觀驗收。
+本機 Full App v0.4.2 已打包，通過 `codesign --verify --deep --strict`（ad-hoc，未 notarize）。解鎖後已用原生 App 完成以下畫面檢查。
 
 ## 仍需理解的限制
 
 這是骨架支撐面校正，不含身體、鞋底、衣服、頭髮的網格厚度，也沒有碰撞、腳部 IK 或多接觸點約束。不同角色的手脚比例仍可能造成接觸外觀差異。來源模型若未生成跌倒，或自己生成懸空姿勢，高度校正不會捏造另一段動作。課堂可比較同一個描述的不同 seed，把「生成正確」「骨架對齊」「網格接觸」分開評測。
+
+
+## 原生 App 目視檢查與 v0.4.3 中文短句
+
+2026-10-09，在原生 Full App v0.4.2 的「機體模組 → 動作」使用 MLX／Metal 與目前選用的預設 VRM：
+
+- `A person is lying face down on the floor.`：可看到身體降低並轉為水平趴姿，播完回到原來的站姿高度。
+- `A person kneels on the ground.`：重播中後段可看到彎膝並降低身體；取消後回復站姿。
+- `A person falls down onto the ground.`：本次片段仍主要站立／踏步，沒有真正倒地，與保存的來源骨架結果一致。
+- 這個預覽沒有繪製實體地板，目視檢查確認的是身體高度與播放還原；精確的支撐面數值由前述探針檢查。衣物／手掌等網格接觸不作零穿模保證。
+
+![原生 App 趴姿](native-prone-v042.png)
+![同一視角播放後回到站姿](native-idle-after-v042.png)
+
+此輪也實際重現 Qwen 0.8B 的中文誤譯：輸入「跪地上」，輸出卻是 `A person lies prone on a ground surface with knees and feet together.`，已把「跪」改成「趴」。格式正確不等於語意正確，這不是接地運算能補救的問題。
+
+v0.4.3 因此加入三句完整匹配的內建對照：
+
+| 中文輸入 | 送進 MotionGPT 的描述 |
+| --- | --- |
+| 跪地上 | A person kneels on the ground. |
+| 趴下來 | A person lies down on their stomach on the floor. |
+| 跌倒 | A person falls to the ground. |
+
+只去除兩端空白與末尾單純句末標點。UI 明示「內建短句對照，未使用語言模型翻譯。」；保留原文與實際英文。不會把「不要跪地上」「跪地上再站起來」「用右膝跪地上」套進短句表；這些仍交原本的本機語言模型。這個小表不是通用中文理解，也不保證 MotionGPT 生成符合描述。helper/store 37 項測試、stage-ui／stage-pages typecheck、修改檔案 lint 均通過。
+
+
+v0.4.3 已在同一台 Mac 的原生 Full App 重測：三個中文短句均顯示上表英文、「內建短句對照」與「已收到動作」，MLX／Metal 服務正常。`跌倒` 對應的 `A person falls to the ground.` 本次仍未真正倒地。App 返回桌寵舞台後，恢復原本已開啟的麥克風狀態。建置與 strict codesign 驗證通過（ad-hoc，未 notarize）；stage-web／i18n typecheck 與 i18n 22 項測試亦通過。
