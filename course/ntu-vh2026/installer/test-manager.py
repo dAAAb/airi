@@ -3,6 +3,8 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
+import shutil
 import tempfile
 import threading
 import unittest
@@ -198,10 +200,145 @@ class ManagerTests(unittest.TestCase):
             self.assertTrue(status['installed'])
             self.assertFalse(status['verified'])
             self.app.selected = [row['id']]
+            self.app.prepare_ollama_store()
             with patch.object(self.app, 'ensure_ollama'):
                 self.app.install()
         self.assertEqual(self.app.job['state'], 'ready')
         self.assertEqual(self.app.verified, {row['id']})
+
+    def test_ollama_metadata_writes_leave_signed_resources_unchanged(self):
+        row, _record, source_blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        executable = self.resources / 'runtimes/ollama/ollama'
+        executable.parent.mkdir(parents=True)
+        executable.write_bytes(b'fixture')
+        before = {str(path.relative_to(self.resources)): manager.hash_file(path)
+                  for path in self.resources.rglob('*') if path.is_file()}
+
+        def fake_ollama(_name, _args, env, port):
+            self.assertEqual(port, 12434)
+            store = Path(env['OLLAMA_MODELS'])
+            self.assertEqual(store, self.app.data / 'ollama')
+            cache = store / 'metadata/model.json'
+            cache.parent.mkdir()
+            cache.write_text('{"ollama_version":"fixture"}')
+            self.app.processes['ollama'] = Mock(poll=lambda: None)
+
+        with patch.object(self.app, 'spawn', side_effect=fake_ollama), \
+             patch.object(manager, 'request_json', return_value={'version': 'fixture'}):
+            self.app.ensure_ollama()
+        after = {str(path.relative_to(self.resources)): manager.hash_file(path)
+                 for path in self.resources.rglob('*') if path.is_file()}
+        self.assertEqual(before, after)
+        target_blob = self.app.data / 'ollama/blobs' / source_blob.name
+        self.assertNotEqual(source_blob.stat().st_ino, target_blob.stat().st_ino)
+        self.assertEqual(target_blob.stat().st_nlink, 1)
+        self.assertFalse(target_blob.is_symlink())
+
+    def test_verified_store_is_reused_by_another_release_without_copying(self):
+        row, _record, source_blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        self.app.prepare_ollama_store()
+        target = self.app.data / 'ollama/blobs' / source_blob.name
+        first_inode = target.stat().st_ino
+        custom = self.app.data / 'ollama/custom-user-file'
+        custom.write_text('preserve')
+        next_resources = self.resources.with_name('next-release')
+        shutil.copytree(self.resources, next_resources)
+        next_app = manager.LocalManager(self.app.data, next_resources)
+        next_app.selected = [row['id']]
+        with patch.object(manager.shutil, 'copyfile', side_effect=AssertionError('do not recopy valid models')), \
+             patch.object(manager.ctypes, 'CDLL', side_effect=AssertionError('do not reclone valid models')):
+            next_app.prepare_ollama_store()
+        self.assertEqual(target.stat().st_ino, first_inode)
+        self.assertEqual(custom.read_text(), 'preserve')
+
+    def test_corrupt_private_copy_is_repaired_without_mutating_bundle(self):
+        row, _record, source_blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        self.app.prepare_ollama_store()
+        target = self.app.data / 'ollama/blobs' / source_blob.name
+        target.write_bytes(b'wrong')
+        self.app.prepare_ollama_store()
+        self.assertEqual(target.read_bytes(), b'model')
+        self.assertEqual(source_blob.read_bytes(), b'model')
+
+    def test_prior_hardlinked_copy_is_replaced_with_independent_file(self):
+        row, _record, source_blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        target = self.app.data / 'ollama/blobs' / source_blob.name
+        target.parent.mkdir(parents=True)
+        os.link(source_blob, target)
+        self.app.prepare_ollama_store()
+        self.assertNotEqual(source_blob.stat().st_ino, target.stat().st_ino)
+        target.write_bytes(b'wrong')
+        self.assertEqual(source_blob.read_bytes(), b'model')
+
+    def test_unselected_sarc_is_not_seeded(self):
+        row, _record, _blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        manifest_path = self.resources / 'payload-manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['ollama_models'].append({'id': 'sarc-taigi', 'path': 'unselected/sarc',
+            'manifest_sha256': '0' * 64, 'ollama_model_digest': manager.CATALOG['sarc-taigi']['digest']})
+        manifest_path.write_text(json.dumps(manifest))
+        with patch.object(self.app, 'verify_bundled_ollama', wraps=self.app.verify_bundled_ollama) as verify:
+            self.app.prepare_ollama_store()
+        verify.assert_called_once_with(row)
+        self.assertFalse((self.app.data / 'ollama/manifests/unselected').exists())
+
+    def test_offline_runtime_checks_private_copy_even_with_valid_api_digest(self):
+        row, record, source_blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        self.app.prepare_ollama_store()
+        (self.app.data / 'ollama/blobs' / source_blob.name).write_bytes(b'wrong')
+        with patch.object(self.app, 'ollama_models', return_value=[{'name': row['model'], 'digest': record['manifest_sha256']}]), \
+             patch.object(manager.urllib.request, 'urlopen', side_effect=AssertionError('network')):
+            with self.assertRaisesRegex(RuntimeError, 'damaged'):
+                self.app.install_ollama(row)
+
+    def test_private_model_store_cannot_link_back_into_signed_app(self):
+        row, _record, _blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        (self.app.data / 'ollama').symlink_to(self.resources / 'payload/ollama', target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'escapes'):
+            self.app.prepare_ollama_store()
+
+    def test_copy_fallback_reserves_space_and_removes_temporary_file(self):
+        row, _record, _blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        with patch.object(manager.sys, 'platform', 'fixture-no-clone'), \
+             patch.object(manager.shutil, 'disk_usage', return_value=Mock(free=manager.OLLAMA_COPY_RESERVE + 1)), \
+             patch.object(manager.shutil, 'copyfile', side_effect=AssertionError('insufficient space')):
+            with self.assertRaisesRegex(RuntimeError, 'Not enough space'):
+                self.app.prepare_ollama_store()
+        self.assertEqual(list((self.app.data / 'ollama').rglob('.airi-model-*')), [])
+
+    def test_seed_copies_only_pinned_files_and_verifies_copy_fallback(self):
+        row, _record, blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        metadata = self.resources / 'payload/ollama/metadata'
+        metadata.mkdir()
+        (metadata / 'private-cache.json').write_text('{}')
+        with patch.object(manager.sys, 'platform', 'fixture-no-clone'), \
+             patch.object(manager.shutil, 'disk_usage', return_value=Mock(free=30 * 1024 ** 3)):
+            self.app.prepare_ollama_store()
+        self.assertFalse((self.app.data / 'ollama/metadata').exists())
+        self.assertEqual((self.app.data / 'ollama/blobs' / blob.name).read_bytes(), b'model')
+
+    def test_failed_copy_checksum_keeps_previous_private_file(self):
+        row, _record, blob = self.ollama_fixture()
+        self.app.selected = [row['id']]
+        target = self.app.data / 'ollama/blobs' / blob.name
+        target.parent.mkdir(parents=True)
+        target.write_bytes(b'old')
+        with patch.object(manager.sys, 'platform', 'fixture-no-clone'), \
+             patch.object(manager.shutil, 'disk_usage', return_value=Mock(free=30 * 1024 ** 3)), \
+             patch.object(manager.shutil, 'copyfile', side_effect=lambda _source, dest: dest.write_bytes(b'bad')):
+            with self.assertRaisesRegex(RuntimeError, 'checksum'):
+                self.app.prepare_ollama_store()
+        self.assertEqual(target.read_bytes(), b'old')
+        self.assertEqual(list(target.parent.glob('.airi-model-*')), [])
 
     def test_bundled_runtime_rejects_external_api_digest_and_unknown_digest(self):
         row, _record, _blob = self.ollama_fixture()
@@ -319,6 +456,7 @@ class ManagerTests(unittest.TestCase):
     def test_existing_ollama_is_never_spawned_or_stopped(self):
         self.app.mode = 'existing'
         with patch.object(manager, 'request_json', return_value={'version': 'test'}), \
+             patch.object(self.app, 'prepare_ollama_store', side_effect=AssertionError('do not modify external mode')), \
              patch.object(manager.subprocess, 'Popen', side_effect=AssertionError('spawn')):
             self.app.ensure_ollama()
             self.app.close()

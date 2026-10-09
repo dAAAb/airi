@@ -4,6 +4,7 @@ The downloadable app supplies runtimes and a built AIRI site. The full app also
 supplies the payload. This manager never installs arbitrary commands from HTTP.
 """
 import argparse
+import ctypes
 import hashlib
 import importlib.util
 import json
@@ -13,6 +14,8 @@ import shutil
 import signal
 import socket
 import subprocess
+import sys
+import tempfile
 import threading
 import time
 import urllib.error
@@ -47,6 +50,7 @@ MODEL_ROWS = [
      'kind': 'files', 'license': 'motiongpt', 'optional': True},
 ]
 CATALOG = {row['id']: row for row in MODEL_ROWS}
+OLLAMA_COPY_RESERVE = 1024 ** 3
 
 
 def request_json(url, data=None, timeout=5):
@@ -182,15 +186,11 @@ class LocalManager:
             request_json(OLLAMA_URLS['existing'] + '/api/version')
             return
         binary = self.runtime('runtimes/ollama/ollama')
+        model_store = self.prepare_ollama_store()
         env = dict(os.environ, OLLAMA_HOST='127.0.0.1:12434',
-                   OLLAMA_MODELS=str(self.data / 'ollama'), OLLAMA_NO_CLOUD='1',
+                   OLLAMA_MODELS=str(model_store), OLLAMA_NO_CLOUD='1',
                    OLLAMA_ORIGINS=ORIGIN, OLLAMA_MAX_LOADED_MODELS='1',
                    OLLAMA_NUM_PARALLEL='1', OLLAMA_CONTEXT_LENGTH='4096')
-        # Full packs supply a separate verified model store. Never write into or
-        # share the user's ~/.ollama directory with the app-owned process.
-        bundled_models = self.resources / 'payload/ollama'
-        if bundled_models.is_dir():
-            env['OLLAMA_MODELS'] = str(bundled_models)
         self.spawn('ollama', [str(binary), 'serve'], env, 12434)
         for _ in range(100):
             if self.processes['ollama'].poll() is not None:
@@ -201,6 +201,61 @@ class LocalManager:
             except OSError:
                 time.sleep(.2)
         raise RuntimeError('Bundled Ollama did not become ready')
+
+    def prepare_ollama_store(self):
+        # Ollama writes model metadata beside its blobs. Resources stays sealed.
+        # Seed only pinned selections into the app-owned writable model store.
+        target = confined(self.data, 'ollama')
+        target.mkdir(parents=True, exist_ok=True)
+        source = self.resources / 'payload/ollama'
+        if not source.is_dir():
+            return target
+        for key in self.selected:
+            row = CATALOG[key]
+            if row['kind'] != 'ollama':
+                continue
+            self.verify_bundled_ollama(row)
+            record = self.ollama_record(row)
+            manifest_path = confined(source / 'manifests', record['path'])
+            model = json.loads(manifest_path.read_text())
+            for blob in [model['config'], *model['layers']]:
+                relative = Path('blobs') / blob['digest'].replace(':', '-')
+                self.seed_ollama_file(confined(source, relative), relative, blob['size'],
+                                      blob['digest'].removeprefix('sha256:'))
+            self.seed_ollama_file(manifest_path, Path('manifests') / record['path'],
+                                  manifest_path.stat().st_size, record['manifest_sha256'])
+            self.verify_ollama_store(row, target)
+        return target
+
+    def seed_ollama_file(self, source, relative, size, digest):
+        if self.stop_event.is_set() or self.closing:
+            raise InterruptedError('Ollama setup canceled')
+        target = confined(self.data, Path('ollama') / relative)
+        if target.is_file() and target.stat().st_nlink == 1 and target.stat().st_size == size and hash_file(target) == digest:
+            return
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if shutil.disk_usage(target.parent).free < OLLAMA_COPY_RESERVE:
+            raise RuntimeError('Leave at least 1 GiB free to prepare the app-owned Ollama store')
+        descriptor, name = tempfile.mkstemp(prefix='.airi-model-', dir=target.parent)
+        os.close(descriptor)
+        temporary = Path(name)
+        temporary.unlink()
+        try:
+            cloned = False
+            if sys.platform == 'darwin':
+                clonefile = ctypes.CDLL(None, use_errno=True).clonefile
+                clonefile.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_uint]
+                clonefile.restype = ctypes.c_int
+                cloned = clonefile(os.fsencode(source), os.fsencode(temporary), 0) == 0
+            if not cloned:
+                if shutil.disk_usage(target.parent).free < size + OLLAMA_COPY_RESERVE:
+                    raise RuntimeError('Not enough space to copy the bundled Ollama model. Leave 1 GiB free after copying.')
+                shutil.copyfile(source, temporary)
+            if temporary.stat().st_size != size or hash_file(temporary) != digest:
+                raise RuntimeError('The app-owned Ollama copy failed its checksum')
+            temporary.replace(target)
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def start_job(self, body):
         keys, mode = body.get('models'), body.get('ollama_mode', 'bundled')
@@ -292,7 +347,7 @@ class LocalManager:
             self.verify_bundled_ollama(row)
         expected = self.expected_ollama_digests(row)
         if any(item.get('name') == row['model'] and item.get('digest') in expected for item in self.ollama_models()):
-            if self.mode == 'bundled' and not offline:
+            if self.mode == 'bundled':
                 self.verify_ollama_store(row, self.data / 'ollama')
             return
         if (self.resources / 'payload/ollama').is_dir():
