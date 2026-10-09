@@ -4,6 +4,7 @@ import type { MotionRuntimeDevice } from '@proj-airi/stage-ui/libs/motion-genera
 import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
 import { useMotionStore } from '@proj-airi/stage-ui/stores/modules/motion'
 import { useMotionDecisionsStore } from '@proj-airi/stage-ui/stores/modules/motion-decisions'
+import { useMotionPromptStore } from '@proj-airi/stage-ui/stores/modules/motion-prompt'
 import { Button, FieldCheckbox, FieldInput, FieldSelect } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -12,13 +13,16 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const motion = useMotionStore()
 const decisions = useMotionDecisionsStore()
+const manualPrompt = useMotionPromptStore()
+const { translating, originalInput, actualPrompt, translatedBy, errorCode: promptError } = storeToRefs(manualPrompt)
 const { enabled: decisionsEnabled, keySource, hasSessionKey, openAiProviders, managerAvailable, status: decisionStatus, elapsedMs, confidence } = storeToRefs(decisions)
 const sessionKeyInput = ref('')
 const keyOptions = computed(() => [
   { value: 'session', label: t('settings.pages.modules.motion.decisions.session-key') },
   ...openAiProviders.value.map(provider => ({ value: provider.id, label: provider.label })),
 ])
-const { enabled, autoGenerate, endpoint, runtimePreference, available, configured, busy, status, lastError, healthDetails, lastClip } = storeToRefs(motion)
+const { enabled, autoGenerate, endpoint, runtimePreference, available, configured, busy: motionBusy, status, lastError, healthDetails, lastClip } = storeToRefs(motion)
+const busy = computed(() => translating.value || motionBusy.value)
 const preview = ref<InstanceType<typeof WidgetStage>>()
 const previewState = ref<'pending' | 'loading' | 'mounted'>('pending')
 const prompt = ref('A person raises their right hand and waves hello.')
@@ -34,7 +38,7 @@ const selectedRuntime = computed({
 
 function stop() {
   decisions.cancelTurn()
-  motion.cancel()
+  manualPrompt.cancel()
   preview.value?.stopGeneratedMotion()
 }
 
@@ -51,11 +55,12 @@ function play() {
 async function generate() {
   playbackRejected.value = false
   preview.value?.stopGeneratedMotion()
-  const clip = await motion.generate(prompt.value)
-  if (clip)
-    play()
+  const clip = await manualPrompt.generate(prompt.value)
+  if (clip && manualPrompt.consumeClip(clip))
+    playbackRejected.value = !preview.value?.playGeneratedMotion(clip)
 }
 
+watch(prompt, () => manualPrompt.clear(), { flush: 'sync' })
 watch(enabled, (value) => {
   if (!value)
     stop()
@@ -112,6 +117,24 @@ onUnmounted(stop)
       :label="t('settings.pages.modules.motion.prompt')"
       :description="t('settings.pages.modules.motion.prompt-description')"
     />
+    <p v-if="translating" role="status" aria-live="polite">
+      {{ t('settings.pages.modules.motion.prompt-normalization.translating') }}
+    </p>
+    <p v-if="promptError" role="alert" :class="['rounded-lg', 'bg-red-100', 'p-3', 'text-sm', 'text-red-800', 'dark:bg-red-950', 'dark:text-red-200']">
+      {{ t(`settings.pages.modules.motion.prompt-normalization.errors.${promptError}`) }}
+    </p>
+    <div v-if="actualPrompt" :class="['flex', 'flex-col', 'gap-2', 'rounded-lg', 'bg-neutral-100', 'p-3', 'text-sm', 'dark:bg-neutral-800']">
+      <p>{{ t('settings.pages.modules.motion.prompt-normalization.original') }} {{ originalInput }}</p>
+      <p :class="['font-medium']">
+        {{ t('settings.pages.modules.motion.prompt-normalization.actual') }}
+      </p>
+      <p :class="['whitespace-pre-wrap', 'break-words']">
+        {{ actualPrompt }}
+      </p>
+      <p v-if="translatedBy">
+        {{ t('settings.pages.modules.motion.prompt-normalization.model', { model: translatedBy }) }}
+      </p>
+    </div>
     <div :class="['flex', 'flex-wrap', 'gap-3']">
       <Button color="primary" variant="primary" :disabled="busy || !configured || previewState !== 'mounted' || !prompt.trim()" @click="generate">
         {{ t('settings.pages.modules.motion.generate') }}

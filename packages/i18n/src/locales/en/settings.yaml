@@ -608,13 +608,26 @@ pages:
           missing-key: Add a key to enable cloud selection; local ACT continues
           unavailable: Local manager unavailable; local ACT continues
       prompt: Motion description
-      prompt-description: Use a short English description of body movement. Start with one action and inspect the result.
+      prompt-description: Enter Chinese or English. Chinese uses your selected local chat model first. English goes directly to MotionGPT.
+      prompt-normalization:
+        translating: Converting the motion description to English with your selected local chat model…
+        original: 'Original input:'
+        actual: Actual English description sent to MotionGPT
+        model: 'Converted locally by {model}. Check the requested limbs and direction.'
+        errors:
+          empty: Enter a body-motion description.
+          too-long: Use a description of 500 characters or fewer.
+          local-model-required: Choose a local chat model with a loopback endpoint in Consciousness, or enter English. Cloud translation is disabled.
+          invalid-output: The model did not return a valid English motion description. Retry, choose another local model, or enter English.
+          not-motion: The model found no affirmative body movement to describe. Enter a specific movement.
+          timeout: Local translation timed out after 60 seconds. Retry or enter English.
+          failed: Local translation failed. Check the selected chat model, or enter English.
       generate: Generate and preview
       replay: Replay last motion
       stop: Cancel / restore idle
       playback-rejected: The character is loading, paused or controlled by pose tracking. Stop tracking before previewing.
       service-error: Check that the optional MotionGPT service is installed and running.
-      limits: Experimental in-place retargeting. Root travel is removed. No finger detail, foot IK or collision handling. Directions and appearance require visual inspection.
+      limits: Experimental skeleton animation. Jumping and crouching retain bounded vertical movement scaled to the character. Horizontal position stays fixed. No finger detail, foot IK or collision handling. Inspect directions and appearance visually.
       status:
         idle: Not tested
         checking: Checking service…

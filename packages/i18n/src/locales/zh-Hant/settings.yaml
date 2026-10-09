@@ -391,13 +391,26 @@ pages:
           missing-key: 請加入金鑰以使用雲端判斷，本地 ACT 繼續
           unavailable: 本機管理服務無法使用，本地 ACT 繼續
       prompt: 動作描述
-      prompt-description: 用簡短英文描述身體動作。先從一個動作開始，檢查生成結果。
+      prompt-description: 可輸入中文或英文。中文先由目前選用的本機對話模型轉成英文，英文直接送進 MotionGPT。
+      prompt-normalization:
+        translating: 正在用目前的本機對話模型轉成英文動作描述…
+        original: 原始輸入：
+        actual: 實際送進 MotionGPT 的英文描述
+        model: '由本機 {model} 轉換。請檢查肢體、左右及方向是否符合原意。'
+        errors:
+          empty: 請輸入身體動作描述。
+          too-long: 請使用 500 字元以內的描述。
+          local-model-required: 請在「意識」選用 loopback 網址的本機對話模型，或直接輸入英文。此處不使用雲端翻譯。
+          invalid-output: 模型沒有產生有效的英文動作描述。請重試、改選其他本機模型，或直接輸入英文。
+          not-motion: 模型沒有找到可描述的肯定動作。請輸入明確的身體動作。
+          timeout: 本機翻譯已超過 60 秒。請重試或直接輸入英文。
+          failed: 本機翻譯失敗。請檢查目前選用的對話模型，或直接輸入英文。
       generate: 生成並預覽
       replay: 重播上次動作
       stop: 取消／恢復待機
       playback-rejected: 角色正在載入、暫停或受姿態追蹤控制。請先停止追蹤再預覽。
       service-error: 請確認選用的 MotionGPT 服務已安裝並啟動。
-      limits: 實驗性的原地骨架轉換，會移除角色根節點位移。沒有手指細節、腳部 IK 或碰撞處理。方向與外觀仍需目視檢查。
+      limits: 實驗性的骨架動畫。跳躍與蹲下會保留依角色比例縮放、範圍受限的上下位移，水平位置維持原地。沒有手指細節、腳部 IK 或碰撞處理。方向與外觀仍需目視檢查。
       status:
         idle: 尚未測試
         checking: 正在檢查服務…

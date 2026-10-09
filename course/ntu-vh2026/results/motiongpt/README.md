@@ -1,6 +1,6 @@
 # MotionGPT 實測原始輸出
 
-後續：[原生 MLX 與對話動作驗證](native-app-validation.md) · [0.4.0 Decisions 選配與安裝包驗證](decisions-validation.md)
+後續：[原生 MLX 與對話動作驗證](native-app-validation.md) · [0.4.0 Decisions 選配與安裝包驗證](decisions-validation.md) · [0.4.1 跳躍與中文測試](jump-language/README.zh-TW.md)
 
 2026-10-08，Apple M4 Max／128 GB，Python 3.12.3、PyTorch 2.8.0、Transformers 4.44.2。
 

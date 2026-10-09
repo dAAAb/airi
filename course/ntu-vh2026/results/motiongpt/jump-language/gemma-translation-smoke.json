@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-09",
+  "model": "gemma4:12b-it-qat",
+  "baseURL": "http://127.0.0.1:12434/v1/",
+  "thinking_mode": "disable",
+  "scope": "Actual frontend translateMotionPrompt + providerOllama + streamFrom. Only synthetic user text, no API keys, no settings changed.",
+  "rows": [
+    {
+      "input": "跳高！",
+      "prompt": "A person jumps high into the air.",
+      "status": "translated",
+      "elapsed_ms": 2259
+    },
+    {
+      "input": "請用左手揮手打招呼",
+      "prompt": "A person waves with their left hand.",
+      "status": "translated",
+      "elapsed_ms": 676
+    },
+    {
+      "input": "不要跳，請向前鞠躬一次。",
+      "prompt": "A person performs one forward bow without jumping.",
+      "status": "translated",
+      "elapsed_ms": 698
+    }
+  ]
+}

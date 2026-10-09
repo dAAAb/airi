@@ -108,7 +108,11 @@ The trace bus is intentionally local to `stage-ui-three`. Desktop apps can bridg
 The player rejects playback during external pose tracking and cancels on model changes.
 
 The source axes are +X anatomical left, +Y up and initial forward +Z. VRM 0 reverses the X/Z directions.
-The player converts world segment directions into normalized bone rotations. It preserves generated body turns, but removes root travel.
+The player converts world segment directions into normalized bone rotations. It preserves generated body turns and keeps horizontal root travel in place.
+Vertical pelvis movement is relative to the first frame and scales by the avatar-to-source leg-length ratio.
+The player limits ascent to 1.5 avatar leg lengths and descent to 0.9 leg lengths. Jumping can leave the floor.
+Each frame restores the prior position before adding its offset. Ending, cancelling or changing models restores the animated base position.
+The first frame anchors height. A clip that starts crouching or airborne has no inferred standing height or automatic floor correction.
 Joint positions cannot recover axial twist, finger detail or facial expressions. This adapter provides no foot IK or collision handling.
 Use it for experimental VRM previews. Do not use it for Live2D or claim that retargeting establishes semantic action quality.
 

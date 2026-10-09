@@ -62,6 +62,40 @@ ACT 是控制資料，後面的文字才交給角色說話。台語角色也可�
 
 這個頁面不把「停止前端等待」等同於「後端推論執行緒立即終止」。已開始的模型推論仍能完成，但過期結果不能再觸發播放。
 
+## 為什麼手動輸入中文會和聊天不同？
+
+聊天時，語言模型會把要求整理成英文 `motionPrompt`。舊的手動輸入欄卻直接把中文交給 MotionGPT。
+本次實查 tokenizer，「跳高！」變成 `Generate motion: <unk>!</s>`，中文動作資訊已經遺失。
+這不能解讀成模型「懂中文但選錯動作」。[Tokenizer 原始證據](../results/motiongpt/jump-language/tokenizer-probe.json)
+
+現在按一次「生成並預覽」，中文會先透過目前在「意識」選用的本機語言模型轉成英文，再送入 MotionGPT。
+畫面保留原文、實際英文及轉換模型，方便檢查左右、前後、次數與否定是否正確。
+英文描述保留直接生成的路徑，不另外呼叫語言模型。
+
+這裡只允許 loopback 本機 provider，包含 `127.0.0.1`、`localhost` 與 `[::1]`，不會自動改選模型或下載模型。
+如果目前選的是雲端 provider、未選模型、轉換逾時或仍回傳中文，就顯示原因，不把原始中文悄悄送入 MotionGPT。
+可以改選本機對話模型，或直接輸入英文。此處不使用選配的 Decisions API。
+
+轉換只處理這次動作描述，不附上角色聊天歷史，不允許工具或網頁搜尋。
+輸出格式不符時最多修正重試一次，總等待上限為 60 秒。
+取消、更換角色或語言模型後，舊翻譯和舊動畫都失去播放資格。
+
+用真正的前端 helper 與既有 Gemma 4 12B 本機服務測得：
+
+| 原文 | 實際英文 | 本次轉換耗時 |
+| --- | --- | --- |
+| 跳高！ | A person jumps high into the air. | 2.259 秒 |
+| 請用左手揮手打招呼 | A person waves with their left hand. | 0.676 秒 |
+| 不要跳，請向前鞠躬一次。 | A person performs one forward bow without jumping. | 0.698 秒 |
+
+這是三次本機轉換紀錄，不是通用效能保證，也不是動作品質或原生 UI 播放測試。
+英文轉對後，MotionGPT 仍有自己的生成限制，需要分開檢查。[本機翻譯原始結果](../results/motiongpt/jump-language/gemma-translation-smoke.json)
+
+新轉換測試及既有動作生命週期測試共 26 項通過，stage-web 型別檢查與修改檔案的 ESLint 通過。
+測試涵蓋英文零翻譯請求、禁止雲端、中文不直接轉送、格式重試、超時、換模型及取消後不得播放。
+
+原始碼：[本機描述轉換與英文驗證](../../../packages/stage-ui/src/libs/motion-prompt.ts)、[取消及過期結果保護](../../../packages/stage-ui/src/stores/modules/motion-prompt.ts)。
+
 ## Decisions API 能放在哪一層？
 
 OpenAI 官方名稱是 **Decisions API**，使用獨立 `POST /v1/decisions`。

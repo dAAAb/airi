@@ -43,10 +43,11 @@ export function isGeneratedMotionClip(value: GeneratedMotionClip) {
         && joint.every(v => Number.isFinite(v) && Math.abs(v) <= 100)))
 }
 
-/** Retarget joint positions in place. No root travel, finger synthesis, collision or foot IK. */
+/** Retarget joint positions with bounded vertical travel. No planar travel, collision or foot IK. */
 export function createVrmGeneratedMotion() {
-  let active: { clip: GeneratedMotionClip, elapsed: number, owner?: MotionVrm } | undefined
+  let active: { clip: GeneratedMotionClip, elapsed: number, sourceLegLength: number, targetLegLength?: number, owner?: MotionVrm } | undefined
   const previousPose = new Map<Object3D, Quaternion>()
+  let previousPosition: { bone: Object3D, position: Vector3 } | undefined
   const frame = Array.from({ length: 22 }, () => new Vector3())
   const parentRotation = new Quaternion()
   const rootRotation = new Quaternion()
@@ -62,6 +63,10 @@ export function createVrmGeneratedMotion() {
     for (const [bone, rotation] of previousPose)
       bone.quaternion.copy(rotation)
     previousPose.clear()
+    if (previousPosition) {
+      previousPosition.bone.position.copy(previousPosition.position)
+      previousPosition = undefined
+    }
   }
 
   function stop() {
@@ -74,7 +79,10 @@ export function createVrmGeneratedMotion() {
       return false
     stop()
     // Own a plain snapshot so UI or transport mutation cannot change a running clip.
-    active = { clip: { ...clip, joints: clip.joints.map(f => f.map(j => [...j])) }, elapsed: 0 }
+    const first = clip.joints[0]
+    const distance = (a: number, b: number) => Math.hypot(...first[a].map((value, axis) => value - first[b][axis]))
+    const sourceLegLength = (distance(1, 4) + distance(4, 7) + distance(2, 5) + distance(5, 8)) / 2
+    active = { clip: { ...clip, joints: clip.joints.map(f => f.map(j => [...j])) }, elapsed: 0, sourceLegLength }
     return true
   }
 
@@ -111,6 +119,23 @@ export function createVrmGeneratedMotion() {
     const envelope = edge * edge * (3 - 2 * edge)
     const vrm0 = vrm.meta.metaVersion === '0'
     hips.parent.getWorldQuaternion(rootRotation)
+
+    if (active.targetLegLength === undefined) {
+      // Normalized local offsets already include the imported avatar's proportions.
+      // Scene scaling applies afterward to both the bones and this vertical displacement.
+      const legBones: BoneName[] = ['leftLowerLeg', 'leftFoot', 'rightLowerLeg', 'rightFoot']
+      active.targetLegLength = legBones.reduce((sum, name) => {
+        const position = vrm.humanoid.normalizedRestPose[name]?.position
+        return sum + (position ? Math.hypot(...position) : 0)
+      }, 0) / 2
+    }
+    if (active.sourceLegLength > 1e-4 && active.targetLegLength > 1e-4) {
+      const relativeHeight = (frame[0].y - clip.joints[0][0][1]) / active.sourceLegLength
+      const boundedHeight = Math.max(-0.9, Math.min(1.5, relativeHeight)) * active.targetLegLength
+      previousPosition = { bone: hips, position: hips.position.clone() }
+      hips.position.y += boundedHeight * envelope
+      hips.updateWorldMatrix(false, true)
+    }
 
     // Body basis preserves the generated turn. Joint positions alone cannot recover axial twist.
     left.subVectors(frame[1], frame[2]).add(direction.subVectors(frame[16], frame[17]))

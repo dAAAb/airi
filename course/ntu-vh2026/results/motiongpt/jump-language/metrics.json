@@ -1,0 +1,125 @@
+{
+  "notes": "Actual local MLX MotionGPT output. Height values are model joint positions, not validated physical ground contacts.",
+  "samples": [
+    {
+      "path": "course/ntu-vh2026/results/motiongpt/jump-language/jump-short-mlx-seed42.json",
+      "sha256": "c58e2393084bb2cc4d0fece2145943bd906e7a71c7407b6dad7364b193d1e4f9",
+      "prompt": "Jump high!",
+      "seed": 42,
+      "device": "mlx",
+      "frames": 56,
+      "fps": 20,
+      "generation_seconds": 0.0881,
+      "request_seconds": 0.1014,
+      "joints": {
+        "pelvis": {
+          "initial_y_m": 0.960338,
+          "min_y_m": 0.730436,
+          "max_y_m": 1.335605,
+          "range_m": 0.605169,
+          "peak_delta_from_initial_m": 0.3752669999999999,
+          "final_y_m": 0.959228,
+          "peak_frame": 29
+        },
+        "left_ankle": {
+          "initial_y_m": 0.061825,
+          "min_y_m": 0.061731,
+          "max_y_m": 0.452007,
+          "range_m": 0.390276,
+          "peak_delta_from_initial_m": 0.390182,
+          "final_y_m": 0.063898,
+          "peak_frame": 29
+        },
+        "right_ankle": {
+          "initial_y_m": 0.064962,
+          "min_y_m": 0.061035,
+          "max_y_m": 0.468663,
+          "range_m": 0.407628,
+          "peak_delta_from_initial_m": 0.403701,
+          "final_y_m": 0.064305,
+          "peak_frame": 29
+        },
+        "left_foot": {
+          "initial_y_m": 0.011299,
+          "min_y_m": 0.011299,
+          "max_y_m": 0.345893,
+          "range_m": 0.334594,
+          "peak_delta_from_initial_m": 0.334594,
+          "final_y_m": 0.013127,
+          "peak_frame": 29
+        },
+        "right_foot": {
+          "initial_y_m": 0.012966,
+          "min_y_m": 0.003461,
+          "max_y_m": 0.363754,
+          "range_m": 0.36029300000000003,
+          "peak_delta_from_initial_m": 0.35078800000000004,
+          "final_y_m": 0.012714,
+          "peak_frame": 29
+        }
+      },
+      "both_feet_min_height_peak_m": 0.345893,
+      "both_feet_min_height_peak_frame": 29
+    },
+    {
+      "path": "course/ntu-vh2026/results/motiongpt/jump-language/jump-landing-mlx-seed42.json",
+      "sha256": "c26978eac7d36072e2de1e29e97bbdf0874fc1db741c0f1680a43f0f157b4999",
+      "prompt": "A person jumps high then lands on both feet.",
+      "seed": 42,
+      "device": "mlx",
+      "frames": 172,
+      "fps": 20,
+      "generation_seconds": 0.1504,
+      "request_seconds": 0.1633,
+      "joints": {
+        "pelvis": {
+          "initial_y_m": 0.922759,
+          "min_y_m": 0.722619,
+          "max_y_m": 1.308001,
+          "range_m": 0.585382,
+          "peak_delta_from_initial_m": 0.385242,
+          "final_y_m": 0.925891,
+          "peak_frame": 92
+        },
+        "left_ankle": {
+          "initial_y_m": 0.052422,
+          "min_y_m": 0.023633,
+          "max_y_m": 0.405053,
+          "range_m": 0.38142,
+          "peak_delta_from_initial_m": 0.352631,
+          "final_y_m": 0.086756,
+          "peak_frame": 92
+        },
+        "right_ankle": {
+          "initial_y_m": 0.044922,
+          "min_y_m": 0.034861,
+          "max_y_m": 0.883741,
+          "range_m": 0.84888,
+          "peak_delta_from_initial_m": 0.838819,
+          "final_y_m": 0.053522,
+          "peak_frame": 94
+        },
+        "left_foot": {
+          "initial_y_m": 0.012536,
+          "min_y_m": -0.00361,
+          "max_y_m": 0.28533,
+          "range_m": 0.28894,
+          "peak_delta_from_initial_m": 0.272794,
+          "final_y_m": 0.052868,
+          "peak_frame": 92
+        },
+        "right_foot": {
+          "initial_y_m": 0.003547,
+          "min_y_m": -0.009991,
+          "max_y_m": 0.781593,
+          "range_m": 0.791584,
+          "peak_delta_from_initial_m": 0.778046,
+          "final_y_m": 0.003228,
+          "peak_frame": 94
+        }
+      },
+      "both_feet_min_height_peak_m": 0.28533,
+      "both_feet_min_height_peak_frame": 92
+    }
+  ]
+}

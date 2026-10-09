@@ -224,6 +224,10 @@ Generation runs asynchronously without delaying the speech pipeline. A new user 
 The model's response selects content for the local generator. It never supplies executable code, asset URLs or shell commands.
 Authored gestures remain available when generation is disabled or unavailable.
 
+`useMotionPromptStore` handles manual descriptions. English goes directly to MotionGPT. Chinese first uses the selected Consciousness model through a loopback-only transport.
+The store displays the original text, actual English prompt and translation model before generation. It rejects cloud endpoints, invalid translations and expired results.
+Translation has a 60-second limit and one format-correction retry. Cancellation or a model change also revokes a returned clip before playback.
+
 `useMotionDecisionsStore` adds optional OpenAI Decisions selection, disabled by default. It sends only the current message text through the authenticated local manager.
 Session keys remain in a closure until the app session ends. Users can instead select an existing OpenAI provider without copying its key.
 The first usable local ACT or cloud decision wins each turn. Idle can win. Refusal, low confidence and unavailable generation templates defer to local ACT.

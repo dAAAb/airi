@@ -1,0 +1,187 @@
+{
+  "scope": "Real MotionGPT joint sequence retargeted onto actual VRM node transforms with three-vrm. No rendered images or semantic-quality score.",
+  "checked_at": "2026-10-09T04:21:18.110Z",
+  "clip": "course/ntu-vh2026/results/motiongpt/jump-language/jump-short-mlx-seed42.json",
+  "clip_sha256": "c58e2393084bb2cc4d0fece2145943bd906e7a71c7407b6dad7364b193d1e4f9",
+  "prompt": "Jump high!",
+  "frames": 56,
+  "fps": 20,
+  "models": [
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-A/AvatarSample_A.vrm",
+      "sha256": "2a0ccd84880b03d7b65503d8b6287f7a97f3bb4fab70a5fd0a47b433c97827f5",
+      "meta_version": "0",
+      "compared_segments": 336,
+      "minimum_direction_cosine": 0.9999999999999997,
+      "measured_frames": 55,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.21672882049807007,
+          "maximum": 0.35376453567976396
+        },
+        "root_world_y_delta": {
+          "minimum": -0.21672882049807007,
+          "maximum": 0.35376453567976396
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 0,
+          "maximum": 0.38375644887601273
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.00017651017581443718,
+          "maximum": 0.3741807012292592
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.00017651017581443718,
+          "maximum": 0.3741807012292592
+        },
+        "lower_of_both_feet_peak_source_frame": 29
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-B/AvatarSample_B.vrm",
+      "sha256": "7fca4a77fdc60ab2c78a9907430744562626180125fa386eb74fb2ea15c2e518",
+      "meta_version": "0",
+      "compared_segments": 336,
+      "minimum_direction_cosine": 0.9999999999999997,
+      "measured_frames": 55,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.20416469528422887,
+          "maximum": 0.3332562252839322
+        },
+        "root_world_y_delta": {
+          "minimum": -0.20416469528422887,
+          "maximum": 0.3332562252839322
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 0,
+          "maximum": 0.36180804753885853
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.0001788067631272594,
+          "maximum": 0.35223376208103474
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.0001788067631272594,
+          "maximum": 0.35223376208103474
+        },
+        "lower_of_both_feet_peak_source_frame": 29
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm0.vrm",
+      "sha256": "568e5285e3791bb79293e846526ce507d4770e11675e823067c9fbbe92cf0287",
+      "meta_version": "0",
+      "compared_segments": 336,
+      "minimum_direction_cosine": 0.9999999999999997,
+      "measured_frames": 55,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.2052574063666085,
+          "maximum": 0.33503984791336294
+        },
+        "root_world_y_delta": {
+          "minimum": -0.2052574063666085,
+          "maximum": 0.33503984791336294
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 0,
+          "maximum": 0.3668296199528467
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.000493158059397758,
+          "maximum": 0.3514554071044956
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.000493158059397758,
+          "maximum": 0.3514554071044956
+        },
+        "lower_of_both_feet_peak_source_frame": 29
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm1.vrm",
+      "sha256": "eea43ce7ada1384bb7150335fe87944d27ccd2e8a6be52b6699c2d1f7548a7c4",
+      "meta_version": "1",
+      "compared_segments": 336,
+      "minimum_direction_cosine": 0.9999999999999022,
+      "measured_frames": 55,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.20525740711245122,
+          "maximum": 0.3350398491307953
+        },
+        "root_world_y_delta": {
+          "minimum": -0.20525740711245122,
+          "maximum": 0.3350398491307953
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 1.8542569424351285e-9,
+          "maximum": 0.36682960777071044
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.0004931900061964645,
+          "maximum": 0.35145537673732563
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.0004931900061964645,
+          "maximum": 0.35145537673732563
+        },
+        "lower_of_both_feet_peak_source_frame": 29
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped": true
+      }
+    }
+  ]
+}

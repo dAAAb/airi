@@ -1,0 +1,43 @@
+{
+  "source": "jump-short-mlx-seed42.json",
+  "first_frame": {
+    "pelvis_y": 0.960338,
+    "left_foot_y": 0.011299,
+    "right_foot_y": 0.012966,
+    "left_leg": {
+      "knee_angle_degrees": 166.256,
+      "leg_chain_length_m": 0.82589,
+      "hip_to_ankle_vertical_m": 0.815087,
+      "vertical_fraction": 0.98692
+    },
+    "right_leg": {
+      "knee_angle_degrees": 165.242,
+      "leg_chain_length_m": 0.816327,
+      "hip_to_ankle_vertical_m": 0.806346,
+      "vertical_fraction": 0.98777
+    }
+  },
+  "pelvis_first_5_frames": [
+    0.960338,
+    0.960256,
+    0.960697,
+    0.961552,
+    0.960687
+  ],
+  "minimum_pelvis_frame": 19,
+  "peak_pelvis_frame": 29,
+  "last_frame": {
+    "left_leg": {
+      "knee_angle_degrees": 162.956,
+      "leg_chain_length_m": 0.823211,
+      "hip_to_ankle_vertical_m": 0.81271,
+      "vertical_fraction": 0.98724
+    },
+    "right_leg": {
+      "knee_angle_degrees": 165.186,
+      "leg_chain_length_m": 0.814018,
+      "hip_to_ankle_vertical_m": 0.804662,
+      "vertical_fraction": 0.98851
+    }
+  }
+}

@@ -1,0 +1,118 @@
+[
+  {
+    "prompt": "跳高！",
+    "input_ids": [
+      6939,
+      2206,
+      4644,
+      10,
+      3,
+      2,
+      55,
+      1
+    ],
+    "tokens": [
+      "▁Gene",
+      "rate",
+      "▁motion",
+      ":",
+      "▁",
+      "<unk>",
+      "!",
+      "</s>"
+    ],
+    "unknown_token_count": 1,
+    "tokenizer_roundtrip": "Generate motion: <unk>!</s>"
+  },
+  {
+    "prompt": "跳起來然後雙腳落地。",
+    "input_ids": [
+      6939,
+      2206,
+      4644,
+      10,
+      3,
+      2,
+      1
+    ],
+    "tokens": [
+      "▁Gene",
+      "rate",
+      "▁motion",
+      ":",
+      "▁",
+      "<unk>",
+      "</s>"
+    ],
+    "unknown_token_count": 1,
+    "tokenizer_roundtrip": "Generate motion: <unk></s>"
+  },
+  {
+    "prompt": "Jump high!",
+    "input_ids": [
+      6939,
+      2206,
+      4644,
+      10,
+      19004,
+      306,
+      55,
+      1
+    ],
+    "tokens": [
+      "▁Gene",
+      "rate",
+      "▁motion",
+      ":",
+      "▁Jump",
+      "▁high",
+      "!",
+      "</s>"
+    ],
+    "unknown_token_count": 0,
+    "tokenizer_roundtrip": "Generate motion: Jump high!</s>"
+  },
+  {
+    "prompt": "A person jumps high then lands on both feet.",
+    "input_ids": [
+      6939,
+      2206,
+      4644,
+      10,
+      71,
+      568,
+      4418,
+      7,
+      306,
+      258,
+      3,
+      6347,
+      30,
+      321,
+      1922,
+      5,
+      1
+    ],
+    "tokens": [
+      "▁Gene",
+      "rate",
+      "▁motion",
+      ":",
+      "▁A",
+      "▁person",
+      "▁jump",
+      "s",
+      "▁high",
+      "▁then",
+      "▁",
+      "lands",
+      "▁on",
+      "▁both",
+      "▁feet",
+      ".",
+      "</s>"
+    ],
+    "unknown_token_count": 0,
+    "tokenizer_roundtrip": "Generate motion: A person jumps high then lands on both feet.</s>"
+  }
+]

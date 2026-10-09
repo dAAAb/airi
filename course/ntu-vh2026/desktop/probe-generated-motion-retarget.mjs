@@ -47,7 +47,23 @@ async function main() {
     return { scene, humanoid, meta: { metaVersion }, sha256: createHash('sha256').update(bytes).digest('hex') }
   }
 
-  const [clipPath, ...modelPaths] = process.argv.slice(2)
+  const positional = []
+  let output = resolve(root, 'course/ntu-vh2026/results/motiongpt/retarget-real-wave.json')
+  const args = process.argv.slice(2)
+  for (let index = 0; index < args.length; index++) {
+    if (args[index] === '--output') {
+      if (!args[index + 1] || args[index + 1].startsWith('--'))
+        throw new Error('--output requires a JSON file path.')
+      output = resolve(args[++index])
+    }
+    else if (args[index].startsWith('--')) {
+      throw new Error(`Unknown option: ${args[index]}`)
+    }
+    else {
+      positional.push(args[index])
+    }
+  }
+  const [clipPath, ...modelPaths] = positional
   if (!clipPath || !modelPaths.length)
     throw new Error('Pass one generated clip JSON and at least one VRM path.')
   const clipBytes = await readFile(resolve(clipPath))
@@ -60,7 +76,11 @@ async function main() {
     const controller = createVrmGeneratedMotion()
     const rootBone = vrm.humanoid.getNormalizedBoneNode('hips')
     const rootBefore = rootBone.position.clone()
-    const initial = Object.values(vrm.humanoid.normalizedHumanBones).map(({ node }) => [node, node.quaternion.clone()])
+    vrm.scene.updateMatrixWorld(true)
+    const rootWorldBefore = rootBone.getWorldPosition(new Vector3())
+    const initial = Object.values(vrm.humanoid.normalizedHumanBones).map(({ node }) => [node, node.quaternion.clone(), node.position.clone()])
+    const feet = ['leftFoot', 'rightFoot'].map(name => vrm.humanoid.getRawBoneNode(name))
+    const feetBefore = feet.map(bone => bone.getWorldPosition(new Vector3()).y)
     const basisRotation = rootBone.parent.getWorldQuaternion(new Quaternion())
     const segments = [
       ['leftUpperArm', 'leftLowerArm', 16, 18],
@@ -73,13 +93,24 @@ async function main() {
       ['rightLowerLeg', 'rightFoot', 5, 8],
     ]
     const dots = []
-    let finite = true
+    const rootLocalY = []
+    const rootWorldY = []
+    const footDeltas = []
+    const rootPlanarDeltas = []
+    let finiteRotations = true
+    let finitePositions = true
     controller.play(clip)
     for (let frame = 1; frame < clip.joints.length; frame++) {
       controller.update(vrm, 1 / clip.fps)
       vrm.humanoid.update()
       vrm.scene.updateMatrixWorld(true)
-      finite &&= initial.every(([node]) => node.quaternion.toArray().every(Number.isFinite))
+      finiteRotations &&= initial.every(([node]) => node.quaternion.toArray().every(Number.isFinite))
+      finitePositions &&= initial.every(([node]) => node.position.toArray().every(Number.isFinite)
+        && node.getWorldPosition(new Vector3()).toArray().every(Number.isFinite))
+      rootPlanarDeltas.push(Math.hypot(rootBone.position.x - rootBefore.x, rootBone.position.z - rootBefore.z))
+      rootLocalY.push(rootBone.position.y - rootBefore.y)
+      rootWorldY.push(rootBone.getWorldPosition(new Vector3()).y - rootWorldBefore.y)
+      footDeltas.push(feet.map((bone, index) => bone.getWorldPosition(new Vector3()).y - feetBefore[index]))
       if (frame / clip.fps < 0.3 || (clip.joints.length - 1 - frame) / clip.fps < 0.4)
         continue
       for (const [bone, child, a, b] of segments) {
@@ -94,14 +125,41 @@ async function main() {
       }
     }
     controller.stop()
+    vrm.humanoid.update()
+    vrm.scene.updateMatrixWorld(true)
     const checks = {
-      finite_rotations: finite,
+      finite_rotations: finiteRotations,
+      finite_positions: finitePositions,
       source_limb_directions_preserved: Math.min(...dots) > 0.999,
-      root_translation_unchanged: rootBone.position.distanceTo(rootBefore) < 1e-8,
+      planar_root_position_unchanged_every_frame: Math.max(...rootPlanarDeltas) < 1e-8,
+      restored_root_position_after_stop: rootBone.position.distanceTo(rootBefore) < 1e-8,
+      restored_all_normalized_positions_after_stop: initial.every(([node, , position]) => node.position.distanceTo(position) < 1e-8),
       restored_idle_rotations: initial.every(([node, rotation]) => node.quaternion.angleTo(rotation) < 1e-7),
       stopped: !controller.active,
     }
-    reports.push({ model: relative(root, resolve(path)), sha256: vrm.sha256, meta_version: vrm.meta.metaVersion, compared_segments: dots.length, minimum_direction_cosine: Math.min(...dots), checks })
+    const range = values => ({ minimum: Math.min(...values), maximum: Math.max(...values) })
+    const lowerFoot = footDeltas.map(values => Math.min(...values))
+    const lowerFootPeak = Math.max(...lowerFoot)
+    reports.push({
+      model: relative(root, resolve(path)),
+      sha256: vrm.sha256,
+      meta_version: vrm.meta.metaVersion,
+      compared_segments: dots.length,
+      minimum_direction_cosine: Math.min(...dots),
+      measured_frames: rootLocalY.length,
+      vertical_motion: {
+        units: 'VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.',
+        baseline: 'Unanimated normalized rest pose before the first controller update.',
+        root_local_y_delta: range(rootLocalY),
+        root_world_y_delta: range(rootWorldY),
+        maximum_root_planar_delta: Math.max(...rootPlanarDeltas),
+        left_foot_world_y_delta: range(footDeltas.map(values => values[0])),
+        right_foot_world_y_delta: range(footDeltas.map(values => values[1])),
+        lower_of_both_feet_world_y_delta: range(lowerFoot),
+        lower_of_both_feet_peak_source_frame: lowerFoot.indexOf(lowerFootPeak) + 1,
+      },
+      checks,
+    })
   }
   const report = {
     scope: 'Real MotionGPT joint sequence retargeted onto actual VRM node transforms with three-vrm. No rendered images or semantic-quality score.',
@@ -113,7 +171,6 @@ async function main() {
     fps: clip.fps,
     models: reports,
   }
-  const output = resolve(root, 'course/ntu-vh2026/results/motiongpt/retarget-real-wave.json')
   await writeFile(output, `${JSON.stringify(report, null, 2)}\n`)
   console.info(JSON.stringify(report, null, 2))
   if (reports.some(model => Object.values(model.checks).some(ok => !ok)))
