@@ -32,6 +32,74 @@ const segments: readonly [BoneName, number, number, BoneName | undefined][] = [
   ['rightLowerArm', 19, 21, 'rightHand'],
 ]
 
+// Support can move from feet to knees, hands, pelvis or torso during floor poses.
+const supportJoints: readonly [BoneName, number][] = [
+  ['hips', 0],
+  ['leftUpperLeg', 1],
+  ['rightUpperLeg', 2],
+  ['spine', 3],
+  ['leftLowerLeg', 4],
+  ['rightLowerLeg', 5],
+  ['chest', 6],
+  ['leftFoot', 7],
+  ['rightFoot', 8],
+  ['upperChest', 9],
+  ['leftToes', 10],
+  ['rightToes', 11],
+  ['neck', 12],
+  ['leftShoulder', 13],
+  ['rightShoulder', 14],
+  ['head', 15],
+  ['leftUpperArm', 16],
+  ['rightUpperArm', 17],
+  ['leftLowerArm', 18],
+  ['rightLowerArm', 19],
+  ['leftHand', 20],
+  ['rightHand', 21],
+]
+
+interface TargetSupport {
+  legLength: number
+  floor: number
+  joints: { bone: Object3D, source: number }[]
+}
+
+function measureTargetSupport(vrm: MotionVrm, hips: Object3D): TargetSupport {
+  const rest = vrm.humanoid.normalizedRestPose
+  const names = new Map<Object3D, BoneName>()
+  const joints: TargetSupport['joints'] = []
+  for (const [name, source] of supportJoints) {
+    const bone = vrm.humanoid.getNormalizedBoneNode(name)
+    if (bone) {
+      names.set(bone, name)
+      joints.push({ bone, source })
+    }
+  }
+  const legBones: BoneName[] = ['leftLowerLeg', 'leftFoot', 'rightLowerLeg', 'rightFoot']
+  const legLength = legBones.reduce((sum, name) => {
+    const position = rest[name]?.position
+    return sum + (position ? Math.hypot(...position) : 0)
+  }, 0) / 2
+  // Normalized rest bones have identity rotations. Sum their offsets in the hips parent's frame.
+  // Keep the avatar's resting foot/toe plane, rather than moving its ankle joints to world Y=0.
+  const soleBones: BoneName[] = ['leftFoot', 'rightFoot', 'leftToes', 'rightToes']
+  const heights = soleBones.flatMap((name) => {
+    let bone = vrm.humanoid.getNormalizedBoneNode(name)
+    if (!bone)
+      return []
+    let height = 0
+    while (bone && bone !== hips.parent) {
+      const boneName = names.get(bone)
+      if (!boneName)
+        return []
+      height += rest[boneName]?.position?.[1] ?? 0
+      bone = bone.parent
+    }
+    return [height]
+  })
+  return { legLength, floor: heights.length ? Math.min(...heights) : Number.NaN, joints }
+}
+
 /** Keep the renderer safe even when a caller bypasses the network schema. */
 export function isGeneratedMotionClip(value: GeneratedMotionClip) {
   return value?.format === 'humanml3d-22'
@@ -43,9 +111,9 @@ export function isGeneratedMotionClip(value: GeneratedMotionClip) {
         && joint.every(v => Number.isFinite(v) && Math.abs(v) <= 100)))
 }
 
-/** Retarget joint positions with bounded vertical travel. No planar travel, collision or foot IK. */
+/** Retarget with a skeleton support plane and bounded airtime. No mesh collision, planar travel or foot IK. */
 export function createVrmGeneratedMotion() {
-  let active: { clip: GeneratedMotionClip, elapsed: number, sourceLegLength: number, targetLegLength?: number, owner?: MotionVrm } | undefined
+  let active: { clip: GeneratedMotionClip, elapsed: number, sourceLegLength: number, support?: TargetSupport, owner?: MotionVrm } | undefined
   const previousPose = new Map<Object3D, Quaternion>()
   let previousPosition: { bone: Object3D, position: Vector3 } | undefined
   const frame = Array.from({ length: 22 }, () => new Vector3())
@@ -58,6 +126,8 @@ export function createVrmGeneratedMotion() {
   const up = new Vector3()
   const front = new Vector3()
   const basis = new Matrix4()
+  const parentInverse = new Matrix4()
+  const supportPosition = new Vector3()
 
   function restore() {
     for (const [bone, rotation] of previousPose)
@@ -120,22 +190,19 @@ export function createVrmGeneratedMotion() {
     const vrm0 = vrm.meta.metaVersion === '0'
     hips.parent.getWorldQuaternion(rootRotation)
 
-    if (active.targetLegLength === undefined) {
-      // Normalized local offsets already include the imported avatar's proportions.
-      // Scene scaling applies afterward to both the bones and this vertical displacement.
-      const legBones: BoneName[] = ['leftLowerLeg', 'leftFoot', 'rightLowerLeg', 'rightFoot']
-      active.targetLegLength = legBones.reduce((sum, name) => {
-        const position = vrm.humanoid.normalizedRestPose[name]?.position
-        return sum + (position ? Math.hypot(...position) : 0)
-      }, 0) / 2
+    active.support ??= measureTargetSupport(vrm, hips)
+    const targetSupport = active.support
+    hips.parent.updateWorldMatrix(true, true)
+    parentInverse.copy(hips.parent.matrixWorld).invert()
+    const lowestTargetSupport = () => {
+      let lowest = Infinity
+      for (const { bone } of targetSupport.joints) {
+        bone.getWorldPosition(supportPosition).applyMatrix4(parentInverse)
+        lowest = Math.min(lowest, supportPosition.y)
+      }
+      return lowest
     }
-    if (active.sourceLegLength > 1e-4 && active.targetLegLength > 1e-4) {
-      const relativeHeight = (frame[0].y - clip.joints[0][0][1]) / active.sourceLegLength
-      const boundedHeight = Math.max(-0.9, Math.min(1.5, relativeHeight)) * active.targetLegLength
-      previousPosition = { bone: hips, position: hips.position.clone() }
-      hips.position.y += boundedHeight * envelope
-      hips.updateWorldMatrix(false, true)
-    }
+    const baselineLowest = lowestTargetSupport()
 
     // Body basis preserves the generated turn. Joint positions alone cannot recover axial twist.
     left.subVectors(frame[1], frame[2]).add(direction.subVectors(frame[16], frame[17]))
@@ -181,6 +248,23 @@ export function createVrmGeneratedMotion() {
       previousPose.set(bone, bone.quaternion.clone())
       bone.quaternion.slerp(targetRotation, envelope)
       bone.updateWorldMatrix(false, true)
+    }
+
+    const { support, sourceLegLength } = active
+    if (sourceLegLength > 1e-4 && support.legLength > 1e-4 && Number.isFinite(support.floor)) {
+      const targetLowest = lowestTargetSupport()
+      // Missing optional target toes must not turn the source ankle height into false airtime.
+      const sourceLowest = Math.min(...frame.map(joint => joint.y))
+      // HumanML3D's training floor is Y=0. Predicted negative joints are noise, not a new floor.
+      // Source: MotionGPT 001aaca, mGPT/data/humanml/scripts/motion_process.py:178-187.
+      // Preserve airborne clearance. Never ground every frame or assume the first pelvis is standing.
+      const clearance = Math.min(1.5, Math.max(0, sourceLowest) / sourceLegLength) * support.legLength
+      const desiredLowest = baselineLowest * (1 - envelope) + (support.floor + clearance) * envelope
+      const displacement = desiredLowest - targetLowest
+      const bounded = Math.max(-2 * support.legLength, Math.min(2 * support.legLength, displacement))
+      previousPosition = { bone: hips, position: hips.position.clone() }
+      hips.position.y += bounded
+      hips.updateWorldMatrix(false, true)
     }
   }
 

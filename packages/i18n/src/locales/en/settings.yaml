@@ -627,7 +627,7 @@ pages:
       stop: Cancel / restore idle
       playback-rejected: The character is loading, paused or controlled by pose tracking. Stop tracking before previewing.
       service-error: Check that the optional MotionGPT service is installed and running.
-      limits: Experimental skeleton animation. Jumping and crouching retain bounded vertical movement scaled to the character. Horizontal position stays fixed. No finger detail, foot IK or collision handling. Inspect directions and appearance visually.
+      limits: Experimental skeleton animation. Floor poses use whole-body support points. Jumping retains bounded airtime scaled to the character. Horizontal position stays fixed. No mesh collision, body thickness, foot IK or finger detail. Check the generated pose and contact visually.
       status:
         idle: Not tested
         checking: Checking service…

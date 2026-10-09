@@ -1,7 +1,7 @@
 {
   "name": "airi-local-classroom",
   "productName": "AIRI Local",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "description": "Local Mandarin and Taiwanese AIRI classroom launcher",
   "author": "dAAAb",

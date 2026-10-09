@@ -1,0 +1,540 @@
+{
+  "scope": "Real MotionGPT joint sequence retargeted onto actual VRM node transforms with three-vrm. No rendered images or semantic-quality score.",
+  "checked_at": "2026-10-09T05:44:32.030Z",
+  "clip": "course/ntu-vh2026/results/motiongpt/ground-contact/kneel-mlx-seed42.json",
+  "clip_sha256": "45df441fe9bd283759b2bb9ad17da60784b232bd96b5e0e3573f64c3d6e41551",
+  "prompt": "A person kneels on the ground.",
+  "frames": 132,
+  "fps": 20,
+  "renderer_source_sha256": "8033aa74bf987f98e452235ca6e07d7598a7e3440ecc3c593812e5b3f4b2cf7b",
+  "source_motion": {
+    "canonical_floor_y": 0,
+    "first_pelvis_y": 0.943338,
+    "pelvis_y": {
+      "minimum": 0.344012,
+      "maximum": 0.943338
+    },
+    "all_joint_minimum_y": {
+      "minimum": -0.096406,
+      "maximum": 0.046051
+    },
+    "positive_all_joint_clearance": {
+      "minimum": 0,
+      "maximum": 0.046051
+    },
+    "frames_with_negative_joint_y": 64,
+    "note": "Generated source motions can hover or fail the prompt. Alignment preserves positive clearance and does not manufacture a fall."
+  },
+  "models": [
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-A/AvatarSample_A.vrm",
+      "sha256": "2a0ccd84880b03d7b65503d8b6287f7a97f3bb4fab70a5fd0a47b433c97827f5",
+      "meta_version": "0",
+      "compared_segments": 944,
+      "minimum_direction_cosine": 0.9999999999999996,
+      "measured_frames": 131,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.5899893389917227,
+          "maximum": 0.015121860704894963
+        },
+        "root_world_y_delta": {
+          "minimum": -0.5899893389917227,
+          "maximum": 0.015121860704894963
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": -0.018190833850668997,
+          "maximum": 0.26530988084392526
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.01869887229268108,
+          "maximum": 0.27488435126555993
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.01869887229268108,
+          "maximum": 0.26309918818077943
+        },
+        "lower_of_both_feet_peak_source_frame": 79
+      },
+      "support_alignment": {
+        "scope": "Normalized joint support plane in hips-parent coordinates. No mesh sole, skin thickness, collision or semantic-quality claim.",
+        "source_floor": 0,
+        "source_clearance_scope": "All 22 source joints, independent of missing optional target bones.",
+        "target_rest_foot_toe_plane": 0.03220772,
+        "target_plane_bones": [
+          "leftFoot",
+          "rightFoot",
+          "leftToes",
+          "rightToes"
+        ],
+        "missing_optional_bones": [],
+        "source_leg_length": 0.8241215589969851,
+        "target_leg_length": 0.7740598044214638,
+        "full_envelope_frames_checked": 118,
+        "maximum_absolute_alignment_error": 4.996003610813204e-16,
+        "source_mapped_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "source_all_joint_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "expected_positive_target_clearance": {
+          "minimum": 0,
+          "maximum": 0.036605561920299276
+        },
+        "measured_target_support_clearance": {
+          "minimum": -2.0122792321330962e-16,
+          "maximum": 0.03660556192029923
+        },
+        "lowest_pelvis_sample": {
+          "frame": 108,
+          "source_lowest_y": -0.038735,
+          "source_mapped_lowest_y": -0.038735,
+          "source_positive_clearance": 0,
+          "expected_target_clearance": 0,
+          "target_lowest_parent_y": 0.032207719999999884,
+          "target_lowest_bone": "leftLowerLeg",
+          "error": -1.1796119636642288e-16
+        },
+        "maximum_clearance_sample": {
+          "frame": 41,
+          "source_lowest_y": 0.038973,
+          "source_mapped_lowest_y": 0.038973,
+          "source_positive_clearance": 0.038973,
+          "expected_target_clearance": 0.036605561920299276,
+          "target_lowest_parent_y": 0.06881328192029923,
+          "target_lowest_bone": "rightToes",
+          "error": -4.85722573273506e-17
+        },
+        "worst_alignment_sample": {
+          "frame": 61,
+          "source_lowest_y": 0.008554,
+          "source_mapped_lowest_y": 0.008554,
+          "source_positive_clearance": 0.008554,
+          "expected_target_clearance": 0.008034382179104509,
+          "target_lowest_parent_y": 0.04024210217910501,
+          "target_lowest_bone": "rightLowerLeg",
+          "error": 4.996003610813204e-16
+        }
+      },
+      "mid_motion_stop": {
+        "frame": 108,
+        "source_pelvis_y": 0.344012,
+        "root_position_before_stop": [
+          0,
+          0.3238761108344014,
+          -0.00436774362
+        ],
+        "lowest_support_before_stop": {
+          "name": "leftLowerLeg",
+          "height": 0.03220772000000005
+        },
+        "maximum_position_restore_error": 0,
+        "maximum_rotation_restore_error": 0
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped_after_completion": true,
+        "full_envelope_support_alignment": true,
+        "mid_motion_stop_was_active": true,
+        "mid_motion_stop_restores_positions": true,
+        "mid_motion_stop_restores_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "packages/stage-ui/src/assets/vrm/models/AvatarSample-B/AvatarSample_B.vrm",
+      "sha256": "7fca4a77fdc60ab2c78a9907430744562626180125fa386eb74fb2ea15c2e518",
+      "meta_version": "0",
+      "compared_segments": 944,
+      "minimum_direction_cosine": 0.9999999999999997,
+      "measured_frames": 131,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.565727699107876,
+          "maximum": 0.02101544687051693
+        },
+        "root_world_y_delta": {
+          "minimum": -0.565727699107876,
+          "maximum": 0.02101544687051693
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": -0.02161891680435085,
+          "maximum": 0.2533248362891748
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -0.02297075426494133,
+          "maximum": 0.26426253991188603
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -0.02297075426494133,
+          "maximum": 0.2533248362891748
+        },
+        "lower_of_both_feet_peak_source_frame": 79
+      },
+      "support_alignment": {
+        "scope": "Normalized joint support plane in hips-parent coordinates. No mesh sole, skin thickness, collision or semantic-quality claim.",
+        "source_floor": 0,
+        "source_clearance_scope": "All 22 source joints, independent of missing optional target bones.",
+        "target_rest_foot_toe_plane": 0.05527497290000003,
+        "target_plane_bones": [
+          "leftFoot",
+          "rightFoot",
+          "leftToes",
+          "rightToes"
+        ],
+        "missing_optional_bones": [],
+        "source_leg_length": 0.8241215589969851,
+        "target_leg_length": 0.7291862879071284,
+        "full_envelope_frames_checked": 118,
+        "maximum_absolute_alignment_error": 4.891920202254596e-16,
+        "source_mapped_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "source_all_joint_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "expected_positive_target_clearance": {
+          "minimum": 0,
+          "maximum": 0.034483477453486296
+        },
+        "measured_target_support_clearance": {
+          "minimum": -2.2898349882893854e-16,
+          "maximum": 0.03448347745348645
+        },
+        "lowest_pelvis_sample": {
+          "frame": 108,
+          "source_lowest_y": -0.038735,
+          "source_mapped_lowest_y": -0.038735,
+          "source_positive_clearance": 0,
+          "expected_target_clearance": 0,
+          "target_lowest_parent_y": 0.055274972900000025,
+          "target_lowest_bone": "leftLowerLeg",
+          "error": -6.938893903907228e-18
+        },
+        "maximum_clearance_sample": {
+          "frame": 41,
+          "source_lowest_y": 0.038973,
+          "source_mapped_lowest_y": 0.038973,
+          "source_positive_clearance": 0.038973,
+          "expected_target_clearance": 0.034483477453486296,
+          "target_lowest_parent_y": 0.08975845035348648,
+          "target_lowest_bone": "rightToes",
+          "error": 1.5265566588595902e-16
+        },
+        "worst_alignment_sample": {
+          "frame": 59,
+          "source_lowest_y": 0.025242,
+          "source_mapped_lowest_y": 0.025242,
+          "source_positive_clearance": 0.025242,
+          "expected_target_clearance": 0.022334229797062097,
+          "target_lowest_parent_y": 0.07760920269706262,
+          "target_lowest_bone": "leftToes",
+          "error": 4.891920202254596e-16
+        }
+      },
+      "mid_motion_stop": {
+        "frame": 108,
+        "source_pelvis_y": 0.344012,
+        "root_position_before_stop": [
+          0,
+          0.3311461894114227,
+          -0.00432754029
+        ],
+        "lowest_support_before_stop": {
+          "name": "leftLowerLeg",
+          "height": 0.05527497290000005
+        },
+        "maximum_position_restore_error": 0,
+        "maximum_rotation_restore_error": 0
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped_after_completion": true,
+        "full_envelope_support_alignment": true,
+        "mid_motion_stop_was_active": true,
+        "mid_motion_stop_restores_positions": true,
+        "mid_motion_stop_restores_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm0.vrm",
+      "sha256": "568e5285e3791bb79293e846526ce507d4770e11675e823067c9fbbe92cf0287",
+      "meta_version": "0",
+      "compared_segments": 944,
+      "minimum_direction_cosine": 0.9999999999999997,
+      "measured_frames": 131,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.5019935254885033,
+          "maximum": 0.010421511288309926
+        },
+        "root_world_y_delta": {
+          "minimum": -0.5019935254885033,
+          "maximum": 0.010421511288309926
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 0,
+          "maximum": 0.352125525304762
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -2.7755575615628914e-17,
+          "maximum": 0.38165039556910885
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -2.7755575615628914e-17,
+          "maximum": 0.352125525304762
+        },
+        "lower_of_both_feet_peak_source_frame": 79
+      },
+      "support_alignment": {
+        "scope": "Normalized joint support plane in hips-parent coordinates. No mesh sole, skin thickness, collision or semantic-quality claim.",
+        "source_floor": 0,
+        "source_clearance_scope": "All 22 source joints, independent of missing optional target bones.",
+        "target_rest_foot_toe_plane": 0.08509726822376251,
+        "target_plane_bones": [
+          "leftFoot",
+          "rightFoot"
+        ],
+        "missing_optional_bones": [
+          "leftToes",
+          "rightToes"
+        ],
+        "source_leg_length": 0.8241215589969851,
+        "target_leg_length": 0.7330889701843267,
+        "full_envelope_frames_checked": 118,
+        "maximum_absolute_alignment_error": 5.065392549852277e-16,
+        "source_mapped_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.06986
+        },
+        "source_all_joint_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "expected_positive_target_clearance": {
+          "minimum": 0,
+          "maximum": 0.03466803667867435
+        },
+        "measured_target_support_clearance": {
+          "minimum": -2.7755575615628914e-16,
+          "maximum": 0.03466803667867435
+        },
+        "lowest_pelvis_sample": {
+          "frame": 108,
+          "source_lowest_y": -0.038735,
+          "source_mapped_lowest_y": -0.038735,
+          "source_positive_clearance": 0,
+          "expected_target_clearance": 0,
+          "target_lowest_parent_y": 0.08509726822376257,
+          "target_lowest_bone": "leftLowerLeg",
+          "error": 5.551115123125783e-17
+        },
+        "maximum_clearance_sample": {
+          "frame": 41,
+          "source_lowest_y": 0.038973,
+          "source_mapped_lowest_y": 0.051783,
+          "source_positive_clearance": 0.038973,
+          "expected_target_clearance": 0.03466803667867435,
+          "target_lowest_parent_y": 0.11976530490243686,
+          "target_lowest_bone": "leftFoot",
+          "error": 0
+        },
+        "worst_alignment_sample": {
+          "frame": 61,
+          "source_lowest_y": 0.008554,
+          "source_mapped_lowest_y": 0.008554,
+          "source_positive_clearance": 0.008554,
+          "expected_target_clearance": 0.0076091238998635055,
+          "target_lowest_parent_y": 0.09270639212362652,
+          "target_lowest_bone": "rightLowerLeg",
+          "error": 5.065392549852277e-16
+        }
+      },
+      "mid_motion_stop": {
+        "frame": 108,
+        "source_pelvis_y": 0.344012,
+        "root_position_before_stop": [
+          0,
+          0.34288221577907474,
+          0
+        ],
+        "lowest_support_before_stop": {
+          "name": "leftLowerLeg",
+          "height": 0.08509726822376262
+        },
+        "maximum_position_restore_error": 0,
+        "maximum_rotation_restore_error": 0
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped_after_completion": true,
+        "full_envelope_support_alignment": true,
+        "mid_motion_stop_was_active": true,
+        "mid_motion_stop_restores_positions": true,
+        "mid_motion_stop_restores_rotations": true,
+        "stopped": true
+      }
+    },
+    {
+      "model": "../../output/week4_demo/test_no_flux.vrm1.vrm",
+      "sha256": "eea43ce7ada1384bb7150335fe87944d27ccd2e8a6be52b6699c2d1f7548a7c4",
+      "meta_version": "1",
+      "compared_segments": 944,
+      "minimum_direction_cosine": 0.9999999999999324,
+      "measured_frames": 131,
+      "vertical_motion": {
+        "units": "VRM scene units. Raw Foot bone positions are ankle joints, not mesh soles or physical ground contact.",
+        "baseline": "Unanimated normalized rest pose before the first controller update.",
+        "root_local_y_delta": {
+          "minimum": -0.5019934779353453,
+          "maximum": 0.010421511124984462
+        },
+        "root_world_y_delta": {
+          "minimum": -0.5019934779353453,
+          "maximum": 0.010421511124984462
+        },
+        "maximum_root_planar_delta": 0,
+        "left_foot_world_y_delta": {
+          "minimum": 1.8542569424351285e-9,
+          "maximum": 0.35212562062672975
+        },
+        "right_foot_world_y_delta": {
+          "minimum": -3.090026809426938e-8,
+          "maximum": 0.3816503936849539
+        },
+        "lower_of_both_feet_world_y_delta": {
+          "minimum": -3.090026809426938e-8,
+          "maximum": 0.35212562062672975
+        },
+        "lower_of_both_feet_peak_source_frame": 79
+      },
+      "support_alignment": {
+        "scope": "Normalized joint support plane in hips-parent coordinates. No mesh sole, skin thickness, collision or semantic-quality claim.",
+        "source_floor": 0,
+        "source_clearance_scope": "All 22 source joints, independent of missing optional target bones.",
+        "target_rest_foot_toe_plane": 0.08509727923959065,
+        "target_plane_bones": [
+          "leftFoot",
+          "rightFoot"
+        ],
+        "missing_optional_bones": [
+          "leftToes",
+          "rightToes"
+        ],
+        "source_leg_length": 0.8241215589969851,
+        "target_leg_length": 0.7330889728481481,
+        "full_envelope_frames_checked": 118,
+        "maximum_absolute_alignment_error": 4.909267437014364e-16,
+        "source_mapped_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.06986
+        },
+        "source_all_joint_minimum_y": {
+          "minimum": -0.096406,
+          "maximum": 0.038973
+        },
+        "expected_positive_target_clearance": {
+          "minimum": 0,
+          "maximum": 0.034668036804647404
+        },
+        "measured_target_support_clearance": {
+          "minimum": -1.3877787807814457e-16,
+          "maximum": 0.03466803680464736
+        },
+        "lowest_pelvis_sample": {
+          "frame": 108,
+          "source_lowest_y": -0.038735,
+          "source_mapped_lowest_y": -0.038735,
+          "source_positive_clearance": 0,
+          "expected_target_clearance": 0,
+          "target_lowest_parent_y": 0.08509727923959065,
+          "target_lowest_bone": "leftLowerLeg",
+          "error": 0
+        },
+        "maximum_clearance_sample": {
+          "frame": 41,
+          "source_lowest_y": 0.038973,
+          "source_mapped_lowest_y": 0.051783,
+          "source_positive_clearance": 0.038973,
+          "expected_target_clearance": 0.034668036804647404,
+          "target_lowest_parent_y": 0.11976531604423801,
+          "target_lowest_bone": "leftFoot",
+          "error": -4.163336342344337e-17
+        },
+        "worst_alignment_sample": {
+          "frame": 61,
+          "source_lowest_y": 0.008554,
+          "source_mapped_lowest_y": 0.008554,
+          "source_positive_clearance": 0.008554,
+          "expected_target_clearance": 0.007609123927512737,
+          "target_lowest_parent_y": 0.09270640316710388,
+          "target_lowest_bone": "rightLowerLeg",
+          "error": 4.909267437014364e-16
+        }
+      },
+      "mid_motion_stop": {
+        "frame": 108,
+        "source_pelvis_y": 0.344012,
+        "root_position_before_stop": [
+          0,
+          0.3428822627064275,
+          0
+        ],
+        "lowest_support_before_stop": {
+          "name": "leftLowerLeg",
+          "height": 0.0850972792395907
+        },
+        "maximum_position_restore_error": 0,
+        "maximum_rotation_restore_error": 0
+      },
+      "checks": {
+        "finite_rotations": true,
+        "finite_positions": true,
+        "source_limb_directions_preserved": true,
+        "planar_root_position_unchanged_every_frame": true,
+        "restored_root_position_after_stop": true,
+        "restored_all_normalized_positions_after_stop": true,
+        "restored_idle_rotations": true,
+        "stopped_after_completion": true,
+        "full_envelope_support_alignment": true,
+        "mid_motion_stop_was_active": true,
+        "mid_motion_stop_restores_positions": true,
+        "mid_motion_stop_restores_rotations": true,
+        "stopped": true
+      }
+    }
+  ]
+}
