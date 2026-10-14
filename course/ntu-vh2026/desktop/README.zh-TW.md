@@ -96,6 +96,23 @@ Apple APFS 可用 copy-on-write 複製既有 payload，減少此機器重複占�
 
 產物預設放在本資料夾 `dist/`。腳本拒絕覆蓋既有產物。預設僅做 ad-hoc signing，**沒有 Developer ID 簽署或 Apple notarization**。不能把本機成功啟動等同於已完成公開發行簽署。
 
+公開發行前，使用 `sign-macos.py` 建立 Developer ID 簽署副本。它不修改原始 App，並拒絕覆蓋輸出。需要鑰匙圈中有效的 Developer ID Application 憑證及私鑰。
+
+```sh
+python3 course/ntu-vh2026/desktop/sign-macos.py \
+  'course/ntu-vh2026/desktop/dist/AIRI Local.app' \
+  --output 'course/ntu-vh2026/desktop/dist/signed/AIRI Local.app' \
+  --identity 'Developer ID Application: YOUR NAME (TEAMID)'
+```
+
+簽署器逐一處理內含 Python、MLX、PyTorch、Ollama 與 Electron 的 Mach-O，再簽署內層 bundle 及最外層 App。可執行檔啟用 Hardened Runtime，簽章包含安全時間戳。只有 Electron 與 Python JIT 主程式套用對應例外權限，不停用函式庫驗證。`--audit-only` 僅列出元件數量，不簽署。
+
+原生檔案預設使用 4 個平行工作，`--workers 1` 可改成循序執行。硬連結別名依序簽署，內層 bundle 也維持由內向外的順序。失敗會停止後續工作，等候已開始的工作結束。若簽署中斷，先停止原程序，再以相同來源及輸出加上 `--resume-existing-copy` 重新簽署副本。此選項僅接受本流程準備、且版本與身分符合來源的副本。
+
+續跑會清除中斷的 `codesign` 暫存檔：只處理來源沒有、且來源與副本都有對應 Mach-O 的 `.cstemp` 普通檔案。來源原有的檔案會保留，不明檔案及符號連結則停止處理並保留供檢查。
+
+簽署完成仍不代表公證完成。使用 Apple `notarytool` 送審並確認 `Accepted`，再將票證 staple 到 App、重新壓縮及計算 SHA256。簽署後不可修改 bundle 內的檔案。發行紀錄與附加票證記錄公證結果。參考 [Apple 簽署指引](https://developer.apple.com/forums/thread/701514) 與 [公證流程](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)。
+
 Lite／Full 的壓縮包可能超過 GitHub 單一 asset 限制。`package-release.py` 串流產生每段至多 1.8 GB 的分片、SHA256 清單及小型 `Installer.zip`，避免先建立巨大壓縮檔。`Installer.zip` 保留組裝腳本的執行權限；把它與所有分片放在同一資料夾，解壓後雙擊 `Open-*.command`，即可先驗證再組装。
 
 ```sh
