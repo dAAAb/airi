@@ -211,6 +211,8 @@ def sign_copy(source, output, identity, workers=4, resume=False):
         metadata.pop('notarized', None)
         metadata.update(signing='developer-id', notarization=NOTARIZATION_MARKER)
         metadata_path.write_text(json.dumps(metadata, indent=2) + '\n')
+    subprocess.run([sys.executable, str(Path(__file__).with_name('sanitize-source-archives.py')),
+                    '--resources', str(output / 'Contents/Resources')], check=True, stdout=subprocess.DEVNULL)
     files, bundles = inventory(output)
     if not files:
         raise ValueError('No Mach-O code was found')

@@ -98,6 +98,10 @@ Apple APFS 可用 copy-on-write 複製既有 payload，減少此機器重複占�
 
 公開發行前，使用 `sign-macos.py` 建立 Developer ID 簽署副本。它不修改原始 App，並拒絕覆蓋輸出。需要鑰匙圈中有效的 Developer ID Application 憑證及私鑰。
 
+打包及簽署前會執行 `sanitize-source-archives.py`。固定版本 VMAF 原始碼壓縮檔帶有 9 個不用的舊版 MATLAB mex 與 3 個編譯過的 object 範例，Apple 也會掃描這些壓縮內容。本流程只移除這 12 個已固定 SHA256 的預編譯成員，逐一確認其餘 1,073 個成員的內容、順序及 metadata 保持一致。原始碼與授權文字完整保留。
+
+`licenses/source-exclusions.json` 記錄移除項目及原始／重包 SHA256。來源 manifest 的 `sha256` 與 `bytes` 對應實際內附壓縮檔，`upstream_sha256` 與 `upstream_bytes` 保留原始下載資料。重包使用固定 gzip 時間戳及空檔名，可重現相同結果。這不修改推論 runtime，也不移除 joblib 等套件的測試資料。
+
 ```sh
 python3 course/ntu-vh2026/desktop/sign-macos.py \
   'course/ntu-vh2026/desktop/dist/AIRI Local.app' \

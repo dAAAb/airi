@@ -279,6 +279,8 @@ def main():
         source = args.electron_app.parent / name
         if source.is_file():
             clone_or_copy(source, notices / f'Electron-{name}')
+    subprocess.run([sys.executable, str(ROOT / 'sanitize-source-archives.py'),
+                    '--resources', str(resources)], check=True, stdout=subprocess.DEVNULL)
     manifest = validate_resources(resources, args.mode)
     rebrand(output)
     metadata = {'app_id': APP_ID, 'version': APP_VERSION, 'electron': '43.4.1',
